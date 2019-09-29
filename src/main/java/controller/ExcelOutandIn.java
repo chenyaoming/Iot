@@ -14,14 +14,7 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
-import javax.swing.DefaultRowSorter;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.RowSorter;
+import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
@@ -42,8 +35,8 @@ public class ExcelOutandIn extends JFrame implements ActionListener {
     JButton button1 = new JButton("ToExcel");
     JButton button2 = new JButton("FromExcel");
 
-    Container ct = null;
-    DefaultTableModel defaultModel = null;
+    //Container ct = null;
+
 
     JButton add = new JButton("添加");
     JButton delete = new JButton("删除");
@@ -74,7 +67,7 @@ public class ExcelOutandIn extends JFrame implements ActionListener {
         buildTable();
         jsp = new JScrollPane(table);
 
-        ct.add(jsp);
+        this.getContentPane().add(jsp);
         button1.setActionCommand("ToExcel");
         button1.addActionListener(this);
 
@@ -250,7 +243,7 @@ public class ExcelOutandIn extends JFrame implements ActionListener {
             value[i][3] = users.getUEmail();
 
         }
-        defaultModel = new DefaultTableModel(value, n) {
+        DefaultTableModel defaultModel = new DefaultTableModel(value, n) {
             boolean[] editables = { false, true, true, true };
 
             @Override
@@ -287,7 +280,8 @@ public class ExcelOutandIn extends JFrame implements ActionListener {
                     int rowss = table.getEditingRow();
                     if (newvalue.equals(oldvalue)) {
                         System.out.println(rowss);
-                        System.out.println(table.getValueAt(rowss, 0) + ""
+                        System.out.println(
+                                  table.getValueAt(rowss, 0) + ""
                                 + table.getValueAt(rowss, 1) + ""
                                 + table.getValueAt(rowss, 2) + ""
                                 + table.getValueAt(rowss, 3));
@@ -370,10 +364,8 @@ public class ExcelOutandIn extends JFrame implements ActionListener {
         // jp2.add(save);
         jp2.add(reset);
 
-        ct = this.getContentPane();
-
-        ct.add(jp1, BorderLayout.NORTH);
-        ct.add(jp2, BorderLayout.SOUTH);
+        this.getContentPane().add(jp1, BorderLayout.NORTH);
+        this.getContentPane().add(jp2, BorderLayout.SOUTH);
 
         init();
         this.setTitle("ToOrFromExcel");
@@ -384,16 +376,42 @@ public class ExcelOutandIn extends JFrame implements ActionListener {
 
     }
 
+    public void dialog() {
+        JTextArea tx1 = new JTextArea();
+        JTextArea tx2 = new JTextArea();
+        JTextArea tx3 = new JTextArea();
+
+        JPanel pan = new JPanel();
+        JPanel pan1 = new JPanel();
+        JPanel pan2 = new JPanel();
+        JPanel pan3 = new JPanel();
+
+        pan1.add(tx1);
+        pan2.add(tx2);
+        pan3.add(tx3);
+        pan.setLayout(new BorderLayout());
+        pan.add(pan1, BorderLayout.NORTH);
+        pan.add(pan2, BorderLayout.CENTER);
+        pan.add(pan3, BorderLayout.SOUTH);
+
+        JDialog jd = new JDialog();
+        jd.add(pan);
+        jd.setVisible(true);
+
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         // TODO Auto-generated method stub
 
         if (e.getActionCommand().equals("add")) {
 
+            dialog();
+
             AddUsers adduser = new AddUsers();
             jp = new JPanel();
             jp.add(adduser);
-            ct.add(jp, BorderLayout.WEST);
+            this.getContentPane().add(jp, BorderLayout.WEST);
 
             /*
              * users= adduser.getU(); if(users==null){
@@ -414,18 +432,16 @@ public class ExcelOutandIn extends JFrame implements ActionListener {
             } catch (Exception ee) {
 
             }
-            int rowcount = defaultModel.getRowCount() - 1;// getRowCount返回行数，rowcount<0代表已经没有任何行了。
+            int rowcount = table.getModel().getRowCount() - 1;// getRowCount返回行数，rowcount<0代表已经没有任何行了。
 
             if (srow > 0) {
+                DefaultTableModel defaultModel = (DefaultTableModel) table.getModel();
+
                 Object id = defaultModel.getValueAt(srow, 0);
                 String ID = id.toString();
                 users = userdao.findById(Integer.parseInt(ID));
-
                 defaultModel.getRowCount();
-
-                System.out.println(ID);
                 defaultModel.removeRow(srow);
-
                 // userdao.delete(users);
                 defaultModel.setRowCount(rowcount);
             }
@@ -433,7 +449,7 @@ public class ExcelOutandIn extends JFrame implements ActionListener {
 
         if (e.getActionCommand().equals("save")) {
             System.out.println("save");
-            ct.remove(jp);
+            this.getContentPane().remove(jp);
         }
 
         if (e.getActionCommand().equals("reset")) {
