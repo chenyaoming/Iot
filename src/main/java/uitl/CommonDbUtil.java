@@ -1,5 +1,6 @@
 package uitl;
 
+import jodd.bean.BeanUtil;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayHandler;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
@@ -11,6 +12,7 @@ import org.apache.commons.dbutils.handlers.ScalarHandler;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +23,7 @@ public class CommonDbUtil {
      * @return
      * @throws SQLException
      */
-    public Object[] queryReturnArray(String sql,Object... params)  {
+    public static Object[] queryReturnArray(String sql,Object... params)  {
 
         Connection connection = null;
         try {
@@ -42,7 +44,7 @@ public class CommonDbUtil {
      * @return
      * @throws SQLException
      */
-    public List<Object[]> queryReturnArrayList(String sql,Object... params)  {
+    public static List<Object[]> queryReturnArrayList(String sql,Object... params)  {
 
         Connection connection = null;
         try {
@@ -63,7 +65,7 @@ public class CommonDbUtil {
      * @return
      * @throws SQLException
      */
-    public <T> T queryReturnBean(String sql, Class<T> beanClass, Object... params)  {
+    public static <T> T queryReturnBean(String sql, Class<T> beanClass, Object... params)  {
 
         Connection connection = null;
         try {
@@ -83,7 +85,7 @@ public class CommonDbUtil {
      * @return
      * @throws SQLException
      */
-    public <T> List<T> queryReturnBeanList(String sql, Class<T> beanClass, Object... params)  {
+    public static <T> List<T> queryReturnBeanList(String sql, Class<T> beanClass, Object... params)  {
 
         Connection connection = null;
         try {
@@ -103,7 +105,7 @@ public class CommonDbUtil {
      * @return
      * @throws SQLException
      */
-    public Map<String,Object> queryReturnMap(String sql, Object... params)  {
+    public static Map<String,Object> queryReturnMap(String sql, Object... params)  {
 
         Connection connection = null;
         try {
@@ -124,7 +126,7 @@ public class CommonDbUtil {
      * @return
      * @throws SQLException
      */
-    public List<Map<String,Object>> queryReturnMapList(String sql, Object... params)  {
+    public static List<Map<String,Object>> queryReturnMapList(String sql, Object... params)  {
 
         Connection connection = null;
         try {
@@ -145,7 +147,7 @@ public class CommonDbUtil {
      * @return
      * @throws SQLException
      */
-    public <T> T queryReturnSimpleVal(String sql,int col,Object... params)  {
+    public static <T> T queryReturnSimpleVal(String sql,int col,Object... params)  {
 
         Connection connection = null;
         try {
@@ -161,7 +163,7 @@ public class CommonDbUtil {
         }
     }
 
-    public void insertOne(String sql,Object... params)  {
+    public static void  insertOne(String sql,Object... params)  {
         Object key = insertOneRetureId(sql,params);
     }
 
@@ -172,7 +174,7 @@ public class CommonDbUtil {
      * @param <T>
      * @return
      */
-    public <T> T insertOneRetureId(String sql,Object... params)  {
+    public static <T> T insertOneRetureId(String sql,Object... params)  {
 
         Connection connection = null;
         try {
@@ -189,7 +191,21 @@ public class CommonDbUtil {
         }
     }
 
-    public void batchUpdate(String sql,Object[]... params)  {
+    public static void update(String sql,Object... params){
+        Connection connection = null;
+        try {
+            connection =JDBCUtils.getConnection();
+            QueryRunner runner=new QueryRunner();
+            runner.update(connection,sql,params);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("执行sql错误："+sql+"参数"+params);
+        }finally {
+            JDBCUtils.closeConnection(connection);
+        }
+    }
+
+    public static void batchUpdate(String sql,Object[]... params)  {
         Connection connection = null;
         try {
             connection =JDBCUtils.getConnection();
@@ -210,5 +226,32 @@ public class CommonDbUtil {
         }
     }
 
+    public static String spliceSqlQuestionMark(int size){
+        StringBuilder markBuilder = new StringBuilder("");
+        if(size > 0 ){
+            for (int i=0 ; i < size; i++){
+                if (i != size -1 ){
+                    markBuilder.append("?,");
+                }else {
+                    markBuilder.append("?");
+                }
+            }
+        }
+        return markBuilder.toString();
+    }
+
+    public static Object[] getBeanValues(Object bean,String[] fieldArr){
+        List<Object> valueList = new ArrayList<>();
+
+        for (String field:fieldArr){
+            valueList.add(BeanUtil.pojo.getProperty(bean,field));
+        }
+
+        Object[] valueArr = new Object[valueList.size()];
+        valueList.toArray(valueArr);
+
+        return valueArr;
+
+    }
 
 }

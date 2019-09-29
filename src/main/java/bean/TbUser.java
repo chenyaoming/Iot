@@ -17,7 +17,7 @@ public class TbUser {
     private Date createDate;
 
     /**
-     * 指纹id
+     * 指纹id,这个唯一
      */
     private int fingerId;
 }

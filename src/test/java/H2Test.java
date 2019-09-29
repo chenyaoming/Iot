@@ -1,10 +1,12 @@
 import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Date;
 
 /**
  * @Description: 内嵌数据库H2的使用
@@ -28,6 +30,15 @@ public class H2Test {
     private static final String DRIVER_CLASS = "org.h2.Driver";
 
     public static void main(String[] args) throws Exception {
+
+        System.out.println(new Date().toString());
+
+        String[] arr = {"2","3"};
+
+
+        String str4 = StringUtils.join(arr, ",");
+        System.out.println(arr.toString());
+
         // TODO Auto-generated method stub
         Class.forName(DRIVER_CLASS);
         Connection conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
