@@ -1,10 +1,8 @@
 package dao;
 
 import bean.TbUser;
-import lombok.extern.slf4j.Slf4j;
 import uitl.CommonDbUtil;
 
-@Slf4j
 public class TbUserDao {
 
 

@@ -50,7 +50,7 @@ public class CommonDbUtil {
         try {
             connection =JDBCUtils.getConnection();
             QueryRunner runner=new QueryRunner();
-            List<Object[]> list=runner.query(connection,sql,new ArrayListHandler());
+            List<Object[]> list=runner.query(connection,sql,new ArrayListHandler(),params);
             return list;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -71,7 +71,7 @@ public class CommonDbUtil {
         try {
             connection =JDBCUtils.getConnection();
             QueryRunner runner=new QueryRunner();
-            return runner.query(connection,sql, new BeanHandler<>(beanClass));
+            return runner.query(connection,sql, new BeanHandler<>(beanClass),params);
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException("执行sql错误："+sql+"参数"+params);
@@ -91,7 +91,7 @@ public class CommonDbUtil {
         try {
             connection =JDBCUtils.getConnection();
             QueryRunner runner=new QueryRunner();
-            return runner.query(connection,sql, new BeanListHandler<>(beanClass));
+            return runner.query(connection,sql, new BeanListHandler<>(beanClass),params);
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException("执行sql错误："+sql+"参数"+params);
@@ -245,8 +245,8 @@ public class CommonDbUtil {
 
         for (String field:fieldArr){
             valueList.add(BeanUtil.pojo.getProperty(bean,field));
-        }
 
+        }
         Object[] valueArr = new Object[valueList.size()];
         valueList.toArray(valueArr);
 

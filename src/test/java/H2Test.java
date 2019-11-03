@@ -18,7 +18,7 @@ public class H2Test {
     /**
      * 以嵌入式(本地)连接方式连接H2数据库
      */
-    private static final String JDBC_URL = "jdbc:h2:D:/Java/H2Test/user";
+    private static final String JDBC_URL = "jdbc:h2:D:/Java/H2Test/iotDb";
 
     /**
      * 使用TCP/IP的服务器模式(远程连接)方式连接H2数据库(推荐)
@@ -44,7 +44,7 @@ public class H2Test {
         Connection conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
         Connection conn2 = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
         Statement statement = conn.createStatement();
-        Statement statement2 = conn.createStatement();
+        //Statement statement2 = conn.createStatement();
         /*statement.execute("DROP TABLE IF EXISTS USER_INF");
         statement.execute("CREATE TABLE USER_INF(id INTEGER PRIMARY KEY, name VARCHAR(100), sex VARCHAR(2))");
 
@@ -54,7 +54,7 @@ public class H2Test {
         statement.executeUpdate("INSERT INTO USER_INF VALUES(4, 'lucy', '男') ");*/
         statement.execute("CREATE TABLE  IF not EXISTS STUDENT (id INTEGER IDENTITY PRIMARY KEY, name VARCHAR(100)) ");
 
-        conn.setAutoCommit(false);
+        /*conn.setAutoCommit(false);
         try {
             statement.execute("INSERT INTO STUDENT(name) VALUES( 'chen88')");
             if(1==1){
@@ -67,13 +67,13 @@ public class H2Test {
             conn.rollback();
         }finally {
 
-        }
+        }*/
 
-        ResultSet resultSet22 = statement.executeQuery("select * from STUDENT");
+       /* ResultSet resultSet22 = statement.executeQuery("select * from TB_DEVICE  limit 0,3;");
         while (resultSet22.next()) {
             System.out.println(
                     resultSet22.getInt("id") + ", " + resultSet22.getString("name") );
-        }
+        }*/
 
 
         /*statement.executeUpdate("INSERT INTO USER_INF VALUES(6, 'tom', '男') ");
@@ -85,7 +85,7 @@ public class H2Test {
         /*statement.executeUpdate("INSERT INTO USER_INF VALUES(131, 'tom', '男') ");
         statement2.executeUpdate("INSERT INTO USER_INF VALUES(231, 'jack', '女') ");*/
 
-        ResultSet resultSet = statement.executeQuery("select * from USER_INF");
+        /*ResultSet resultSet = statement.executeQuery("select * from USER_INF");
 
         //insert(conn);
 
@@ -93,7 +93,7 @@ public class H2Test {
             System.out.println(
                     resultSet.getInt("id") + ", " + resultSet.getString("name") + ", " + resultSet.getString("sex"));
         }
-
+*/
 
         statement.close();
         conn.close();

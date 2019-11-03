@@ -43,12 +43,13 @@ public class ExcelOutandIn extends JFrame implements ActionListener {
     JButton save = new JButton("保存");
     JButton reset = new JButton("刷新");
 
+    //jp1 用来装 导入导出两个按钮，即 button1 ,button2
     JPanel jp1 = new JPanel(), jp;
     JPanel jp2 = new JPanel();
     JScrollPane jsp = null;
     UsersDAO userdao = new UsersDAO();
     Users users = null;
-
+    //表格
     protected JTable table = null;
     protected String oldvalue = "";
     protected String newvalue = "";
@@ -60,14 +61,47 @@ public class ExcelOutandIn extends JFrame implements ActionListener {
         ExcelOutandIn tm = new ExcelOutandIn();
     }
 
+    public ExcelOutandIn() {
 
-    void init() {
-        CommonUtil.setlookandfeel();
+        //new BorderLayout(); 这个没啥用，去掉
 
+        Font font = new Font("宋体", 4, 14);
+
+        //excel相关按钮
+        jp1.add(button1);
+        jp1.add(button2);
+
+        //增加 保存 删除 刷新按钮相关
+        add.setFont(font);
+        save.setFont(font);
+        delete.setFont(font);
+        reset.setFont(font);
+
+        jp2.add(add);
+        jp2.add(delete);
+        jp2.add(save);
+        jp2.add(reset);
+
+        this.getContentPane().add(jp1, BorderLayout.NORTH);
+        this.getContentPane().add(jp2, BorderLayout.SOUTH);
+
+
+
+        //初始化表格数据和添加监听器
+        initTableAndAddListener();
+        this.setTitle("ToOrFromExcel");
+        this.setVisible(true);
+        this.setSize(600, 400);
+        this.setLocation(400, 250);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+    }
+
+
+    void initTableAndAddListener() {
+        //构建表格
         buildTable();
-        jsp = new JScrollPane(table);
 
-        this.getContentPane().add(jsp);
         button1.setActionCommand("ToExcel");
         button1.addActionListener(this);
 
@@ -228,8 +262,24 @@ public class ExcelOutandIn extends JFrame implements ActionListener {
         table.invalidate();
     }
 
-    @SuppressWarnings("unchecked")
     public void buildTable() {
+        //构建表格模型数据
+        DefaultTableModel defaultModel = buildTableModelAndData();
+        //根据模型新建表单
+        table = new JTable(defaultModel);
+        //设置排序器
+        setRowSorter(defaultModel);
+        //添加表格数据变更监听器
+        addTableDataChangeListener(defaultModel);
+        //添加鼠标监听事件
+        addMouseListener();
+
+        jsp = new JScrollPane(table);
+
+        this.getContentPane().add(jsp);
+    }
+
+    private DefaultTableModel buildTableModelAndData() {
         String[] n = { "编号", "姓名", "密码", "邮箱" };
         List list = userdao.findAll();
         Object[][] value = new Object[list.size()][4];
@@ -243,6 +293,7 @@ public class ExcelOutandIn extends JFrame implements ActionListener {
             value[i][3] = users.getUEmail();
 
         }
+
         DefaultTableModel defaultModel = new DefaultTableModel(value, n) {
             boolean[] editables = { false, true, true, true };
 
@@ -252,23 +303,30 @@ public class ExcelOutandIn extends JFrame implements ActionListener {
             }
         };
         defaultModel.isCellEditable(1, 1);
-        table = new JTable(defaultModel);
-        RowSorter sorter = new TableRowSorter(defaultModel);
-        table.setRowSorter(sorter);
+        return defaultModel;
+    }
 
-        // 设置排序
-        ((DefaultRowSorter) sorter).setComparator(0, new Comparator<Object>() {
+    private void addMouseListener() {
+        table.addMouseListener(new MouseAdapter() {
             @Override
-            public int compare(Object arg0, Object arg1) {
+            public void mouseClicked(MouseEvent e) {
+
+                // 记录进入编辑状态前单元格得数据
+
                 try {
-                    int a = Integer.parseInt(arg0.toString());
-                    int b = Integer.parseInt(arg1.toString());
-                    return a - b;
-                } catch (NumberFormatException e) {
-                    return 0;
+                    oldvalue = table.getValueAt(table.getSelectedRow(),
+                            table.getSelectedColumn()).toString();
+                    System.out.println(oldvalue);
+                } catch (Exception ex) {
+                    // TODO: handle exception
                 }
+
             }
+
         });
+    }
+
+    private void addTableDataChangeListener(DefaultTableModel defaultModel) {
         defaultModel.addTableModelListener(new TableModelListener() {
 
             @Override
@@ -326,55 +384,28 @@ public class ExcelOutandIn extends JFrame implements ActionListener {
             }
 
         });
+    }
 
-        table.addMouseListener(new MouseAdapter() {
+    private void setRowSorter(DefaultTableModel defaultModel) {
+        RowSorter sorter = new TableRowSorter(defaultModel);
+        table.setRowSorter(sorter);
+
+        // 设置排序
+        ((DefaultRowSorter) sorter).setComparator(0, new Comparator<Object>() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-
-                // 记录进入编辑状态前单元格得数据
-
+            public int compare(Object arg0, Object arg1) {
                 try {
-                    oldvalue = table.getValueAt(table.getSelectedRow(),
-                            table.getSelectedColumn()).toString();
-                    System.out.println(oldvalue);
-                } catch (Exception ex) {
-                    // TODO: handle exception
+                    int a = Integer.parseInt(arg0.toString());
+                    int b = Integer.parseInt(arg1.toString());
+                    return a - b;
+                } catch (NumberFormatException e) {
+                    return 0;
                 }
-
             }
-
         });
     }
 
-    public ExcelOutandIn() {
 
-        new BorderLayout();
-
-        Font font = new Font("宋体", 4, 14);
-
-        add.setFont(font);
-        save.setFont(font);
-        delete.setFont(font);
-        reset.setFont(font);
-        jp1.add(button1);
-        jp1.add(button2);
-
-        jp2.add(add);
-        jp2.add(delete);
-        // jp2.add(save);
-        jp2.add(reset);
-
-        this.getContentPane().add(jp1, BorderLayout.NORTH);
-        this.getContentPane().add(jp2, BorderLayout.SOUTH);
-
-        init();
-        this.setTitle("ToOrFromExcel");
-        this.setVisible(true);
-        this.setSize(600, 400);
-        this.setLocation(400, 250);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-    }
 
     public void dialog() {
         JTextArea tx1 = new JTextArea();
@@ -405,81 +436,106 @@ public class ExcelOutandIn extends JFrame implements ActionListener {
         // TODO Auto-generated method stub
 
         if (e.getActionCommand().equals("add")) {
-
-            dialog();
-
-            AddUsers adduser = new AddUsers();
-            jp = new JPanel();
-            jp.add(adduser);
-            this.getContentPane().add(jp, BorderLayout.WEST);
-
-            /*
-             * users= adduser.getU(); if(users==null){
-             * JOptionPane.showMessageDialog(null, "Null");
-             *
-             * }else{
-             *
-             * }
-             */
-            // tableAddRow(id, name, pwd, email);
+            //添加的监控事件
+            doAddAction();
         }
         // defaultModel.addRow(v);
         if (e.getActionCommand().equals("delete")) {
-            int srow = 0;
-
-            try {
-                srow = table.getSelectedRow();
-            } catch (Exception ee) {
-
-            }
-            int rowcount = table.getModel().getRowCount() - 1;// getRowCount返回行数，rowcount<0代表已经没有任何行了。
-
-            if (srow > 0) {
-                DefaultTableModel defaultModel = (DefaultTableModel) table.getModel();
-
-                Object id = defaultModel.getValueAt(srow, 0);
-                String ID = id.toString();
-                users = userdao.findById(Integer.parseInt(ID));
-                defaultModel.getRowCount();
-                defaultModel.removeRow(srow);
-                // userdao.delete(users);
-                defaultModel.setRowCount(rowcount);
-            }
+            //删除的监控事件
+            doDeleteAction();
         }
 
         if (e.getActionCommand().equals("save")) {
-            System.out.println("save");
-            this.getContentPane().remove(jp);
+            //保存的监控事件
+            doSaveAction();
         }
 
         if (e.getActionCommand().equals("reset")) {
-
-            fillTable(userdao.findAll());
-
+            //刷新的监控事件
+            doResetAction();
         }
 
         if (e.getActionCommand().equalsIgnoreCase("ToExcel")) {
-
-            File selectedFile = JFileChooserUtil.getSelectedFile(".xls",this);
-            if (selectedFile != null) {
-                String path = selectedFile.getPath();
-
-                // System.out.println(path);
-                ToExcel(path);
-            }
+            //导出excel的监控事件
+            doExportExcelAction();
 
         } else if (e.getActionCommand().equalsIgnoreCase("FromExcel")) {
-            File selectedFile = JFileChooserUtil.getSelectedOpenFile(".xls",this);
-            if (selectedFile != null) {
-                // String name=selectedFile.getName();
-                String path = selectedFile.getPath();
-                FromExcel(path);
-                fillTable(userdao.findAll());
-
-            }
-
+            //导入excel的监控事件
+            doImportExcelAction();
         }
 
+    }
+
+    private void doImportExcelAction() {
+        File selectedFile = JFileChooserUtil.getSelectedOpenFile(".xls",this);
+        if (selectedFile != null) {
+            // String name=selectedFile.getName();
+            String path = selectedFile.getPath();
+            FromExcel(path);
+            fillTable(userdao.findAll());
+
+        }
+    }
+
+    private void doExportExcelAction() {
+        File selectedFile = JFileChooserUtil.getSelectedFile(".xls",this);
+        if (selectedFile != null) {
+            String path = selectedFile.getPath();
+
+            // System.out.println(path);
+            ToExcel(path);
+        }
+    }
+
+    private void doResetAction() {
+        fillTable(userdao.findAll());
+    }
+
+    private void doSaveAction() {
+        System.out.println("save");
+        this.getContentPane().remove(jp);
+    }
+
+    private void doDeleteAction() {
+        int srow = 0;
+
+        try {
+            srow = table.getSelectedRow();
+        } catch (Exception ee) {
+
+        }
+        int rowcount = table.getModel().getRowCount() - 1;// getRowCount返回行数，rowcount<0代表已经没有任何行了。
+
+        if (srow > 0) {
+            DefaultTableModel defaultModel = (DefaultTableModel) table.getModel();
+
+            Object id = defaultModel.getValueAt(srow, 0);
+            String ID = id.toString();
+            users = userdao.findById(Integer.parseInt(ID));
+            defaultModel.getRowCount();
+            defaultModel.removeRow(srow);
+            // userdao.delete(users);
+            defaultModel.setRowCount(rowcount);
+        }
+    }
+
+    private void doAddAction() {
+        dialog();
+
+        AddUsers adduser = new AddUsers();
+        jp = new JPanel();
+        jp.add(adduser);
+        this.getContentPane().add(jp, BorderLayout.WEST);
+
+        /*
+         * users= adduser.getU(); if(users==null){
+         * JOptionPane.showMessageDialog(null, "Null");
+         *
+         * }else{
+         *
+         * }
+         */
+        // tableAddRow(id, name, pwd, email);
     }
 
 }
