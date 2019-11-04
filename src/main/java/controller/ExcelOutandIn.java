@@ -467,7 +467,7 @@ public class ExcelOutandIn extends JFrame implements ActionListener {
     }
 
     private void doImportExcelAction() {
-        File selectedFile = JFileChooserUtil.getSelectedOpenFile(".xls",this);
+        File selectedFile = JFileChooserUtil.getSelectedOpenFile(new String[]{".xls",".xlsx"},this);
         if (selectedFile != null) {
             // String name=selectedFile.getName();
             String path = selectedFile.getPath();

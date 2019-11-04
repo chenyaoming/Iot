@@ -2,12 +2,17 @@ package frame;
 
 
 import bean.TbDevice;
+import controller.ExcelUtil;
 import dao.DaoFactory;
 import dao.TbDeviceDao;
+import helper.DeviceExportHelper;
 import jodd.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import table.TableBase;
 import uitl.CommonUtil;
+import uitl.JFileChooserUtil;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -15,15 +20,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 public class DeviceFrame extends JFrame {
-    private JButton btn1, btn2, btn3, prePage, nextPage, lastPage;
+    private JButton btn1, btn2, btn3,btnImport,btnExport, prePage, nextPage, lastPage;
     private JPanel mainPanel, conditPanel, pagePanel;
     private JLabel jname1, jname2, jname3, pageInfo;
     private JTextField deviceNameField = null, deviceTypeNumField = null,
@@ -39,7 +42,7 @@ public class DeviceFrame extends JFrame {
     //JExcelImpl excel=new JExcelImpl();
     TableBase table = null;
 
-    JFrame jf = null;
+    public  static JFrame jf = null ;
 
     public DeviceFrame() {
         jf = this;
@@ -73,6 +76,8 @@ public class DeviceFrame extends JFrame {
         btn1 = new JButton("查询");
         btn2 = new JButton("重置");
         btn3 = new JButton("新增");
+        btnImport = new JButton("导入");
+        btnExport = new JButton("导出");
         prePage = new JButton("上一页");
         nextPage = new JButton("下一页");
         lastPage = new JButton("末  页");
@@ -160,6 +165,18 @@ public class DeviceFrame extends JFrame {
         //s.anchor = GridBagConstraints.WEST;
         //s.insets = new Insets(0, 40, 0, 0);
         conditPanel.add(btn3, s);
+
+        s.gridx = 4;
+        s.gridy = 3;
+        //s.anchor = GridBagConstraints.WEST;
+        //s.insets = new Insets(0, 40, 0, 0);
+        conditPanel.add(btnImport, s);
+
+        s.gridx = 5;
+        s.gridy = 3;
+        //s.anchor = GridBagConstraints.WEST;
+        //s.insets = new Insets(0, 40, 0, 0);
+        conditPanel.add(btnExport, s);
 
         mainPanel.setLayout(new BorderLayout());
         mainPanel.add(conditPanel, BorderLayout.NORTH);
@@ -354,8 +371,26 @@ public class DeviceFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 showCustomDialog(jf,jf);
+                //add1();
             }
         });
+
+        //导入
+        btnImport.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                doImportExcelAction(new String[]{".xls",".xlsx"});
+            }
+        });
+
+        //导出
+        btnExport.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                doExportExcelAction();
+            }
+        });
+
 
         // 上一页
         prePage.addActionListener(new ActionListener() {
@@ -439,6 +474,108 @@ public class DeviceFrame extends JFrame {
                 + table.getCurrentPage() + " 页|" + "总共 " + table.getTotalPage() + " 页");
     }
 
+    public void add1() {
+        Font f1 = new Font("楷体", Font.BOLD, 19);
+        Font f2 = new Font("楷体", Font.BOLD, 16);
+
+        JFrame frame = new JFrame("请输入要添加的教师信息");
+        JLabel t0 = new JLabel("编号");
+        JLabel t1 = new JLabel("姓名");
+        JLabel t2 = new JLabel("身份证号");
+        JLabel t3 = new JLabel("地址");
+        JLabel t4 = new JLabel("电话");
+        JLabel t5 = new JLabel("部门");
+        JLabel t6 = new JLabel("工资");
+        JLabel t7 = new JLabel("参加工作时间");
+        JLabel t71 = new JLabel("年");
+        JLabel t8 = new JLabel("专业");
+        JLabel t9 = new JLabel("职务");
+        JLabel t10 = new JLabel("备注");
+        JTextField tid = new JTextField(30);
+        JTextField name = new JTextField(30);
+        JTextField id = new JTextField(30);
+        JTextField address = new JTextField(30);
+        JTextField phone = new JTextField(30);
+        JTextField department = new JTextField(50);
+        JTextField salary = new JTextField(50);
+        JTextField worktime = new JTextField(50);
+        JTextField profess = new JTextField(50);
+        JTextField duty = new JTextField(50);
+        JTextField remark = new JTextField(50);
+
+        JButton e1 = new JButton("确定");
+        JButton e2 = new JButton("取消");
+        frame.setLayout(null);
+        t0.setBounds(100, 0, 90, 50);
+        t0.setFont(f2);
+        t1.setBounds(100, 50, 90, 50);
+        t1.setFont(f2);
+        t2.setBounds(70, 100, 90, 50);
+        t2.setFont(f2);
+        t3.setBounds(100, 150, 90, 50);
+        t3.setFont(f2);
+        t4.setBounds(100, 200, 90, 50);
+        t4.setFont(f2);
+        t5.setBounds(100, 250, 90, 50);
+        t5.setFont(f2);
+        t6.setBounds(100, 300, 90, 50);
+        t6.setFont(f2);
+        t7.setBounds(30, 350, 130, 50);
+        t7.setFont(f2);
+        t71.setBounds(400, 350, 130, 50);
+        t7.setFont(f2);
+        t8.setBounds(100, 400, 90, 50);
+        t8.setFont(f2);
+        t9.setBounds(100, 450, 90, 50);
+        t9.setFont(f2);
+        t10.setBounds(100, 500, 90, 50);
+        t10.setFont(f2);
+        tid.setBounds(150, 10, 250, 30);
+        name.setBounds(150, 60, 250, 30);
+        id.setBounds(150, 110, 250, 30);
+        address.setBounds(150, 160, 250, 30);
+        phone.setBounds(150, 210, 250, 30);
+        department.setBounds(150, 260, 250, 30);
+        salary.setBounds(150, 310, 250, 30);
+        worktime.setBounds(150, 360, 250, 30);
+        profess.setBounds(150, 410, 250, 30);
+        duty.setBounds(150, 460, 250, 30);
+        remark.setBounds(150, 510, 250, 30);
+        e1.setBounds(60, 560, 80, 30);
+        e1.setFont(f2);
+        e2.setBounds(300, 560, 80, 30);
+        e2.setFont(f2);
+        frame.add(t0);
+        frame.add(tid);
+        frame.add(t1);
+        frame.add(name);
+        frame.add(t2);
+        frame.add(id);
+        frame.add(t3);
+        frame.add(address);
+        frame.add(t4);
+        frame.add(phone);
+        frame.add(t5);
+        frame.add(department);
+        frame.add(t6);
+        frame.add(salary);
+        frame.add(t7);
+        frame.add(t71);
+        frame.add(worktime);
+
+        frame.add(t8);
+        frame.add(profess);
+        frame.add(t9);
+        frame.add(duty);
+        frame.add(t10);
+        frame.add(remark);
+        frame.add(e1);
+        frame.add(e2);
+        frame.setLocation(500, 110);
+        frame.setSize(500, 650);
+        frame.setVisible(true);
+    }
+
     /**
      * 显示一个自定义的对话框
      *
@@ -449,47 +586,91 @@ public class DeviceFrame extends JFrame {
         // 创建一个模态对话框
         final JDialog dialog = new JDialog(owner, "新增", true);
         // 设置对话框的宽高
-        dialog.setSize(400, 400);
+        //dialog.setSize(400, 400);
+        dialog.setSize(500, 650);
         // 设置对话框大小不可改变
         dialog.setResizable(false);
         // 设置对话框相对显示的位置
         dialog.setLocationRelativeTo(parentComponent);
+        dialog.setLayout(null);
 
-        JPanel namePane = new JPanel();
+        Font f1 = new Font("楷体", Font.BOLD, 19);
+        Font f2 = new Font("楷体", Font.BOLD, 16);
+
+
         JLabel jNameLabel = new JLabel("设备名称");
+        jNameLabel.setBounds(100, 0, 90, 50);
         JTextField jNameTextField=new JTextField(30);
-        namePane.add(jNameLabel);
-        namePane.add(jNameTextField);
+        jNameTextField.setBounds(150, 10, 250, 30);
+        dialog.add(jNameLabel);
+        dialog.add(jNameTextField);
 
-        JPanel typePane = new JPanel();
         JLabel jTypeNumLabel = new JLabel("设备型号");
+        jTypeNumLabel.setBounds(100, 50, 90, 50);
         JTextField jTypeNumTextField=new JTextField(30);
-        typePane.add(jTypeNumLabel);
-        typePane.add(jTypeNumTextField);
+        jTypeNumTextField.setBounds(150, 60, 250, 30);
+        dialog.add(jTypeNumLabel);
+        dialog.add(jTypeNumTextField);
 
-        JPanel codePane = new JPanel();
         JLabel jCodeLabel = new JLabel("设备编码");
+        jCodeLabel.setBounds(100, 100, 90, 50);
         JTextField jCodeTextField=new JTextField(30);
-        codePane.add(jCodeLabel);
-        codePane.add(jCodeTextField);
+        jCodeTextField.setBounds(150, 110, 250, 30);
+        dialog.add(jCodeLabel);
+        dialog.add(jCodeTextField);
 
-        JPanel positionPane = new JPanel();
         JLabel jPositionLabel = new JLabel("存放位置");
+        jPositionLabel.setBounds(100, 150, 90, 50);
         JTextField jPositionTextField=new JTextField(30);
-        positionPane.add(jPositionLabel);
-        positionPane.add(jPositionTextField);
+        jPositionTextField.setBounds(150, 160, 250, 30);
+        dialog.add(jPositionLabel);
+        dialog.add(jPositionTextField);
 
-        JPanel featuresPane = new JPanel();
         JLabel jFeaturesLabel = new JLabel("设备功能");
+        jFeaturesLabel.setBounds(100, 200, 90, 50);
         JTextField jfeaturesTextField=new JTextField(30);
-        featuresPane.add(jFeaturesLabel);
-        featuresPane.add(jfeaturesTextField);
+        jfeaturesTextField.setBounds(150, 210, 250, 30);
+        dialog.add(jFeaturesLabel);
+        dialog.add(jfeaturesTextField);
 
-        JPanel buttonPane = new JPanel();
+        JLabel imageLabel = new JLabel("设备图片");
+        imageLabel.setBounds(100, 250, 90, 50);
+        JButton imageBtn  = new JButton("请选择图片...");
+        imageBtn.setBounds(150, 260, 100, 30);
+        dialog.add(imageLabel);
+        dialog.add(imageBtn);
+
+        ImagePanel iPanel = new ImagePanel();
+        iPanel.setBounds(290, 260, 120, 90);
+        iPanel.setVisible(false);
+        dialog.add(iPanel);
+
         JButton cancelBtn = new JButton("取消");
+        cancelBtn.setBounds(130, 370, 80, 30);
         JButton saveBtn = new JButton("保存");
-        buttonPane.add(cancelBtn);
-        buttonPane.add(saveBtn);
+        saveBtn.setBounds(300, 370,  80, 30);
+        dialog.add(cancelBtn);
+        dialog.add(saveBtn);
+
+
+
+        // 选择图片
+        imageBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                String[] picSufix = new String[]{".bmp",".jpg",".png",".tif",".gif",".pcx",".tga",".exif",".fpx",".svg",
+                        ".psd",".cdr",".pcd",".dxf",".ufo",".eps",".ai",".raw",".WMF",".w!ebp"};
+
+                File selectedFile = JFileChooserUtil.getSelectedOpenFile(picSufix,jf);
+                if(null != selectedFile){
+                    iPanel.setImagePath(selectedFile.getPath());
+                    iPanel.repaint();
+                    iPanel.setVisible(true);
+                }
+            }
+        });
+
 
         // 保存按钮
         saveBtn.addActionListener(new ActionListener() {
@@ -497,7 +678,7 @@ public class DeviceFrame extends JFrame {
             public void actionPerformed(ActionEvent e) {
 
                 TbDevice device = new TbDevice(jNameTextField.getText(),jTypeNumTextField.getText(),jCodeTextField.getText(),
-                        jPositionTextField.getText(),null,jfeaturesTextField.getText());
+                        jPositionTextField.getText(),iPanel.getImagePath(),jfeaturesTextField.getText());
 
                 if(StringUtils.isBlank(device.getName())){
                     JOptionPane.showMessageDialog(new JPanel(),"请填写设备名称","提示",1);
@@ -510,6 +691,9 @@ public class DeviceFrame extends JFrame {
                 if(StringUtils.isBlank(device.getCode())){
                     JOptionPane.showMessageDialog(new JPanel(),"请填写设备编码","提示",1);
                     return;
+                }
+                if(StringUtils.isNotEmpty(device.getImage())){
+                    device.setImage(JFileChooserUtil.writeImgToUpload(new File(device.getImage())));
                 }
 
                 DaoFactory.getDeviceDao().insert(device);
@@ -526,27 +710,76 @@ public class DeviceFrame extends JFrame {
             }
         });
 
-
-        // 创建对话框的内容面板, 在面板内可以根据自己的需要添加任何组件并做任意是布局
-        JPanel panel = new JPanel();
-
         // 添加组件到面板
-        panel.add(namePane);
+        /*panel.add(namePane);
         panel.add(typePane);
         panel.add(codePane);
         panel.add(positionPane);
         panel.add(featuresPane);
+        panel.add(imagePane);*/
         //panel.add(buttonPane);
-        dialog.add(panel,BorderLayout.CENTER);
-        dialog.add(buttonPane,BorderLayout.SOUTH);
+        /*dialog.add(panel,BorderLayout.CENTER);
+        dialog.add(buttonPane,BorderLayout.SOUTH);*/
 
         // 设置对话框的内容面板
         //dialog.setContentPane(panel);
+
         // 显示对话框
         dialog.setVisible(true);
+    }
 
+    private void doImportExcelAction(String[] sufixArr) {
+        File selectedFile = JFileChooserUtil.getSelectedOpenFile(sufixArr,this);
+        if (selectedFile != null) {
+            // String name=selectedFile.getName();
+            String path = selectedFile.getPath();
 
+            List<TbDevice> deviceList = DeviceExportHelper.getDeviceData(selectedFile.getPath());
+            DaoFactory.getDeviceDao().insertBatch(deviceList);
+            //System.out.println(path);
+            //FromExcel(path);
+            //fillTable(userdao.findAll());
 
+        }
+    }
+
+    private void doExportExcelAction() {
+        File selectedFile = JFileChooserUtil.getSelectedFile(".xls",this);
+        if (selectedFile != null) {
+            String path = selectedFile.getPath();
+
+            // System.out.println(path);
+            ToExcel(path);
+        }
+    }
+
+    public void ToExcel(String path) {
+
+        List<TbDevice> list = DaoFactory.getDeviceDao().findByPage(1,5);
+
+        HSSFWorkbook wb = new HSSFWorkbook();
+        HSSFSheet sheet = wb.createSheet("Users");
+
+        String[] n = { "序号", "名称", "型号", "管理编码",
+                "存放位置", "图片", "功用"};
+
+        Object[][] value = new Object[list.size() + 1][7];
+
+        for (int i = 0; i < list.size(); i++) {
+            TbDevice device = list.get(i);
+
+            value[i + 1][0] = device.getId();
+            value[i + 1][1] = device.getName();
+            value[i + 1][2] = device.getTypeNum();
+            value[i + 1][3] = device.getCode();
+            value[i + 1][4] = device.getSavePosition();
+            value[i + 1][5] = device.getImage();
+            value[i + 1][6] = device.getFeatures();
+
+        }
+        ExcelUtil.writeArrayToExcel(wb, sheet, list.size() + 1, 7, value);
+
+        ExcelUtil.writeWorkbook(wb, path);
 
     }
 

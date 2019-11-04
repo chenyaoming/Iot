@@ -73,17 +73,33 @@ public class TbDeviceDao {
         if(CollectionUtils.isEmpty(deviceList)){
             return ;
         }
-        List<Object[]> paramsList = new ArrayList<>();
-        for (TbDevice device :deviceList){
-            Object[] params = {device.getName(),device.getTypeNum(),device.getCode(),
-                    device.getSavePosition(),device.getImage(),device.getFeatures()};
+        Object[][] dataParam = new Object[deviceList.size()][6];
 
-            paramsList.add(params);
+        //List<Object[]> paramsList = new ArrayList<>();
+
+        for (int i = 0; i< deviceList.size(); i++){
+            TbDevice device = deviceList.get(i);
+            dataParam[i][0]=device.getName();
+            dataParam[i][1]=device.getTypeNum();
+            dataParam[i][2]=device.getCode();
+            dataParam[i][3]=device.getSavePosition();
+            dataParam[i][4]=device.getImage();
+            dataParam[i][5]=device.getFeatures();
         }
 
-        Object[] paramArr = new Object[paramsList.size()];
-        paramsList.toArray(paramArr);
-        CommonDbUtil.batchUpdate(sql,(Object[][]) paramArr);
+       /* for (TbDevice device :deviceList){
+
+
+
+            *//*Object[] params = {device.getName(),device.getTypeNum(),device.getCode(),
+                    device.getSavePosition(),device.getImage(),device.getFeatures()};
+
+            paramsList.add(params);*//*
+        }*/
+
+        /*Object[] paramArr = new Object[paramsList.size()];
+        paramsList.toArray(paramArr);*/
+        CommonDbUtil.batchUpdate(sql,dataParam);
     }
 
     public void update(TbDevice device){
