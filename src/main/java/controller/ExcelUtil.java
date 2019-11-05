@@ -1,5 +1,8 @@
 package controller;
 
+import bean.DeviceExcelColum;
+import bean.TbDevice;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -11,12 +14,24 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
+import org.apache.poi.xssf.usermodel.XSSFDrawing;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * 描述：Excel写操作帮助类
@@ -239,10 +254,10 @@ public class ExcelUtil {
     /**
      * 功能：将HSSFWorkbook写入Excel文件
      * @param     wb        HSSFWorkbook
-     * @param     absPath    写入文件的相对路径
+     * @param     fileName    写入文件的相对路径
      * @param     fileName    文件名
      */
-    public static void writeWorkbook(HSSFWorkbook wb,String fileName){
+    public static void writeWorkbook(XSSFWorkbook wb,String fileName){
         FileOutputStream fos=null;
         File f=new File(fileName);
         try {
@@ -280,6 +295,137 @@ public class ExcelUtil {
             return "";
         } else {
             return value.toString();
+        }
+    }
+
+    public static XSSFWorkbook getWorkBook(List<TbDevice> deviceList, String filePath) {
+        DeviceExcelColum colum = new DeviceExcelColum(true);
+
+        String[] alias = { "序号", "名称", "型号", "管理编码",
+                "存放位置", "图片", "功用"};
+
+
+        //String[] keys = colum.colums;
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        int sheetSize = deviceList.size() + 50;
+        double sheetNo = Math.ceil(deviceList.size() / sheetSize);
+        for (int index = 0; index <= sheetNo; index++) {
+            XSSFSheet sheet = workbook.createSheet();
+
+            //sheet.setDefaultColumnWidth(100*256);
+            //sheet.setDefaultRowHeight((short) 2000);
+
+            workbook.setSheetName(index, "人才、志愿者" + index);
+            XSSFRow row = sheet.createRow(0);
+
+           // sheet.setColumnWidth(0, 2048);
+
+            XSSFCell cell;
+            XSSFCellStyle cellStyle = workbook.createCellStyle();
+            XSSFFont font = workbook.createFont();
+            font.setBoldweight(XSSFFont.BOLDWEIGHT_BOLD);
+            // 居中
+            cellStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+            // 加粗
+            cellStyle.setFont(font);
+            //创建标题
+            for (int i = 0; i < alias.length; i++) {
+                cell = row.createCell(i);
+                cell.setCellValue(alias[i]);
+                cell.setCellStyle(cellStyle);
+            }
+            int startNo = index * sheetSize;
+            int endNo = Math.min(startNo + sheetSize, deviceList.size());
+            cellStyle = workbook.createCellStyle();
+            // 居中
+            cellStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+            cellStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+            // 写入各条记录,每条记录对应excel表中的一行
+            for (int i = startNo; i < endNo; i++) {
+                int rowNum = i + 1 - startNo ;
+                row = sheet.createRow(rowNum);
+                TbDevice device = deviceList.get(i);
+
+                sheet.setColumnWidth(i, (short)4000);
+                row.setHeight((short)1000);
+
+                setCellValue(row.createCell(0), cellStyle, device.getId());
+                setCellValue(row.createCell(1), cellStyle, device.getName());
+                setCellValue(row.createCell(2), cellStyle, device.getTypeNum());
+                setCellValue(row.createCell(3), cellStyle, device.getCode());
+                setCellValue(row.createCell(4), cellStyle, device.getSavePosition());
+                cell = row.createCell(5);
+
+               // sheet.addMergedRegion(new CellRangeAddress(i + 4,i + 4,i + 4,i + 4)) ;
+                if(StringUtils.isNotBlank(device.getImage())){
+                    // 头像
+                    File photoFile = new File(device.getImage().trim()) ;
+                    if (photoFile.exists()){
+
+                        try {
+                            BufferedImage bufferedImage = ImageIO.read(photoFile) ;
+                            ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
+                            ImageIO.write(bufferedImage, "jpg", byteArrayOut);
+                            byte[] data = byteArrayOut.toByteArray();
+                            XSSFDrawing drawingPatriarch = sheet.createDrawingPatriarch();
+                            XSSFClientAnchor anchor = new XSSFClientAnchor(100, 100, 1000, 1000, (short)5, i + 1, (short) 6, i + 2);
+                            //todo限制图片格式
+                            drawingPatriarch.createPicture(anchor, workbook.addPicture(data, XSSFWorkbook.PICTURE_TYPE_JPEG));
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                    } else {
+                        cell.setCellType(XSSFCell.CELL_TYPE_STRING);
+                        cell.setCellValue("");
+                    }
+                }
+                setCellValue(row.createCell(6), cellStyle, device.getFeatures());
+
+            }
+            /*// 设置列宽
+            for (int i = 1; i < alias.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+            // 处理中文不能自动调整列宽的问题
+            setSizeColumn(sheet, alias.length);*/
+        }
+
+        return workbook;
+    }
+
+    private static void setCellValue(XSSFCell cell, XSSFCellStyle cellStyle, Object value) {
+        cell.setCellType(XSSFCell.CELL_TYPE_STRING);
+
+        cell.setCellValue(value == null ? "" : value.toString());
+        cell.setCellStyle(cellStyle);
+    }
+
+    // 自适应宽度(中文支持)
+    private static void setSizeColumn(XSSFSheet sheet, int size) {
+        for (int columnNum = 0; columnNum < size; columnNum++) {
+            int columnWidth = sheet.getColumnWidth(columnNum) / 256;
+            for (int rowNum = 0; rowNum <= sheet.getLastRowNum(); rowNum++) {
+                XSSFRow currentRow;
+                //当前行未被使用过
+                if (sheet.getRow(rowNum) == null) {
+                    currentRow = sheet.createRow(rowNum);
+                } else {
+                    currentRow = sheet.getRow(rowNum);
+                }
+                if (currentRow.getCell(columnNum) != null) {
+                    XSSFCell currentCell = currentRow.getCell(columnNum);
+                    if (currentCell.getCellType() == XSSFCell.CELL_TYPE_STRING) {
+                        int length = currentCell.getStringCellValue().getBytes().length;
+                        if (columnWidth < length) {
+                            columnWidth = length;
+                        }
+                    }
+                }
+            }
+            columnWidth = columnWidth * 256 ;
+            sheet.setColumnWidth(columnNum, columnWidth >= 65280 ? 6000 : columnWidth);
         }
     }
 

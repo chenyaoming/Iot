@@ -11,7 +11,7 @@ import java.io.File;
 
 @Data
 @NoArgsConstructor
-public class ImagePanel extends JPanel {
+public class ImagePanel extends JButton {
 
     Image image = null;
 
@@ -25,8 +25,11 @@ public class ImagePanel extends JPanel {
     public void paint(Graphics g) {
         try {
             if(StringUtils.isNotEmpty(imagePath)){
-                image = ImageIO.read(new File(imagePath));
-                g.drawImage(image, 0, 0, 500, 400, null);
+                File file = new File(imagePath.trim());
+                if(file.exists()){
+                    image = ImageIO.read(file);
+                    g.drawImage(image, 0, 0, 100, 100, null);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

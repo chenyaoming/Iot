@@ -4,12 +4,10 @@ package frame;
 import bean.TbDevice;
 import controller.ExcelUtil;
 import dao.DaoFactory;
-import dao.TbDeviceDao;
 import helper.DeviceExportHelper;
 import jodd.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import table.TableBase;
 import uitl.CommonUtil;
 import uitl.JFileChooserUtil;
@@ -23,10 +21,9 @@ import java.io.File;
 import java.util.List;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 
 public class DeviceFrame extends JFrame {
-    private JButton btn1, btn2, btn3,btnImport,btnExport, prePage, nextPage, lastPage;
+    private JButton btn1, btn2, btn3,btnImport,btnExport, btnEdit,prePage, nextPage, lastPage;
     private JPanel mainPanel, conditPanel, pagePanel;
     private JLabel jname1, jname2, jname3, pageInfo;
     private JTextField deviceNameField = null, deviceTypeNumField = null,
@@ -36,9 +33,6 @@ public class DeviceFrame extends JFrame {
     private JMenu fileMenu;
     private JMenuItem imput, export,exit;
 
-    TbDeviceDao dao = DaoFactory.getDeviceDao();
-
-    //SQLiteDBImpl dao = new SQLiteDBImpl();
     //JExcelImpl excel=new JExcelImpl();
     TableBase table = null;
 
@@ -56,9 +50,9 @@ public class DeviceFrame extends JFrame {
         //初始化数据
         //showAllData();
         // 设置主窗体大小
-        this.setPreferredSize(new Dimension(750, 380));
+        this.setPreferredSize(new Dimension(750, 600));
         // 设置主窗体显示在屏幕的位置
-        this.setLocation(280, 100);
+        this.setLocation(280, 50);
         // 设置是否显示
         this.setVisible(true);
         this.pack();
@@ -78,6 +72,9 @@ public class DeviceFrame extends JFrame {
         btn3 = new JButton("新增");
         btnImport = new JButton("导入");
         btnExport = new JButton("导出");
+        btnEdit = new JButton("编辑");
+
+
         prePage = new JButton("上一页");
         nextPage = new JButton("下一页");
         lastPage = new JButton("末  页");
@@ -178,6 +175,12 @@ public class DeviceFrame extends JFrame {
         //s.insets = new Insets(0, 40, 0, 0);
         conditPanel.add(btnExport, s);
 
+        s.gridx = 6;
+        s.gridy = 3;
+        //s.anchor = GridBagConstraints.WEST;
+        //s.insets = new Insets(0, 40, 0, 0);
+        conditPanel.add(btnEdit, s);
+
         mainPanel.setLayout(new BorderLayout());
         mainPanel.add(conditPanel, BorderLayout.NORTH);
 
@@ -224,45 +227,6 @@ public class DeviceFrame extends JFrame {
 
         //查询数据并且设置分页bar信息
         selectDataAndSetPageInfo();
-
-
-      /*  String proName = deviceNameField.getText();
-        String vendorName = deviceTypeNumField.getText();
-        String proType = deviceCodeField.getText();
-        if ((proName != null && !proName.equals(""))
-                || (vendorName != null && !vendorName.equals(""))
-                || (proType != null && !proType.equals(""))) {
-            //TableBase.bigList.clear();
-            clearTable();
-
-            //查询要展示的记录
-            //List<TbDevice> deviceList = DaoFactory.getDeviceDao().findByPage(table.getCurrentPage(),table.getPageCount());
-
-
-            //table.setRestCount(dao.countAll());
-
-            //TableBase.bigList = dao.queryProInfo(proName, vendorName, proType);
-            //table.initTable();
-
-            //查询数据并且设置分页bar信息
-            selectDataAndSetPageInfo();
-
-            *//*if (0 == table.getTotalRowCount()) {
-                clearTable();
-                //table.initResultData(null);
-                pageInfo.setText("总共 " + table.getTotalRowCount() + " 条记录|当前第 "
-                        + table.getCurrentPage() + " 页|" + "总共 " + table.getTotalPage() + " 页");
-                JOptionPane.showMessageDialog(null,
-                        "<html> <font face= '宋体 ' size= '5'> <b>不存在所查询信息，请重新输入！</b> </font> </html> ");
-                return;
-            } else {
-                //查询数据并且设置分页bar信息
-                selectDataAndSetPageInfo();
-            }*//*
-        } else {
-            JOptionPane.showMessageDialog(null, "请输入查询条件!", "提示消息",
-                    JOptionPane.WARNING_MESSAGE);
-        }*/
     }
 
     /**
@@ -270,7 +234,6 @@ public class DeviceFrame extends JFrame {
      */
     private void selectDataAndSetPageInfo() {
 
-        clearTable();
         TbDevice device = new TbDevice(deviceNameField.getText(),deviceTypeNumField.getText(),deviceCodeField.getText());
 
         //设置记录总数
@@ -285,15 +248,6 @@ public class DeviceFrame extends JFrame {
         table.showTable(deviceList);
     }
 
-
-    // 清空表数据
-    private void clearTable() {
-        TableBase.model.fireTableDataChanged();
-        table.clearTable();
-        //table.initTable();
-        //Product.products.clear();
-        //showlist.clear();
-    }
 
     private void initOperator() {
         exit.addActionListener(new ActionListener() {
@@ -370,7 +324,7 @@ public class DeviceFrame extends JFrame {
         btn3.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                showCustomDialog(jf,jf);
+                showCustomDialog(jf,jf,null);
                 //add1();
             }
         });
@@ -390,6 +344,15 @@ public class DeviceFrame extends JFrame {
                 doExportExcelAction();
             }
         });
+
+        //编辑
+        btnEdit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                doEditAction();
+            }
+        });
+
 
 
         // 上一页
@@ -424,22 +387,7 @@ public class DeviceFrame extends JFrame {
             }
 
         });
-        // 表格单元格内容气泡悬浮显示
-        table.addMouseMotionListener(new MouseAdapter() {
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                int row = table.rowAtPoint(e.getPoint());
-                int col = table.columnAtPoint(e.getPoint());
-                if (row > -1 && col > -1) {
-                    Object value = table.getValueAt(row, col);
-                    if (null != value && !"".equals(value)) {
-                        table.setToolTipText(value.toString());// 悬浮显示单元格内容
-                    } else {
-                        table.setToolTipText(null);// 关闭提示
-                    }
-                }
-            }
-        });
+
         export.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -467,6 +415,25 @@ public class DeviceFrame extends JFrame {
                 }*/
             }
         });
+    }
+
+    private void doEditAction() {
+        if(table.getSelectedRow() < 0){
+            JOptionPane.showMessageDialog(jf,"请选择一条记录编辑","提示",1);
+            return;
+        }
+        String id = table.getValueAt(table.getSelectedRow(), 0).toString();
+        if(StringUtils.isBlank(id)){
+            JOptionPane.showMessageDialog(jf,"此记录不存在","警告",2);
+            return;
+        }
+        TbDevice device = DaoFactory.getDeviceDao().queryById(Integer.valueOf(id));
+        if(null == device){
+            JOptionPane.showMessageDialog(jf,"此记录不存在","警告",2);
+            return;
+        }
+        showCustomDialog(jf,jf,device);
+
     }
 
     private void setPageInfo() {
@@ -582,12 +549,12 @@ public class DeviceFrame extends JFrame {
      * @param owner 对话框的拥有者
      * @param parentComponent 对话框的父级组件
      */
-    private static void showCustomDialog(Frame owner, Component parentComponent) {
+    private void showCustomDialog(Frame owner, Component parentComponent,TbDevice oldDevice) {
         // 创建一个模态对话框
-        final JDialog dialog = new JDialog(owner, "新增", true);
+        final JDialog dialog = new JDialog(owner, "设备信息", true);
         // 设置对话框的宽高
         //dialog.setSize(400, 400);
-        dialog.setSize(500, 650);
+        dialog.setSize(500, 500);
         // 设置对话框大小不可改变
         dialog.setResizable(false);
         // 设置对话框相对显示的位置
@@ -596,6 +563,11 @@ public class DeviceFrame extends JFrame {
 
         Font f1 = new Font("楷体", Font.BOLD, 19);
         Font f2 = new Font("楷体", Font.BOLD, 16);
+
+
+        JTextField idTextField =new JTextField(30);
+        idTextField.setVisible(false);
+        dialog.add(idTextField);
 
 
         JLabel jNameLabel = new JLabel("设备名称");
@@ -652,6 +624,46 @@ public class DeviceFrame extends JFrame {
         dialog.add(cancelBtn);
         dialog.add(saveBtn);
 
+        if(null != oldDevice){
+            idTextField.setText(oldDevice.getImage());
+            jNameTextField.setText(oldDevice.getName());
+            jTypeNumTextField.setText(oldDevice.getTypeNum());
+
+            jCodeTextField.setText(oldDevice.getCode());
+            jPositionTextField.setText(oldDevice.getSavePosition());
+            if(StringUtils.isNotBlank(oldDevice.getImage())){
+                iPanel.setImagePath(oldDevice.getImage());
+                iPanel.repaint();
+                iPanel.setVisible(true);
+            }
+            jfeaturesTextField.setText(oldDevice.getFeatures());
+        }
+
+        iPanel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // 创建一个模态对话框
+               // final JDialog dialog = new JDialog(owner, "图片", true);
+
+                final JDialog dialog = new JDialog(owner, "图片", true);
+
+                // 设置对话框的宽高
+                //dialog.setSize(400, 400);
+                dialog.setSize(500, 400);
+                // 设置对话框大小不可改变
+               // dialog.setResizable(false);
+                // 设置对话框相对显示的位置
+                dialog.setLocationRelativeTo(parentComponent);
+                //dialog.setLayout(null);
+
+                JScrollPane scrollPane=new JScrollPane();
+                scrollPane.setViewportView(new JScrollImagePanel(iPanel.getImagePath()));
+
+                dialog.add(scrollPane,BorderLayout.CENTER);
+                dialog.setVisible(true);
+
+            }
+        });
 
 
         // 选择图片
@@ -677,28 +689,42 @@ public class DeviceFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                TbDevice device = new TbDevice(jNameTextField.getText(),jTypeNumTextField.getText(),jCodeTextField.getText(),
+                TbDevice newDevice = new TbDevice(jNameTextField.getText(),jTypeNumTextField.getText(),jCodeTextField.getText(),
                         jPositionTextField.getText(),iPanel.getImagePath(),jfeaturesTextField.getText());
 
-                if(StringUtils.isBlank(device.getName())){
+                if(null != oldDevice){
+                    newDevice.setId(oldDevice.getId());
+                }
+
+                if(StringUtils.isBlank(newDevice.getName())){
                     JOptionPane.showMessageDialog(new JPanel(),"请填写设备名称","提示",1);
                     return;
                 }
-                if(StringUtil.isBlank(device.getTypeNum())){
+                if(StringUtil.isBlank(newDevice.getTypeNum())){
                     JOptionPane.showMessageDialog(new JPanel(),"请填写设备型号","提示",1);
                     return;
                 }
-                if(StringUtils.isBlank(device.getCode())){
+                if(StringUtils.isBlank(newDevice.getCode())){
                     JOptionPane.showMessageDialog(new JPanel(),"请填写设备编码","提示",1);
                     return;
                 }
-                if(StringUtils.isNotEmpty(device.getImage())){
-                    device.setImage(JFileChooserUtil.writeImgToUpload(new File(device.getImage())));
+                if(StringUtils.isNotEmpty(newDevice.getImage())){
+                    newDevice.setImage(JFileChooserUtil.writeImgToUpload(new File(newDevice.getImage())));
                 }
 
-                DaoFactory.getDeviceDao().insert(device);
+                if(null != newDevice.getId()){
+                    //编辑更新
+                    DaoFactory.getDeviceDao().update(newDevice);
+                }else{
+                    //增加
+                    DaoFactory.getDeviceDao().insert(newDevice);
+                }
+
+
                 dialog.dispose();
                 JOptionPane.showMessageDialog(new JPanel(),"操作成功","提示",JOptionPane.PLAIN_MESSAGE);
+
+                btn1.doClick();
             }
         });
 
@@ -755,9 +781,9 @@ public class DeviceFrame extends JFrame {
 
     public void ToExcel(String path) {
 
-        List<TbDevice> list = DaoFactory.getDeviceDao().findByPage(1,5);
+        List<TbDevice> list = DaoFactory.getDeviceDao().findByPage(10,5);
 
-        HSSFWorkbook wb = new HSSFWorkbook();
+       /* HSSFWorkbook wb = new HSSFWorkbook();
         HSSFSheet sheet = wb.createSheet("Users");
 
         String[] n = { "序号", "名称", "型号", "管理编码",
@@ -777,7 +803,9 @@ public class DeviceFrame extends JFrame {
             value[i + 1][6] = device.getFeatures();
 
         }
-        ExcelUtil.writeArrayToExcel(wb, sheet, list.size() + 1, 7, value);
+        ExcelUtil.writeArrayToExcel(wb, sheet, list.size() + 1, 7, value);*/
+
+        XSSFWorkbook wb = ExcelUtil.getWorkBook(list,path);
 
         ExcelUtil.writeWorkbook(wb, path);
 

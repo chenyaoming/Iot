@@ -143,9 +143,9 @@ public class ExcelOutandIn extends JFrame implements ActionListener {
             value[i + 1][3] = users.getUEmail();
 
         }
-        ExcelUtil.writeArrayToExcel(wb, sheet, list.size() + 1, 4, value);
+       /* ExcelUtil.writeArrayToExcel(wb, sheet, list.size() + 1, 4, value);
 
-        ExcelUtil.writeWorkbook(wb, path);
+        ExcelUtil.writeWorkbook(wb, path);*/
 
     }
 

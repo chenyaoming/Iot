@@ -2,37 +2,50 @@ package table;
 
 import bean.TbDevice;
 import dao.DaoFactory;
+import frame.JScrollImagePanel;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import java.util.ArrayList;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.List;
 
 @Data
 public class TableBase extends JTable {
 	// JTable表分页信息相关变量
 	private int currentPage = 1;
-	private int pageCount = 5; //每页显示的条数
-    private int totalPage = 0;//总页数
+	private int pageCount = 10; //每页显示的条数 ,跟下面mode 的10对应
+	private int totalPage = 0;//总页数
     private int totalRowCount = 0;//总行数
-    //private int currentPageRowCount=0;//当前页数据条数
-    //private int column = 0; //表的列数
-    //private long restCount;
-    //private static Object[][] resultData;
 
-	//public static List<TbDevice> bigList=new ArrayList<>(); //大集合，从外界获取
-	//public static List<TbDevice> smallList=new ArrayList<>(); //小集合，返回给调用它的类
+	//从0开始，第0个列是id隐藏列
+	public static final int ID_HIDDEN_COLUM = 0;
+	//从0开始，第6个列是图片列
+	public static final int IMAGE_COLUM = 6;
+	//图片列宽度
+	public static final int IMAGE_COLUM_WIDTH = 100;
+    //表格行高大小
+	public static final int ROW_HEIGHT = 40;
 
+	/**
+	 * 表格展示图片的宽度
+	 */
+	public static final int IMAGE_SHOW_WIDTH = 80;
+	/**
+	 * 表格展示图片的高度
+	 */
+	public static final int IMAGE_SHOW_HEIGHT = 30;
 
-	// JTable表信息相关变量
-	//private List<TbDevice> products = Product.products;
-	public static String[] columnNames = { "序号", "名称", "型号", "管理编码",
+	//ID为隐藏列
+	public static String[] COLUMN_NAMES = { "ID","序号", "名称", "型号", "管理编码",
 			"存放位置", "图片", "功用"};
-	public static DefaultTableModel model = new DefaultTableModel(columnNames,
-			5);
+
 
 	public TableBase() {
 		initTable();
@@ -44,50 +57,17 @@ public class TableBase extends JTable {
 		List<TbDevice> deviceList = DaoFactory.getDeviceDao().findByPage(this.getCurrentPage(),this.getPageCount());
 		//结果集的总页数
 		this.setTotalPage(totalRowCount % pageCount == 0 ? totalRowCount/ pageCount : totalRowCount / pageCount + 1);
-
-		//Object[][] data = getData(deviceList);
-        this.setModel(model);
         this.showTable(deviceList);
-		/*if (data != null) {
-			*//*initResultData(data);
-			model = new DefaultTableModel(getPageData(), columnNames);*//*
-		} else {
-			// 如果结果集中没有数据，那么就用空来代替数据集中的每一行
-			Object[][] nothing = { {}, {}, {}, {}, {} };
-			model = new DefaultTableModel(nothing, columnNames);
-		}*/
-		// 表头不可拖动
-		this.getTableHeader().setReorderingAllowed(false);
-		//this.setModel(model);
-		// 设置表格内容不能被编辑
-		isCellEditable(this.getRowCount(), this.getColumnCount());
-		this.setRowHeight(20);
-		DefaultTableCellRenderer r = new DefaultTableCellRenderer();
-		r.setHorizontalAlignment(JLabel.CENTER);
-		setDefaultRenderer(Object.class, r);
+        //表格单元格内容气泡悬浮显示
+		addMouseMotionListener(this);
+		addMouseListener(this);
+
 	}
 
-
-	public void clearTable() {
-		//用空来代替数据集中的每一行
-		Object[][] nothing = { {}, {}, {}, {}, {} };
-		model = new DefaultTableModel(nothing, columnNames);
-		totalRowCount = 0;
-
-		// 表头不可拖动
-		this.getTableHeader().setReorderingAllowed(false);
-		this.setModel(model);
-		// 设置表格内容不能被编辑
-		isCellEditable(this.getRowCount(), this.getColumnCount());
-		this.setRowHeight(20);
-		DefaultTableCellRenderer r = new DefaultTableCellRenderer();
-		r.setHorizontalAlignment(JLabel.CENTER);
-		setDefaultRenderer(Object.class, r);
-	}
 	// 表格允许被编辑
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		return true;
+		return false;
 	}
 
 	/**
@@ -95,96 +75,49 @@ public class TableBase extends JTable {
 	 * @param list
 	 */
 	public void showTable(List<TbDevice> list){
-	    if(CollectionUtils.isNotEmpty(list)){
-            for (int i = 0; i < list.size(); i++) {
-                this.setValueAt((i + 1)+(currentPage-1)*pageCount, i, 0);
-                this.setValueAt((list.get(i)).getName(), i, 1);
-                this.setValueAt((list.get(i)).getTypeNum(), i, 2);
-                this.setValueAt((list.get(i)).getCode(), i, 3);
-                this.setValueAt((list.get(i)).getSavePosition(), i, 4);
-                this.setValueAt((list.get(i)).getImage(), i, 5);
-                this.setValueAt((list.get(i)).getFeatures(), i, 6);
-            }
-        }
 
-	}
-	// 初始化结果集
-	private Object[][] getData(List<TbDevice> devices) {
-		if (CollectionUtils.isNotEmpty(devices)) {
-			Object[][] data = new Object[devices.size()][7];
-			for (int i = 0; i < devices.size(); i++) {
-				TbDevice d = devices.get(i);
-				d.setId(i+1);//按遍历顺序排列数据集
-				Object[] a = { d.getId(), d.getName(),d.getTypeNum(),d.getCode(),
-						d.getSavePosition(),d.getImage(),d.getFeatures()};// 把List集合的数据赋给Object数组
-				data[i] = a;// 把数组的值赋给二维数组的一行
-			}
-			return data;
-		}
-		return null;
-	}
+		Object[][] data = new Object[list.size()][COLUMN_NAMES.length];
+		if(CollectionUtils.isNotEmpty(list)){
+			for (int i = 0; i < list.size(); i++) {
 
-	/*public void initResultData(Object[][] data) {
-		if (data != null) {
-			resultData = data;// 总的结果集
-			column = data[0].length;// 表的列数
-			totalRowCount = data.length;// 表的长度
-			totalPage = totalRowCount % pageCount == 0 ? totalRowCount/ pageCount : totalRowCount / pageCount + 1;// 结果集的总页数
-			//restCount = totalRowCount % pageCount == 0 ? 5 : totalRowCount% pageCount;// 最后一页的数据数
-		}else{
-			currentPageRowCount=0;
-			currentPage=1;
-			totalPage=1;
-		}
+				TbDevice device = list.get(i);
+				//隐藏列
+				data[i][0] = device.getId();
+				data[i][1] = (i + 1)+(currentPage-1)*pageCount;
+				data[i][2] = device.getName();
+				data[i][3] = device.getTypeNum();
+				data[i][4] = device.getCode();
+				data[i][5] = device.getSavePosition();
 
-	}*/
+				if(StringUtils.isNotBlank(device.getImage())){
 
-	/**
-	 * 根据当前页，筛选记录
-	 */
-	public List<TbDevice> select() {
-		/*restCount = bigList.size();
-		for (int i = (currentPage - 1) * pageCount; i < currentPage	* pageCount && i < restCount; i++) {
-			smallList.add(bigList.get(i));
-		}
-		currentPageRowCount=smallList.size();
-		return smallList;*/
-		List<TbDevice> deviceList = DaoFactory.getDeviceDao().findByPage(this.getCurrentPage(),this.getPageCount());
-		if(null == deviceList ){
-			deviceList = new ArrayList<>();
-		}
-		//currentPageRowCount = deviceList.size();
-		return deviceList;
-	}
-	/**
-	 * 获取分页数据
-	 *
-	 * @return
-	 */
-	/*public Object[][] getPageData() {
-		Object[][] currentPageData = new Object[pageCount][column];// 构造每页数据集
-		if (this.getCurrentPage() < this.totalPage) {// 如果当前页数小于总页数，那么每页数目应该是规定的数pageCount
-			for (int i = pageCount * (this.getCurrentPage() - 1); i < pageCount
-					* (this.getCurrentPage() - 1) + pageCount; i++) {
-				for (int j = 0; j < column; j++) {
-					// 把结果集中对应每页的每一行数据全部赋值给当前页的每一行的每一列
-					currentPageData[i % pageCount][j] = resultData[i][j];
+					ImageIcon imageIcon = new ImageIcon(device.getImage().trim());
+					imageIcon.setImage(imageIcon.getImage().getScaledInstance(IMAGE_SHOW_WIDTH, IMAGE_SHOW_HEIGHT, Image.SCALE_DEFAULT));
+
+					data[i][6] = imageIcon;
 				}
-			}
-		} else {
-			// 在动态改变数据结果集的时候，如果当前页没有数据了，则回到前一页（一般针对最后一页而言）
-			if (1!=currentPage&&pageCount * (this.getCurrentPage() - 1) >= totalRowCount) {
-				this.currentPage--;
-			}
-			for (int i = pageCount * (this.getCurrentPage() - 1); i < pageCount
-					* (this.getCurrentPage() - 1) + restCount; i++) {
-				for (int j = 0; j < column; j++) {
-					currentPageData[i % pageCount][j] = resultData[i][j];
-				}
+				data[i][7] = device.getFeatures();
 			}
 		}
-		return currentPageData;
-	}*/
+		DefaultTableModel model = new DefaultTableModel(data, COLUMN_NAMES);
+	    this.setModel(model);
+
+	    //设置隐藏列
+		setHideColumn(ID_HIDDEN_COLUM);
+
+		// 表头不可拖动
+		this.getTableHeader().setReorderingAllowed(false);
+		// 设置表格内容不能被编辑
+		isCellEditable(this.getRowCount(), this.getColumnCount());
+		//设置行高
+		this.setRowHeight(ROW_HEIGHT);
+		//设置图片的列宽
+		setColumnWidth(IMAGE_COLUM,IMAGE_COLUM_WIDTH);
+
+		DefaultTableCellRenderer r = new DefaultTableCellRenderer();
+		r.setHorizontalAlignment(JLabel.CENTER);
+		setDefaultRenderer(Object.class, r);
+	}
 
 	/**
 	 * 获取上一页
@@ -221,6 +154,108 @@ public class TableBase extends JTable {
 	 */
 	public int getFirstPage() {
 		return 1;
+	}
+
+
+	@Override
+	public Class getColumnClass(int column) {
+		return (column == IMAGE_COLUM) ? Icon.class : Object.class;
+	}
+
+	/**
+	 * 设置指定列的宽度
+	 * @param colname  列名
+	 * @param width
+	 */
+	public void setColumnWidth(Object colname,int width){
+		//此方法是通过equals方法查找的，需要注意列名重复问题
+		this.getColumn(colname).setPreferredWidth(width);
+	}
+
+	/**
+	 * 设置指定列的宽度
+	 * @param column
+	 * @param width
+	 */
+	public void setColumnWidth(int column,int width){
+		this.getTableHeader().getColumnModel().getColumn(column).setPreferredWidth(width);
+		this.getColumnModel().getColumn(column).setPreferredWidth(width);
+	}
+
+	/**
+	 * 设置隐藏列
+	 * @param i 所隐藏的列
+	 */
+	public void setHideColumn(int i){
+		this.getTableHeader().getColumnModel().getColumn(i).setMaxWidth(0);
+		this.getTableHeader().getColumnModel().getColumn(i).setMinWidth(0);
+		this.getColumnModel().getColumn(i).setMaxWidth(0);
+		this.getColumnModel().getColumn(i).setMinWidth(0);
+	}
+
+	/**
+	 *  表格单元格内容气泡悬浮显示
+	 */
+	public void addMouseMotionListener(JTable table){
+		addMouseMotionListener(new MouseAdapter() {
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				int row = table.rowAtPoint(e.getPoint());
+				int col = table.columnAtPoint(e.getPoint());
+				//图片一列不展示
+				if (row > -1 && col > -1 && col != IMAGE_COLUM) {
+					Object value = table.getValueAt(row, col);
+					if (null != value && !"".equals(value)) {
+						table.setToolTipText(value.toString());// 悬浮显示单元格内容
+					} else {
+						table.setToolTipText(null);// 关闭提示
+					}
+				}
+			}
+		});
+	}
+
+	public void addMouseListener(final  JTable table) {
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+
+				// 记录进入编辑状态前单元格得数据
+				try {
+					if(table.getSelectedColumn() == IMAGE_COLUM){
+						//图片那一列
+
+						Object obj = table.getValueAt(table.getSelectedRow(),
+								table.getSelectedColumn());
+						if(null != obj){
+							String imgUrl = obj.toString();
+							if(StringUtils.isNotBlank(imgUrl) && new File(imgUrl.trim()).exists()){
+								final JDialog dialog = new JDialog(new Frame(), "图片", true);
+
+								// 设置对话框的宽高
+								//dialog.setSize(400, 400);
+
+								// 设置对话框大小不可改变
+								// dialog.setResizable(false);
+								// 设置对话框相对显示的位置
+								dialog.setLocationRelativeTo(table);
+								//dialog.setLayout(null);
+
+								JScrollImagePanel jScrollImagePanel = new JScrollImagePanel(imgUrl);
+
+								JScrollPane scrollPane=new JScrollPane();
+								scrollPane.setViewportView(jScrollImagePanel);
+								dialog.setSize(jScrollImagePanel.getWidth(), jScrollImagePanel.getHeight());
+								dialog.add(scrollPane,BorderLayout.CENTER);
+								dialog.setVisible(true);
+							}
+						}
+					}
+				} catch (Exception ex) {
+				}
+			}
+
+		});
 	}
 
 
