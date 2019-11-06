@@ -6,6 +6,7 @@ import frame.JScrollImagePanel;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import uitl.ModalFrameUtil;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -46,10 +47,17 @@ public class TableBase extends JTable {
 	public static String[] COLUMN_NAMES = { "ID","序号", "名称", "型号", "管理编码",
 			"存放位置", "图片", "功用"};
 
+	private JFrame ownFrame = null;
 
-	public TableBase() {
+	/*public TableBase() {
+		initTable();
+	}*/
+
+	public TableBase(JFrame ownFrame) {
+		this.ownFrame = ownFrame;
 		initTable();
 	}
+
 
 	public void initTable() {
 
@@ -230,24 +238,22 @@ public class TableBase extends JTable {
 						if(null != obj){
 							String imgUrl = obj.toString();
 							if(StringUtils.isNotBlank(imgUrl) && new File(imgUrl.trim()).exists()){
-								final JDialog dialog = new JDialog(new Frame(), "图片", true);
+								JFrame imageFrame = new JFrame();
 
 								// 设置对话框的宽高
-								//dialog.setSize(400, 400);
-
-								// 设置对话框大小不可改变
-								// dialog.setResizable(false);
-								// 设置对话框相对显示的位置
-								dialog.setLocationRelativeTo(table);
-								//dialog.setLayout(null);
+								imageFrame.setSize(550, 450);
+								imageFrame.setLocationRelativeTo(table);
 
 								JScrollImagePanel jScrollImagePanel = new JScrollImagePanel(imgUrl);
-
 								JScrollPane scrollPane=new JScrollPane();
 								scrollPane.setViewportView(jScrollImagePanel);
-								dialog.setSize(jScrollImagePanel.getWidth(), jScrollImagePanel.getHeight());
-								dialog.add(scrollPane,BorderLayout.CENTER);
-								dialog.setVisible(true);
+
+								//dialog.setSize(jScrollImagePanel.getWidth(), jScrollImagePanel.getHeight());
+								imageFrame.add(scrollPane,BorderLayout.CENTER);
+								//imageFrame.setVisible(true);
+								ModalFrameUtil.showAsModal(imageFrame,null);
+
+								imageFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 							}
 						}
 					}
@@ -257,7 +263,5 @@ public class TableBase extends JTable {
 
 		});
 	}
-
-
 
 }

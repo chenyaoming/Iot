@@ -38,18 +38,20 @@ public class DeviceExportHelper {
             List<String> values = deviceValues.get(n);
             TbDevice device = new TbDevice();
             for (int i = 0;i < values.size() ; i++){
-                if(d.image.equals(d.colums[i])){
-                    //processStudioIdField(v.colums[i] , values.get(i), invoiceData);
+
+                if(d.serial.equals(d.colums[i])){
+
+                }else if(d.image.equals(d.colums[i]) ){
+                    //处理图片字段
+                    String picKey = (n+1)+"-"+i;
+                    PictureData pictureData = pictureDataMap.get(picKey);
+                    if(null != pictureData){
+                        device.setImage(JFileChooserUtil.writeImgToUpload(pictureData));
+                    }
+
                 }else{
                     BeanUtil.pojo.setProperty(device,d.colums[i], values.get(i));
                 }
-
-                String picKey = (n+1)+"-"+i;
-                PictureData pictureData = pictureDataMap.get(picKey);
-                if(null != pictureData){
-                    device.setImage(JFileChooserUtil.writeImgToUpload(pictureData));
-                }
-
             }
             deviceList.add(device);
         }

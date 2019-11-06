@@ -15,32 +15,40 @@ import java.util.List;
 public class DeviceExcelColum {
 
 
-    @FieldSort(order = 0) public String name;
+    /**
+     * 序号,程序不处理它
+     */
+    @FieldSort(order = 2) public String serial;
+
+    /**
+     * 名称
+     */
+    @FieldSort(order = 2) public String name;
 
     /**
      * 型号
      */
-    @FieldSort(order = 2) public String typeNum;
+    @FieldSort(order = 4) public String typeNum;
 
     /**
      * 编码
      */
-    @FieldSort(order = 4) public String code;
+    @FieldSort(order = 6) public String code;
 
     /**
      * 存放位置
      */
-    @FieldSort(order = 6) public String savePosition;
+    @FieldSort(order = 8) public String savePosition;
 
     /**
      * 图片
      */
-    @FieldSort(order = 8) public String image;
+    @FieldSort(order = 10) public String image;
 
     /**
      * 功能
      */
-    @FieldSort(order = 10) public String features;
+    @FieldSort(order = 12) public String features;
 
 
     public String[] colums;

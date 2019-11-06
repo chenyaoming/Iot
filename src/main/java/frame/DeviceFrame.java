@@ -11,13 +11,18 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import table.TableBase;
 import uitl.CommonUtil;
 import uitl.JFileChooserUtil;
+import uitl.ModalFrameUtil;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.*;
@@ -40,7 +45,7 @@ public class DeviceFrame extends JFrame {
 
     public DeviceFrame() {
         jf = this;
-        table = new TableBase();
+        table = new TableBase(jf);
         // 初始化所有控件
         initComponent();
         // 构造函数中调用initUI来向窗口中添加控件
@@ -50,12 +55,13 @@ public class DeviceFrame extends JFrame {
         //初始化数据
         //showAllData();
         // 设置主窗体大小
-        this.setPreferredSize(new Dimension(750, 600));
+        this.setPreferredSize(new Dimension(800, 600));
         // 设置主窗体显示在屏幕的位置
         this.setLocation(280, 50);
         // 设置是否显示
         this.setVisible(true);
         this.pack();
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     private void initComponent() {
@@ -68,8 +74,13 @@ public class DeviceFrame extends JFrame {
         export=new JMenuItem("导出");
         exit = new JMenuItem("退出");
         btn1 = new JButton("查询");
+
+        /*Dimension preferredSize = new Dimension(60,30);
+        btn1.setPreferredSize(preferredSize );*/
+
         btn2 = new JButton("重置");
         btn3 = new JButton("新增");
+
         btnImport = new JButton("导入");
         btnExport = new JButton("导出");
         btnEdit = new JButton("编辑");
@@ -79,11 +90,11 @@ public class DeviceFrame extends JFrame {
         nextPage = new JButton("下一页");
         lastPage = new JButton("末  页");
         jname1 = new JLabel("设备名称");
-        deviceNameField = new JTextField(13);
+        deviceNameField = new JTextField(15);
         jname2 = new JLabel("设备型号");
-        deviceTypeNumField = new JTextField(13);
+        deviceTypeNumField = new JTextField(15);
         jname3 = new JLabel("设备编码");
-        deviceCodeField = new JTextField(13);
+        deviceCodeField = new JTextField(15);
 
         jsp = new JScrollPane(table);
         // 设置菜单
@@ -98,88 +109,105 @@ public class DeviceFrame extends JFrame {
 
     private void initUI() {
         // 主界面标题
-        this.setTitle("竞品查询");
-        this.setIconImage(new ImageIcon("images/logo.png").getImage());
+        this.setTitle("设备管理");
+        this.setIconImage(new ImageIcon("images/logo.ico").getImage());
         conditPanel.setBorder(BorderFactory.createTitledBorder("查询条件"));
         // 条件窗口控制条件
-        conditPanel.setLayout(new GridBagLayout());
-        GridBagConstraints s = new GridBagConstraints();
-        // 设置设备名称label
-        s.gridx = 1;
-        s.gridy = 0;
-        s.weightx = 0;
-        s.weighty = 0;
-        s.anchor = GridBagConstraints.EAST;
-        conditPanel.add(jname1, s);
-        // 设置设备名称输入框
-        s.gridx = 2;
-        s.gridy = 0;
-        s.weightx = 1;
-        s.anchor = GridBagConstraints.WEST;
-        conditPanel.add(deviceNameField, s);
+        //conditPanel.setLayout(new GridBagLayout());
+
+        GridBagLayout gridBagLayout=new GridBagLayout(); //实例化布局对象
+        conditPanel.setLayout(gridBagLayout);                     //jf窗体对象设置为GridBagLayout布局
 
 
-        // 设置设备类型label
-        s.gridx = 3;
-        s.gridy = 0;
-        s.weightx = 1;
-        s.anchor = GridBagConstraints.EAST;
-        conditPanel.add(jname2, s);
-        // 设置设备类型输入框
-        s.gridx = 4;
-        s.gridy = 0;
-        s.weightx = 1;
-        s.anchor = GridBagConstraints.WEST;
-        conditPanel.add(deviceTypeNumField, s);
+        GridBagConstraints gridBagConstraints=new GridBagConstraints();//实例化这个对象用来对组件进行管理
+       // gridBagConstraints.fill=GridBagConstraints.BOTH;//该方法是为了设置如果组件所在的区域比组件本身要大时的显示情况
+        //NONE：不调整组件大小。
+        //HORIZONTAL：加宽组件，使它在水平方向上填满其显示区域，但是不改变高度。
+        //VERTICAL：加高组件，使它在垂直方向上填满其显示区域，但是不改变宽度。
+        //BOTH：使组件完全填满其显示区域。
+        /*
+         * 分别对组件进行设置
+         */
+        //组件1(gridx,gridy)组件的左上角坐标，gridwidth，gridheight：组件占用的网格行数和列数
 
-        // 设置设备编码label
-        s.gridx = 5;
-        s.gridy = 0;
-        s.weightx = 1;
-        s.anchor = GridBagConstraints.EAST;
-        conditPanel.add(jname3, s);
 
-        s.gridx = 6;
-        s.gridy = 0;
-        s.weightx = 1;
-        s.anchor = GridBagConstraints.WEST;
-        conditPanel.add(deviceCodeField, s);
+        gridBagConstraints.gridx=0;
+        gridBagConstraints.gridy=0;
+        gridBagConstraints.gridwidth=1;
+        gridBagConstraints.gridheight=1;
+        gridBagLayout.setConstraints(jname1, gridBagConstraints);
+        //组件2
+        gridBagConstraints.gridx=1;
+        gridBagConstraints.gridy=0;
+        gridBagConstraints.gridwidth=3;
+        gridBagConstraints.gridheight=1;
+        gridBagLayout.setConstraints(deviceNameField, gridBagConstraints);
 
-        // 设置查询、重置按钮
-        s.gridx = 1;
-        s.gridy = 3;
-        s.anchor = GridBagConstraints.EAST;
-        conditPanel.add(btn1, s);
+        gridBagConstraints.gridx=4;
+        gridBagConstraints.gridy=0;
+        gridBagConstraints.gridwidth=1;
+        gridBagConstraints.gridheight=1;
+        gridBagLayout.setConstraints(jname2, gridBagConstraints);
 
-        s.gridx = 2;
-        s.gridy = 3;
-        s.anchor = GridBagConstraints.WEST;
-        s.insets = new Insets(0, 40, 0, 0);
-        conditPanel.add(btn2, s);
+        gridBagConstraints.gridx=5;
+        gridBagConstraints.gridy=0;
+        gridBagConstraints.gridwidth=3;
+        gridBagConstraints.gridheight=1;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 10);
+        gridBagLayout.setConstraints(deviceTypeNumField, gridBagConstraints);
 
-        s.gridx = 3;
-        s.gridy = 3;
-        //s.anchor = GridBagConstraints.WEST;
-        //s.insets = new Insets(0, 40, 0, 0);
-        conditPanel.add(btn3, s);
+        gridBagConstraints.gridx=8;
+        gridBagConstraints.gridy=0;
+        gridBagConstraints.gridwidth=1;
+        gridBagConstraints.gridheight=1;
+        gridBagLayout.setConstraints(btn1, gridBagConstraints);
 
-        s.gridx = 4;
-        s.gridy = 3;
-        //s.anchor = GridBagConstraints.WEST;
-        //s.insets = new Insets(0, 40, 0, 0);
-        conditPanel.add(btnImport, s);
+        gridBagConstraints.gridx=9;
+        gridBagConstraints.gridy=0;
+        gridBagConstraints.gridwidth=1;
+        gridBagConstraints.gridheight=1;
 
-        s.gridx = 5;
-        s.gridy = 3;
-        //s.anchor = GridBagConstraints.WEST;
-        //s.insets = new Insets(0, 40, 0, 0);
-        conditPanel.add(btnExport, s);
+        gridBagLayout.setConstraints(btn2, gridBagConstraints);
 
-        s.gridx = 6;
-        s.gridy = 3;
-        //s.anchor = GridBagConstraints.WEST;
-        //s.insets = new Insets(0, 40, 0, 0);
-        conditPanel.add(btnEdit, s);
+
+        gridBagConstraints.gridx=0;
+        gridBagConstraints.gridy=1;
+        gridBagConstraints.gridwidth=1;
+        gridBagConstraints.gridheight=1;
+        gridBagLayout.setConstraints(btn3, gridBagConstraints);
+
+        gridBagConstraints.gridx=1;
+        gridBagConstraints.gridy=1;
+        gridBagConstraints.gridwidth=1;
+        gridBagConstraints.gridheight=1;
+        gridBagLayout.setConstraints(btnEdit, gridBagConstraints);
+
+        gridBagConstraints.gridx=4;
+        gridBagConstraints.gridy=1;
+        gridBagConstraints.gridwidth=1;
+        gridBagConstraints.gridheight=1;
+        gridBagLayout.setConstraints(btnImport, gridBagConstraints);
+
+        gridBagConstraints.gridx=5;
+        gridBagConstraints.gridy=1;
+        gridBagConstraints.gridwidth=1;
+        gridBagConstraints.gridheight=1;
+        gridBagLayout.setConstraints(btnExport, gridBagConstraints);
+
+
+        conditPanel.add(jname1);
+        conditPanel.add(deviceNameField);
+        conditPanel.add(jname2);
+        conditPanel.add(deviceTypeNumField);
+
+        conditPanel.add(btn1);
+        conditPanel.add(btn2);
+
+        conditPanel.add(btn3);
+        conditPanel.add(btnEdit);
+        conditPanel.add(btnImport);
+        conditPanel.add(btnExport);
+
 
         mainPanel.setLayout(new BorderLayout());
         mainPanel.add(conditPanel, BorderLayout.NORTH);
@@ -218,7 +246,7 @@ public class DeviceFrame extends JFrame {
 
     // 退出窗口
     private void exitWindow() {
-        JOptionPane.showMessageDialog(null, "程序即将退出...");
+        //JOptionPane.showMessageDialog(null, "程序即将退出...");
         System.exit(0);
     }
     // 查询
@@ -258,7 +286,7 @@ public class DeviceFrame extends JFrame {
         });
         // 查询事件
         // 增加回车事件
-        this.getRootPane().setDefaultButton(btn1);// 获取焦点
+        //this.getRootPane().setDefaultButton(btn1);// 获取焦点
         btn1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -391,28 +419,14 @@ public class DeviceFrame extends JFrame {
         export.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                /*if(excel.openFile("export")){
-                    try {
-                        DefaultTableModel excelmodel = new DefaultTableModel(TableBase.resultData, TableBase.columnNames);
-                        JTable exceltable = new JTable(excelmodel);
-                        exceltable.setModel(excelmodel);
-                        excel.exportTable(exceltable, new File(excel.getRealPath()));
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
-                }*/
+               doExportExcelAction();
             }
         });
 
         imput.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                /*if(excel.openFile("imput")){
-                    List<?> list=excel.jxlExlToList(new File(excel.getRealPath()));
-                    if(dao.save(list, "products")){
-                        JOptionPane.showMessageDialog(null, "数据导入成功！");
-                    }
-                }*/
+                doImportExcelAction(new String[]{".xls",".xlsx"});
             }
         });
     }
@@ -441,108 +455,6 @@ public class DeviceFrame extends JFrame {
                 + table.getCurrentPage() + " 页|" + "总共 " + table.getTotalPage() + " 页");
     }
 
-    public void add1() {
-        Font f1 = new Font("楷体", Font.BOLD, 19);
-        Font f2 = new Font("楷体", Font.BOLD, 16);
-
-        JFrame frame = new JFrame("请输入要添加的教师信息");
-        JLabel t0 = new JLabel("编号");
-        JLabel t1 = new JLabel("姓名");
-        JLabel t2 = new JLabel("身份证号");
-        JLabel t3 = new JLabel("地址");
-        JLabel t4 = new JLabel("电话");
-        JLabel t5 = new JLabel("部门");
-        JLabel t6 = new JLabel("工资");
-        JLabel t7 = new JLabel("参加工作时间");
-        JLabel t71 = new JLabel("年");
-        JLabel t8 = new JLabel("专业");
-        JLabel t9 = new JLabel("职务");
-        JLabel t10 = new JLabel("备注");
-        JTextField tid = new JTextField(30);
-        JTextField name = new JTextField(30);
-        JTextField id = new JTextField(30);
-        JTextField address = new JTextField(30);
-        JTextField phone = new JTextField(30);
-        JTextField department = new JTextField(50);
-        JTextField salary = new JTextField(50);
-        JTextField worktime = new JTextField(50);
-        JTextField profess = new JTextField(50);
-        JTextField duty = new JTextField(50);
-        JTextField remark = new JTextField(50);
-
-        JButton e1 = new JButton("确定");
-        JButton e2 = new JButton("取消");
-        frame.setLayout(null);
-        t0.setBounds(100, 0, 90, 50);
-        t0.setFont(f2);
-        t1.setBounds(100, 50, 90, 50);
-        t1.setFont(f2);
-        t2.setBounds(70, 100, 90, 50);
-        t2.setFont(f2);
-        t3.setBounds(100, 150, 90, 50);
-        t3.setFont(f2);
-        t4.setBounds(100, 200, 90, 50);
-        t4.setFont(f2);
-        t5.setBounds(100, 250, 90, 50);
-        t5.setFont(f2);
-        t6.setBounds(100, 300, 90, 50);
-        t6.setFont(f2);
-        t7.setBounds(30, 350, 130, 50);
-        t7.setFont(f2);
-        t71.setBounds(400, 350, 130, 50);
-        t7.setFont(f2);
-        t8.setBounds(100, 400, 90, 50);
-        t8.setFont(f2);
-        t9.setBounds(100, 450, 90, 50);
-        t9.setFont(f2);
-        t10.setBounds(100, 500, 90, 50);
-        t10.setFont(f2);
-        tid.setBounds(150, 10, 250, 30);
-        name.setBounds(150, 60, 250, 30);
-        id.setBounds(150, 110, 250, 30);
-        address.setBounds(150, 160, 250, 30);
-        phone.setBounds(150, 210, 250, 30);
-        department.setBounds(150, 260, 250, 30);
-        salary.setBounds(150, 310, 250, 30);
-        worktime.setBounds(150, 360, 250, 30);
-        profess.setBounds(150, 410, 250, 30);
-        duty.setBounds(150, 460, 250, 30);
-        remark.setBounds(150, 510, 250, 30);
-        e1.setBounds(60, 560, 80, 30);
-        e1.setFont(f2);
-        e2.setBounds(300, 560, 80, 30);
-        e2.setFont(f2);
-        frame.add(t0);
-        frame.add(tid);
-        frame.add(t1);
-        frame.add(name);
-        frame.add(t2);
-        frame.add(id);
-        frame.add(t3);
-        frame.add(address);
-        frame.add(t4);
-        frame.add(phone);
-        frame.add(t5);
-        frame.add(department);
-        frame.add(t6);
-        frame.add(salary);
-        frame.add(t7);
-        frame.add(t71);
-        frame.add(worktime);
-
-        frame.add(t8);
-        frame.add(profess);
-        frame.add(t9);
-        frame.add(duty);
-        frame.add(t10);
-        frame.add(remark);
-        frame.add(e1);
-        frame.add(e2);
-        frame.setLocation(500, 110);
-        frame.setSize(500, 650);
-        frame.setVisible(true);
-    }
-
     /**
      * 显示一个自定义的对话框
      *
@@ -551,7 +463,7 @@ public class DeviceFrame extends JFrame {
      */
     private void showCustomDialog(Frame owner, Component parentComponent,TbDevice oldDevice) {
         // 创建一个模态对话框
-        final JDialog dialog = new JDialog(owner, "设备信息", true);
+        final JFrame dialog = new JFrame("设备信息");
         // 设置对话框的宽高
         //dialog.setSize(400, 400);
         dialog.setSize(500, 500);
@@ -573,54 +485,54 @@ public class DeviceFrame extends JFrame {
         JLabel jNameLabel = new JLabel("设备名称");
         jNameLabel.setBounds(100, 0, 90, 50);
         JTextField jNameTextField=new JTextField(30);
-        jNameTextField.setBounds(150, 10, 250, 30);
+        jNameTextField.setBounds(160, 10, 250, 30);
         dialog.add(jNameLabel);
         dialog.add(jNameTextField);
 
         JLabel jTypeNumLabel = new JLabel("设备型号");
         jTypeNumLabel.setBounds(100, 50, 90, 50);
         JTextField jTypeNumTextField=new JTextField(30);
-        jTypeNumTextField.setBounds(150, 60, 250, 30);
+        jTypeNumTextField.setBounds(160, 60, 250, 30);
         dialog.add(jTypeNumLabel);
         dialog.add(jTypeNumTextField);
 
         JLabel jCodeLabel = new JLabel("设备编码");
         jCodeLabel.setBounds(100, 100, 90, 50);
         JTextField jCodeTextField=new JTextField(30);
-        jCodeTextField.setBounds(150, 110, 250, 30);
+        jCodeTextField.setBounds(160, 110, 250, 30);
         dialog.add(jCodeLabel);
         dialog.add(jCodeTextField);
 
         JLabel jPositionLabel = new JLabel("存放位置");
         jPositionLabel.setBounds(100, 150, 90, 50);
         JTextField jPositionTextField=new JTextField(30);
-        jPositionTextField.setBounds(150, 160, 250, 30);
+        jPositionTextField.setBounds(160, 160, 250, 30);
         dialog.add(jPositionLabel);
         dialog.add(jPositionTextField);
 
         JLabel jFeaturesLabel = new JLabel("设备功能");
         jFeaturesLabel.setBounds(100, 200, 90, 50);
         JTextField jfeaturesTextField=new JTextField(30);
-        jfeaturesTextField.setBounds(150, 210, 250, 30);
+        jfeaturesTextField.setBounds(160, 210, 250, 30);
         dialog.add(jFeaturesLabel);
         dialog.add(jfeaturesTextField);
 
         JLabel imageLabel = new JLabel("设备图片");
         imageLabel.setBounds(100, 250, 90, 50);
         JButton imageBtn  = new JButton("请选择图片...");
-        imageBtn.setBounds(150, 260, 100, 30);
+        imageBtn.setBounds(160, 260, 100, 30);
         dialog.add(imageLabel);
         dialog.add(imageBtn);
 
         ImagePanel iPanel = new ImagePanel();
-        iPanel.setBounds(290, 260, 120, 90);
-        iPanel.setVisible(false);
+        iPanel.setBounds(280, 260, 100, 90);
+        //iPanel.setVisible(false);
         dialog.add(iPanel);
 
         JButton cancelBtn = new JButton("取消");
-        cancelBtn.setBounds(130, 370, 80, 30);
+        cancelBtn.setBounds(160, 370, 80, 30);
         JButton saveBtn = new JButton("保存");
-        saveBtn.setBounds(300, 370,  80, 30);
+        saveBtn.setBounds(280, 370,  80, 30);
         dialog.add(cancelBtn);
         dialog.add(saveBtn);
 
@@ -634,35 +546,37 @@ public class DeviceFrame extends JFrame {
             if(StringUtils.isNotBlank(oldDevice.getImage())){
                 iPanel.setImagePath(oldDevice.getImage());
                 iPanel.repaint();
-                iPanel.setVisible(true);
+                //iPanel.setVisible(true);
             }
             jfeaturesTextField.setText(oldDevice.getFeatures());
         }
 
-        iPanel.addActionListener(new ActionListener() {
+        iPanel.addMouseListener(new MouseAdapter(){
             @Override
-            public void actionPerformed(ActionEvent e) {
-                // 创建一个模态对话框
-               // final JDialog dialog = new JDialog(owner, "图片", true);
+            public void mouseClicked(MouseEvent e) {
+                // 处理鼠标点击
+                if(StringUtils.isNotBlank(iPanel.getImagePath()) && new File(iPanel.getImagePath().trim()).exists()){
+                    JFrame imageFrame = new JFrame();
 
-                final JDialog dialog = new JDialog(owner, "图片", true);
+                    // 设置对话框的宽高
+                    imageFrame.setSize(550, 450);
+                    imageFrame.setLocationRelativeTo(jf);
+                    imageFrame.toFront();
 
-                // 设置对话框的宽高
-                //dialog.setSize(400, 400);
-                dialog.setSize(500, 400);
-                // 设置对话框大小不可改变
-               // dialog.setResizable(false);
-                // 设置对话框相对显示的位置
-                dialog.setLocationRelativeTo(parentComponent);
-                //dialog.setLayout(null);
+                    JScrollImagePanel jScrollImagePanel = new JScrollImagePanel(iPanel.getImagePath());
+                    JScrollPane scrollPane=new JScrollPane();
+                    scrollPane.setViewportView(jScrollImagePanel);
 
-                JScrollPane scrollPane=new JScrollPane();
-                scrollPane.setViewportView(new JScrollImagePanel(iPanel.getImagePath()));
+                    //dialog.setSize(jScrollImagePanel.getWidth(), jScrollImagePanel.getHeight());
+                    imageFrame.add(scrollPane,BorderLayout.CENTER);
+                    //imageFrame.setVisible(true);
+                    ModalFrameUtil.showAsModal(imageFrame,dialog);
 
-                dialog.add(scrollPane,BorderLayout.CENTER);
-                dialog.setVisible(true);
+                    imageFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                }
 
             }
+
         });
 
 
@@ -671,8 +585,7 @@ public class DeviceFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                String[] picSufix = new String[]{".bmp",".jpg",".png",".tif",".gif",".pcx",".tga",".exif",".fpx",".svg",
-                        ".psd",".cdr",".pcd",".dxf",".ufo",".eps",".ai",".raw",".WMF",".w!ebp"};
+                String[] picSufix = new String[]{".jpg",".jpeg",".png"};
 
                 File selectedFile = JFileChooserUtil.getSelectedOpenFile(picSufix,jf);
                 if(null != selectedFile){
@@ -736,75 +649,35 @@ public class DeviceFrame extends JFrame {
             }
         });
 
-        // 添加组件到面板
-        /*panel.add(namePane);
-        panel.add(typePane);
-        panel.add(codePane);
-        panel.add(positionPane);
-        panel.add(featuresPane);
-        panel.add(imagePane);*/
-        //panel.add(buttonPane);
-        /*dialog.add(panel,BorderLayout.CENTER);
-        dialog.add(buttonPane,BorderLayout.SOUTH);*/
-
-        // 设置对话框的内容面板
-        //dialog.setContentPane(panel);
-
+        ModalFrameUtil.showAsModal(dialog,jf);
         // 显示对话框
-        dialog.setVisible(true);
+        //这个只能调用一次，不然会删两次才能删掉
+        //dialog.setVisible(true);
+        dialog.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
     private void doImportExcelAction(String[] sufixArr) {
         File selectedFile = JFileChooserUtil.getSelectedOpenFile(sufixArr,this);
         if (selectedFile != null) {
             // String name=selectedFile.getName();
-            String path = selectedFile.getPath();
-
             List<TbDevice> deviceList = DeviceExportHelper.getDeviceData(selectedFile.getPath());
             DaoFactory.getDeviceDao().insertBatch(deviceList);
-            //System.out.println(path);
-            //FromExcel(path);
-            //fillTable(userdao.findAll());
-
         }
     }
-
     private void doExportExcelAction() {
-        File selectedFile = JFileChooserUtil.getSelectedFile(".xls",this);
+        String fileName = "设备表格-"+new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        File selectedFile = JFileChooserUtil.getSelectedFile(fileName,".xlsx",this);
         if (selectedFile != null) {
             String path = selectedFile.getPath();
-
-            // System.out.println(path);
             ToExcel(path);
         }
     }
 
     public void ToExcel(String path) {
 
-        List<TbDevice> list = DaoFactory.getDeviceDao().findByPage(10,5);
+        List<TbDevice> list = DaoFactory.getDeviceDao().findAll();
 
-       /* HSSFWorkbook wb = new HSSFWorkbook();
-        HSSFSheet sheet = wb.createSheet("Users");
-
-        String[] n = { "序号", "名称", "型号", "管理编码",
-                "存放位置", "图片", "功用"};
-
-        Object[][] value = new Object[list.size() + 1][7];
-
-        for (int i = 0; i < list.size(); i++) {
-            TbDevice device = list.get(i);
-
-            value[i + 1][0] = device.getId();
-            value[i + 1][1] = device.getName();
-            value[i + 1][2] = device.getTypeNum();
-            value[i + 1][3] = device.getCode();
-            value[i + 1][4] = device.getSavePosition();
-            value[i + 1][5] = device.getImage();
-            value[i + 1][6] = device.getFeatures();
-
-        }
-        ExcelUtil.writeArrayToExcel(wb, sheet, list.size() + 1, 7, value);*/
-
+       /* ExcelUtil.writeArrayToExcel(wb, sheet, list.size() + 1, 7, value);*/
         XSSFWorkbook wb = ExcelUtil.getWorkBook(list,path);
 
         ExcelUtil.writeWorkbook(wb, path);
@@ -813,7 +686,7 @@ public class DeviceFrame extends JFrame {
 
     public static void main(String[] args){
         //设置样式
-        CommonUtil.setlookandfeel();
+        //CommonUtil.setlookandfeel();
         DeviceFrame deviceFrame = new DeviceFrame();
     }
 }

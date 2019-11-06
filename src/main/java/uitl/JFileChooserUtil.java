@@ -76,8 +76,7 @@ public class JFileChooserUtil {
         }
     }
 
-    public static File getSelectedFile(final String type, Container container) {
-        String name = container.getName();
+    public static File getSelectedFile(String fileName,final String type, Container container) {
 
         JFileChooser pathChooser = new JFileChooser();
         pathChooser.setFileFilter(new FileFilter() {
@@ -100,7 +99,7 @@ public class JFileChooserUtil {
                 return "文件格式（" + type + "）";
             }
         });
-        pathChooser.setSelectedFile(new File(name + type));
+        pathChooser.setSelectedFile(new File(fileName + type));
         int showSaveDialog = pathChooser.showSaveDialog(container);
         if (showSaveDialog == JFileChooser.APPROVE_OPTION) {
             return pathChooser.getSelectedFile();

@@ -1,6 +1,5 @@
 package controller;
 
-import bean.DeviceExcelColum;
 import bean.TbDevice;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -259,7 +258,25 @@ public class ExcelUtil {
      */
     public static void writeWorkbook(XSSFWorkbook wb,String fileName){
         FileOutputStream fos=null;
-        File f=new File(fileName);
+        File f =new File(fileName);
+
+        String name = fileName.substring(0,fileName.lastIndexOf("."));
+        String sufix = fileName.substring(fileName.lastIndexOf("."));
+
+        int i = 1;
+        while (f.exists()&& i < 1000){
+            fileName = name+"（"+i+"）"+sufix;
+            f = new File(fileName);
+            i++;
+        }
+
+        if(!f.exists()){
+            try {
+                f.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         try {
             fos=new FileOutputStream(f);
             wb.write(fos);
@@ -299,7 +316,7 @@ public class ExcelUtil {
     }
 
     public static XSSFWorkbook getWorkBook(List<TbDevice> deviceList, String filePath) {
-        DeviceExcelColum colum = new DeviceExcelColum(true);
+        //DeviceExcelColum colum = new DeviceExcelColum(true);
 
         String[] alias = { "序号", "名称", "型号", "管理编码",
                 "存放位置", "图片", "功用"};
@@ -307,90 +324,87 @@ public class ExcelUtil {
 
         //String[] keys = colum.colums;
         XSSFWorkbook workbook = new XSSFWorkbook();
-        int sheetSize = deviceList.size() + 50;
-        double sheetNo = Math.ceil(deviceList.size() / sheetSize);
-        for (int index = 0; index <= sheetNo; index++) {
-            XSSFSheet sheet = workbook.createSheet();
+        XSSFSheet sheet = workbook.createSheet();
 
-            //sheet.setDefaultColumnWidth(100*256);
-            //sheet.setDefaultRowHeight((short) 2000);
+        //sheet.setDefaultColumnWidth(100*256);
+        //sheet.setDefaultRowHeight((short) 2000);
 
-            workbook.setSheetName(index, "人才、志愿者" + index);
-            XSSFRow row = sheet.createRow(0);
+        workbook.setSheetName(0, "设备表格");
+        XSSFRow row = sheet.createRow(0);
 
-           // sheet.setColumnWidth(0, 2048);
+       // sheet.setColumnWidth(0, 2048);
 
-            XSSFCell cell;
-            XSSFCellStyle cellStyle = workbook.createCellStyle();
-            XSSFFont font = workbook.createFont();
-            font.setBoldweight(XSSFFont.BOLDWEIGHT_BOLD);
-            // 居中
-            cellStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
-            // 加粗
-            cellStyle.setFont(font);
-            //创建标题
-            for (int i = 0; i < alias.length; i++) {
-                cell = row.createCell(i);
-                cell.setCellValue(alias[i]);
-                cell.setCellStyle(cellStyle);
-            }
-            int startNo = index * sheetSize;
-            int endNo = Math.min(startNo + sheetSize, deviceList.size());
-            cellStyle = workbook.createCellStyle();
-            // 居中
-            cellStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
-            cellStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
-            // 写入各条记录,每条记录对应excel表中的一行
-            for (int i = startNo; i < endNo; i++) {
-                int rowNum = i + 1 - startNo ;
-                row = sheet.createRow(rowNum);
-                TbDevice device = deviceList.get(i);
-
-                sheet.setColumnWidth(i, (short)4000);
-                row.setHeight((short)1000);
-
-                setCellValue(row.createCell(0), cellStyle, device.getId());
-                setCellValue(row.createCell(1), cellStyle, device.getName());
-                setCellValue(row.createCell(2), cellStyle, device.getTypeNum());
-                setCellValue(row.createCell(3), cellStyle, device.getCode());
-                setCellValue(row.createCell(4), cellStyle, device.getSavePosition());
-                cell = row.createCell(5);
-
-               // sheet.addMergedRegion(new CellRangeAddress(i + 4,i + 4,i + 4,i + 4)) ;
-                if(StringUtils.isNotBlank(device.getImage())){
-                    // 头像
-                    File photoFile = new File(device.getImage().trim()) ;
-                    if (photoFile.exists()){
-
-                        try {
-                            BufferedImage bufferedImage = ImageIO.read(photoFile) ;
-                            ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
-                            ImageIO.write(bufferedImage, "jpg", byteArrayOut);
-                            byte[] data = byteArrayOut.toByteArray();
-                            XSSFDrawing drawingPatriarch = sheet.createDrawingPatriarch();
-                            XSSFClientAnchor anchor = new XSSFClientAnchor(100, 100, 1000, 1000, (short)5, i + 1, (short) 6, i + 2);
-                            //todo限制图片格式
-                            drawingPatriarch.createPicture(anchor, workbook.addPicture(data, XSSFWorkbook.PICTURE_TYPE_JPEG));
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
-                    } else {
-                        cell.setCellType(XSSFCell.CELL_TYPE_STRING);
-                        cell.setCellValue("");
-                    }
-                }
-                setCellValue(row.createCell(6), cellStyle, device.getFeatures());
-
-            }
-            /*// 设置列宽
-            for (int i = 1; i < alias.length; i++) {
-                sheet.autoSizeColumn(i);
-            }
-            // 处理中文不能自动调整列宽的问题
-            setSizeColumn(sheet, alias.length);*/
+        XSSFCell cell;
+        XSSFCellStyle cellStyle = workbook.createCellStyle();
+        XSSFFont font = workbook.createFont();
+        font.setBoldweight(XSSFFont.BOLDWEIGHT_BOLD);
+        // 居中
+        cellStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+        // 加粗
+        cellStyle.setFont(font);
+        //创建标题
+        for (int i = 0; i < alias.length; i++) {
+            cell = row.createCell(i);
+            cell.setCellValue(alias[i]);
+            cell.setCellStyle(cellStyle);
         }
+
+        cellStyle = workbook.createCellStyle();
+        // 居中
+        cellStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+        cellStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+        // 写入各条记录,每条记录对应excel表中的一行
+        for (int i = 0; i < deviceList.size(); i++) {
+            //数据行从1开始，标题行是1
+            row = sheet.createRow(i+1);
+            TbDevice device = deviceList.get(i);
+            //设置列宽和行高
+            sheet.setColumnWidth(i, (short)4000);
+            row.setHeight((short)1000);
+
+            setCellValue(row.createCell(0), cellStyle, i+1);
+            setCellValue(row.createCell(1), cellStyle, device.getName());
+            setCellValue(row.createCell(2), cellStyle, device.getTypeNum());
+            setCellValue(row.createCell(3), cellStyle, device.getCode());
+            setCellValue(row.createCell(4), cellStyle, device.getSavePosition());
+            cell = row.createCell(5);
+
+            //sheet.addMergedRegion(new CellRangeAddress(i + 1,i + 2,5,6)) ;
+            if(StringUtils.isNotBlank(device.getImage())){
+                // 头像
+                File photoFile = new File(device.getImage().trim()) ;
+                if (photoFile.exists()){
+                    try {
+                        BufferedImage bufferedImage = ImageIO.read(photoFile) ;
+                        ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
+                        ImageIO.write(bufferedImage, "jpg", byteArrayOut);
+                        byte[] data = byteArrayOut.toByteArray();
+                        XSSFDrawing drawingPatriarch = sheet.createDrawingPatriarch();
+                        //图片位置的调整可设置XSSFClientAnchor的前四个参数：分别是图片距离单元格left，top，right，bottom的像素距离
+                        //单位最小为10000
+                        XSSFClientAnchor anchor = new XSSFClientAnchor(10000*10, 10000*10, 10000*110, 10000*55, (short)5, i + 1, (short) 5, i + 1);
+                        //todo限制图片格式
+                        drawingPatriarch.createPicture(anchor, workbook.addPicture(data, XSSFWorkbook.PICTURE_TYPE_JPEG));
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                } else {
+                    cell.setCellType(XSSFCell.CELL_TYPE_STRING);
+                    cell.setCellValue("");
+                }
+            }
+            setCellValue(row.createCell(6), cellStyle, device.getFeatures());
+
+        }
+        /*// 设置列宽
+        for (int i = 1; i < alias.length; i++) {
+            sheet.autoSizeColumn(i);
+        }
+        // 处理中文不能自动调整列宽的问题
+        setSizeColumn(sheet, alias.length);*/
+
 
         return workbook;
     }

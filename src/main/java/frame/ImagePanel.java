@@ -11,7 +11,7 @@ import java.io.File;
 
 @Data
 @NoArgsConstructor
-public class ImagePanel extends JButton {
+public class ImagePanel extends JLabel {
 
     Image image = null;
 

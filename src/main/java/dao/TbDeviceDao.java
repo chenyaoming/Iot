@@ -12,6 +12,11 @@ public class TbDeviceDao {
 
     public static final String COLUMS = "name,typeNum,code,savePosition,image,features";
 
+    public List<TbDevice> findAll(){
+        String sql = "select * from TB_DEVICE";
+        return CommonDbUtil.queryReturnBeanList(sql,TbDevice.class);
+    }
+
     public List<TbDevice> findByPage(int page,int size){
         Object[] params = {(page -1)*size ,size};
         String sql = "select * from TB_DEVICE  limit ?,?";

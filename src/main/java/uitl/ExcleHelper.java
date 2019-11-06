@@ -77,6 +77,7 @@ public class ExcleHelper {
             }
 
         } catch (Exception e){
+            e.printStackTrace();
             throw new RuntimeException("读取表格报错");
         }
 
