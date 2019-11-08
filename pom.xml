@@ -45,10 +45,16 @@
     </dependency>
 
 
-    <dependency>
+    <!--<dependency>
       <groupId>com.zkteco</groupId>
       <artifactId>biometric</artifactId>
       <version>1.0</version>
+    </dependency>-->
+
+    <dependency>
+      <groupId>com.zkteco</groupId>
+      <artifactId>ZKFingerReader</artifactId>
+      <version>1.0.0</version>
     </dependency>
 
     <dependency>

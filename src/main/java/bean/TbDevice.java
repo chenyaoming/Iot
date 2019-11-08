@@ -14,6 +14,8 @@ public class TbDevice {
 
     private String name;
 
+
+
     /**
      * 型号
      */
@@ -23,6 +25,11 @@ public class TbDevice {
      * 编码
      */
     private String code;
+
+    /**
+     * 库存数量
+     */
+    private Integer count;
 
     /**
      * 存放位置

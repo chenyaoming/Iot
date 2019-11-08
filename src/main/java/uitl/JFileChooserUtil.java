@@ -42,7 +42,7 @@ public class JFileChooserUtil {
     }
 
     public static File getSelectedOpenFile(final String[] types, Container container) {
-        String name = container.getName();
+        //String name = container.getName();
 
         JFileChooser pathChooser = new JFileChooser();
          pathChooser.setFileFilter(new FileFilter() {

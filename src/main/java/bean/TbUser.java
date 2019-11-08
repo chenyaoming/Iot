@@ -12,12 +12,38 @@ public class TbUser {
 
     private Integer id;
 
+    /**
+     * 姓名
+     */
     private String name;
 
+    /**
+     * 性别
+     */
+    private String gender;
+
+    /**
+     * 年龄
+     */
+    private Integer age;
+
+    /**
+     * 联系电话
+     */
+    private String phone;
+
+    /**
+     * 创建时间
+     */
     private Date createDate;
 
     /**
      * 指纹id,这个唯一
      */
-    private int fingerId;
+    private Integer fingerId;
+
+    public TbUser(String name, String phone) {
+        this.name = name;
+        this.phone = phone;
+    }
 }

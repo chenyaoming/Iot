@@ -21,6 +21,7 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import table.device.DeviceTable;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -318,7 +319,7 @@ public class ExcelUtil {
     public static XSSFWorkbook getWorkBook(List<TbDevice> deviceList, String filePath) {
         //DeviceExcelColum colum = new DeviceExcelColum(true);
 
-        String[] alias = { "序号", "名称", "型号", "管理编码",
+        String[] alias = { "序号", "名称", "型号", "管理编码","库存数量",
                 "存放位置", "图片", "功用"};
 
 
@@ -366,8 +367,10 @@ public class ExcelUtil {
             setCellValue(row.createCell(1), cellStyle, device.getName());
             setCellValue(row.createCell(2), cellStyle, device.getTypeNum());
             setCellValue(row.createCell(3), cellStyle, device.getCode());
-            setCellValue(row.createCell(4), cellStyle, device.getSavePosition());
-            cell = row.createCell(5);
+            setCellValue(row.createCell(4), cellStyle, device.getCount());
+
+            setCellValue(row.createCell(5), cellStyle, device.getSavePosition());
+            cell = row.createCell(6);
 
             //sheet.addMergedRegion(new CellRangeAddress(i + 1,i + 2,5,6)) ;
             if(StringUtils.isNotBlank(device.getImage())){
@@ -382,7 +385,8 @@ public class ExcelUtil {
                         XSSFDrawing drawingPatriarch = sheet.createDrawingPatriarch();
                         //图片位置的调整可设置XSSFClientAnchor的前四个参数：分别是图片距离单元格left，top，right，bottom的像素距离
                         //单位最小为10000
-                        XSSFClientAnchor anchor = new XSSFClientAnchor(10000*10, 10000*10, 10000*110, 10000*55, (short)5, i + 1, (short) 5, i + 1);
+
+                        XSSFClientAnchor anchor = new XSSFClientAnchor(10000*10, 10000*10, 10000*110, 10000*55, (short)(DeviceTable.IMAGE_COLUM - 1), i + 1, (short) (DeviceTable.IMAGE_COLUM - 1), i + 1);
                         //todo限制图片格式
                         drawingPatriarch.createPicture(anchor, workbook.addPicture(data, XSSFWorkbook.PICTURE_TYPE_JPEG));
 
@@ -395,7 +399,7 @@ public class ExcelUtil {
                     cell.setCellValue("");
                 }
             }
-            setCellValue(row.createCell(6), cellStyle, device.getFeatures());
+            setCellValue(row.createCell(7), cellStyle, device.getFeatures());
 
         }
         /*// 设置列宽

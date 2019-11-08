@@ -519,6 +519,7 @@ public class ZKFPDemo extends JFrame{
 				System.out.println("采集指纹图像，指纹模板.......");
 				if (0 == (ret = FingerprintSensorEx.AcquireFingerprint(mhDevice, imgbuf, template, templateLen)))
 				{
+					System.out.println(ret);
 					//检查是否是假手指
 					if (checkFakeFinger()) {
 						return;
@@ -529,6 +530,7 @@ public class ZKFPDemo extends JFrame{
 					OnExtractOK(template, templateLen[0]);
 				}
 				try {
+					System.out.println(ret);
 					//每0.5秒搜集一次
 					Thread.sleep(500);
 				} catch (InterruptedException e) {
@@ -655,6 +657,7 @@ public class ZKFPDemo extends JFrame{
 			//DBMerge 合并3次按手指的指纹模板。  DBAdd 添加登记模板到内存。
 			if (0 == (ret = FingerprintSensorEx.DBMerge(mhDB, regtemparray[0], regtemparray[1], regtemparray[2], regTemp, _retLen)) &&
 					0 == (ret = FingerprintSensorEx.DBAdd(mhDB, iFid, regTemp))) {
+				System.out.println("登记成功的指纹id:"+iFid);
 				iFid++;
 				//实际返回指纹模板的长度
 				cbRegTemp = _retLen[0];

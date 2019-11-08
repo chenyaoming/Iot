@@ -36,6 +36,11 @@ public class DeviceExcelColum {
     @FieldSort(order = 6) public String code;
 
     /**
+     * 库存数量
+     */
+    @FieldSort(order = 7) public String count;
+
+    /**
      * 存放位置
      */
     @FieldSort(order = 8) public String savePosition;

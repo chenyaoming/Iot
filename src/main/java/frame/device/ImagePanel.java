@@ -1,4 +1,4 @@
-package frame;
+package frame.device;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

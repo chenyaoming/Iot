@@ -7,7 +7,7 @@
  *
  * @author gao
  */
-import frame.JScrollImagePanel;
+import frame.device.JScrollImagePanel;
 
 import java.awt.*;
 

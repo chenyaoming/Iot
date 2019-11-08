@@ -10,7 +10,7 @@ import java.util.List;
 
 public class TbDeviceDao {
 
-    public static final String COLUMS = "name,typeNum,code,savePosition,image,features";
+    public static final String COLUMS = "name,typeNum,code,count,savePosition,image,features";
 
     public List<TbDevice> findAll(){
         String sql = "select * from TB_DEVICE";
@@ -59,9 +59,9 @@ public class TbDeviceDao {
 
     public Integer insert(TbDevice device){
 
-        String sql = "INSERT INTO TB_DEVICE("+ COLUMS +") VALUES(?,?,?,?,?,?)";
+        String sql = "INSERT INTO TB_DEVICE("+ COLUMS +") VALUES(?,?,?,?,?,?,?)";
 
-        Object[] params = {device.getName(),device.getTypeNum(),device.getCode(),
+        Object[] params = {device.getName(),device.getTypeNum(),device.getCode(),device.getCount(),
                 device.getSavePosition(),device.getImage(),device.getFeatures()};
         return CommonDbUtil.insertOneRetureId(sql,params);
     }
@@ -73,12 +73,12 @@ public class TbDeviceDao {
     }
 
     public void insertBatch(List<TbDevice> deviceList){
-        String sql = "INSERT INTO TB_DEVICE("+ COLUMS +") VALUES(?,?,?,?,?,?)";
+        String sql = "INSERT INTO TB_DEVICE("+ COLUMS +") VALUES(?,?,?,?,?,?,?)";
 
         if(CollectionUtils.isEmpty(deviceList)){
             return ;
         }
-        Object[][] dataParam = new Object[deviceList.size()][6];
+        Object[][] dataParam = new Object[deviceList.size()][7];
 
         //List<Object[]> paramsList = new ArrayList<>();
 
@@ -87,9 +87,11 @@ public class TbDeviceDao {
             dataParam[i][0]=device.getName();
             dataParam[i][1]=device.getTypeNum();
             dataParam[i][2]=device.getCode();
-            dataParam[i][3]=device.getSavePosition();
-            dataParam[i][4]=device.getImage();
-            dataParam[i][5]=device.getFeatures();
+            dataParam[i][3]=device.getCount();
+
+            dataParam[i][4]=device.getSavePosition();
+            dataParam[i][5]=device.getImage();
+            dataParam[i][6]=device.getFeatures();
         }
 
        /* for (TbDevice device :deviceList){
@@ -109,10 +111,10 @@ public class TbDeviceDao {
 
     public void update(TbDevice device){
 
-        Object[] params = {device.getName(),device.getTypeNum(),device.getCode(),
+        Object[] params = {device.getName(),device.getTypeNum(),device.getCode(),device.getCount(),
                 device.getSavePosition(),device.getImage(),device.getFeatures(),device.getId()};
 
-        String sql = "update TB_DEVICE set name =?,typeNum =? ,code =? ,savePosition =? ,image =? ,features =? " +
+        String sql = "update TB_DEVICE set name =?,typeNum =? ,code =?,count =? ,savePosition =? ,image =? ,features =? " +
                 " where id = ?";
         CommonDbUtil.update(sql,params);
     }
