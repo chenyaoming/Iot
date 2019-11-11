@@ -1,5 +1,6 @@
 package frame;
 
+import frame.borrow.BorrowPanel;
 import frame.device.DevicePanel;
 import frame.user.UserPanel;
 
@@ -60,8 +61,9 @@ public class MainFram extends JFrame{
         tabbedPane.addTab("人员管理", new UserPanel(this));
 
         // 创建第 3 个选项卡（选项卡包含 标题、图标 和 tip提示）
-        tabbedPane.addTab("借出归还管理", new ImageIcon("bb.jpg"), createTextPanel("TAB 03"), "This is a tab.");
+        //tabbedPane.addTab("借出归还管理", new ImageIcon("bb.jpg"), createTextPanel("TAB 03"), "This is a tab.");
 
+        tabbedPane.addTab("借出归还管理", new BorrowPanel(this));
 
         // 添加选项卡选中状态改变的监听器
         tabbedPane.addChangeListener(new ChangeListener() {

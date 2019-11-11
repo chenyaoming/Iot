@@ -1,6 +1,7 @@
-package table.device;
+package table.borrow;
 
-import bean.TbDevice;
+import bean.TbBorrowRecord;
+import bean.TbUser;
 import dao.DaoFactory;
 import frame.device.JScrollImagePanel;
 import lombok.Data;
@@ -15,10 +16,12 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @Data
-public class DeviceTable extends JTable {
+public class BorrowTable extends JTable {
 	// JTable表分页信息相关变量
 	private int currentPage = 1;
 	private int pageCount = 10; //每页显示的条数 ,跟下面mode 的10对应
@@ -27,11 +30,11 @@ public class DeviceTable extends JTable {
 
 	//从0开始，第0个列是id隐藏列
 	public static final int ID_HIDDEN_COLUM = 0;
-	//从0开始，第7个列是图片列
+	//从0开始，第6个列是图片列
 	public static final int IMAGE_COLUM = 7;
 	//图片列宽度
 	public static final int IMAGE_COLUM_WIDTH = 100;
-    //表格行高大小
+	//表格行高大小
 	public static final int ROW_HEIGHT = 40;
 
 	/**
@@ -44,16 +47,16 @@ public class DeviceTable extends JTable {
 	public static final int IMAGE_SHOW_HEIGHT = 30;
 
 	//ID为隐藏列
-	public static String[] COLUMN_NAMES = { "ID","序号", "名称", "型号", "管理编码","库存数量",
-			"存放位置", "图片", "功用"};
+	public static String[] COLUMN_NAMES = { "ID","序号","名称","型号", "管理编码", "存放位置", "图片","功用",
+			"借用人","借用日期","借出保管员","归还人","归还日期","归还保管员","备注"};
 
-	private Component ownFrame = null;
+	private JFrame ownFrame = null;
 
-	/*public DeviceTable() {
+	/*public TableBase() {
 		initTable();
 	}*/
 
-	public DeviceTable(Component ownFrame) {
+	public BorrowTable(JFrame ownFrame) {
 		this.ownFrame = ownFrame;
 		initTable();
 	}
@@ -61,15 +64,15 @@ public class DeviceTable extends JTable {
 
 	public void initTable() {
 
-        this.setTotalRowCount((int) DaoFactory.getDeviceDao().countAll());
-		List<TbDevice> deviceList = DaoFactory.getDeviceDao().findByPage(this.getCurrentPage(),this.getPageCount());
+        this.setTotalRowCount((int) DaoFactory.getUserDao().countAll());
+		List<TbBorrowRecord> borrowList = DaoFactory.getBorrowRecordDao().findByPage(this.getCurrentPage(),this.getPageCount());
 		//结果集的总页数
 		this.setTotalPage(totalRowCount % pageCount == 0 ? totalRowCount/ pageCount : totalRowCount / pageCount + 1);
-        this.showTable(deviceList);
+        this.showTable(borrowList);
         //表格单元格内容气泡悬浮显示
 		addMouseMotionListener(this);
-		addMouseListener(this);
 
+		addMouseListener(this);
 	}
 
 	// 表格允许被编辑
@@ -79,34 +82,48 @@ public class DeviceTable extends JTable {
 	}
 
 	/**
-	 * 显示表格数据 {"ID", "序号", "名称", "型号", "管理编码", "库存数量","存放位置", "图片", "功用"};
+	 * 显示表格数据 COLUMN_NAMES
 	 * @param list
 	 */
-	public void showTable(List<TbDevice> list){
+	public void showTable(List<TbBorrowRecord> list){
+
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 		Object[][] data = new Object[list.size()][COLUMN_NAMES.length];
 		if(CollectionUtils.isNotEmpty(list)){
 			for (int i = 0; i < list.size(); i++) {
 
-				TbDevice device = list.get(i);
+				TbBorrowRecord record = list.get(i);
 				//隐藏列
-				data[i][0] = device.getId();
+				data[i][0] = record.getId();
+				//序号
 				data[i][1] = (i + 1)+(currentPage-1)*pageCount;
-				data[i][2] = device.getName();
-				data[i][3] = device.getTypeNum();
-				data[i][4] = device.getCode();
-				data[i][5] = device.getCount();
-				data[i][6] = device.getSavePosition();
+
+				data[i][2] = record.getDeviceName();
+				data[i][3] = record.getDeviceType();
+				data[i][4] = record.getDeviceCode();
+				data[i][5] = record.getDevicePosition();
 
 
-				if(StringUtils.isNotBlank(device.getImage())){
+				if(StringUtils.isNotBlank(record.getDeviceImage())){
 
-					ImageIcon imageIcon = new ImageIcon(device.getImage().trim());
+					ImageIcon imageIcon = new ImageIcon(record.getDeviceImage().trim());
 					imageIcon.setImage(imageIcon.getImage().getScaledInstance(IMAGE_SHOW_WIDTH, IMAGE_SHOW_HEIGHT, Image.SCALE_DEFAULT));
 
-					data[i][7] = imageIcon;
+					data[i][6] = imageIcon;
 				}
-				data[i][8] = device.getFeatures();
+				data[i][7] = record.getFeatures();
+
+				data[i][8] = record.getBorrowUserName();
+				data[i][9] = simpleDateFormat.format(record.getBorrowDate());
+				data[i][10] = record.getBorrowClerkUserName();
+
+				data[i][11] = record.getReturnUserName();
+				if(null != record.getReturnDate()){
+					data[i][12] = simpleDateFormat.format(record.getReturnDate());
+				}
+				data[i][13] = record.getReturnClerkUserName();
+				data[i][14] = record.getRemark();
 			}
 		}
 		DefaultTableModel model = new DefaultTableModel(data, COLUMN_NAMES);
@@ -119,10 +136,9 @@ public class DeviceTable extends JTable {
 		this.getTableHeader().setReorderingAllowed(false);
 		// 设置表格内容不能被编辑
 		isCellEditable(this.getRowCount(), this.getColumnCount());
+
 		//设置行高
 		this.setRowHeight(ROW_HEIGHT);
-		//设置图片的列宽
-		setColumnWidth(IMAGE_COLUM,IMAGE_COLUM_WIDTH);
 
 		DefaultTableCellRenderer r = new DefaultTableCellRenderer();
 		r.setHorizontalAlignment(JLabel.CENTER);
@@ -167,11 +183,6 @@ public class DeviceTable extends JTable {
 	}
 
 
-	@Override
-	public Class getColumnClass(int column) {
-		return (column == IMAGE_COLUM) ? Icon.class : Object.class;
-	}
-
 	/**
 	 * 设置指定列的宽度
 	 * @param colname  列名
@@ -206,6 +217,9 @@ public class DeviceTable extends JTable {
 	/**
 	 *  表格单元格内容气泡悬浮显示
 	 */
+	/**
+	 *  表格单元格内容气泡悬浮显示
+	 */
 	public void addMouseMotionListener(JTable table){
 		addMouseMotionListener(new MouseAdapter() {
 			@Override
@@ -224,6 +238,7 @@ public class DeviceTable extends JTable {
 			}
 		});
 	}
+
 
 	public void addMouseListener(final  JTable table) {
 		table.addMouseListener(new MouseAdapter() {
@@ -265,5 +280,11 @@ public class DeviceTable extends JTable {
 
 		});
 	}
+
+	@Override
+	public Class getColumnClass(int column) {
+		return (column == IMAGE_COLUM) ? Icon.class : Object.class;
+	}
+
 
 }

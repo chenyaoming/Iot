@@ -25,6 +25,26 @@ public class TbBorrowRecord {
      */
     private Integer deviceId;
 
+    private String deviceName;
+
+    private String deviceType;
+
+    private String deviceCode;
+
+    private String devicePosition;
+
+    private String deviceImage;
+
+    /**
+     * 功能
+     */
+    private String features;
+
+    /**
+     * 借出数量
+     */
+    private Integer borrowNum;
+
     /**
      * 借用人id
      */
@@ -33,7 +53,7 @@ public class TbBorrowRecord {
     /**
      * 借用人名称
      */
-    private Integer borrowUserName;
+    private String borrowUserName;
 
     /**
      * 借用日期
