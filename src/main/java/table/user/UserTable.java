@@ -24,6 +24,9 @@ public class UserTable extends JTable {
 	//从0开始，第0个列是id隐藏列
 	public static final int ID_HIDDEN_COLUM = 0;
 
+	//表格行高大小
+	public static final int ROW_HEIGHT = 40;
+
 	//ID为隐藏列
 	public static String[] COLUMN_NAMES = { "ID","序号","姓名", "性别", "年龄", "联系电话","创建时间"};
 
@@ -91,6 +94,9 @@ public class UserTable extends JTable {
 		this.getTableHeader().setReorderingAllowed(false);
 		// 设置表格内容不能被编辑
 		isCellEditable(this.getRowCount(), this.getColumnCount());
+
+		//设置行高
+		this.setRowHeight(ROW_HEIGHT);
 
 		DefaultTableCellRenderer r = new DefaultTableCellRenderer();
 		r.setHorizontalAlignment(JLabel.CENTER);

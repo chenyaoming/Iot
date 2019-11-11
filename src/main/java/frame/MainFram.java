@@ -49,7 +49,7 @@ public class MainFram extends JFrame{
 
         // 主界面标题
         this.setTitle("出入库系统");
-        this.setIconImage(new ImageIcon("images/logo.ico").getImage());
+        this.setIconImage(new ImageIcon("images/logo.png").getImage());
 
 
 

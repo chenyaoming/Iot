@@ -2,16 +2,13 @@ package frame.user;
 
 import bean.TbUser;
 import dao.DaoFactory;
-import jodd.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import table.user.UserTable;
-import uitl.ModalFrameUtil;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class UserPanel extends JPanel {
@@ -319,140 +316,8 @@ public class UserPanel extends JPanel {
      * @param parentComponent 对话框的父级组件
      */
     private void showCustomDialog(Frame owner, Component parentComponent,TbUser oldUser) {
-        // 创建一个模态对话框
-        final JFrame dialog = new JFrame("用户信息");
-        // 设置对话框的宽高
-        //dialog.setSize(400, 400);
-        dialog.setSize(500, 500);
-        // 设置对话框大小不可改变
-        dialog.setResizable(false);
-        // 设置对话框相对显示的位置
-        dialog.setLocationRelativeTo(parentComponent);
-        dialog.setLayout(null);
-
-        Font f1 = new Font("楷体", Font.BOLD, 19);
-        Font f2 = new Font("楷体", Font.BOLD, 16);
-
-
-        JTextField idTextField =new JTextField(30);
-        idTextField.setVisible(false);
-        dialog.add(idTextField);
-
-
-        JLabel nameLabel = new JLabel("姓名");
-        nameLabel.setBounds(100, 0, 90, 50);
-        JTextField nameField=new JTextField(30);
-        nameField.setBounds(160, 10, 250, 30);
-        dialog.add(nameLabel);
-        dialog.add(nameField);
-
-        JLabel genderLabel = new JLabel("性别");
-        genderLabel.setBounds(100, 50, 90, 50);
-        JTextField genderField=new JTextField(30);
-        genderField.setBounds(160, 60, 250, 30);
-        dialog.add(genderLabel);
-        dialog.add(genderField);
-
-        JLabel ageLabel = new JLabel("年龄");
-        ageLabel.setBounds(100, 100, 90, 50);
-        JTextField ageField=new JTextField(30);
-        ageField.setBounds(160, 110, 250, 30);
-        dialog.add(ageLabel);
-        dialog.add(ageField);
-
-        JLabel phoneLabel = new JLabel("联系电话");
-        phoneLabel.setBounds(100, 150, 90, 50);
-        JTextField phoneField=new JTextField(30);
-        phoneField.setBounds(160, 160, 250, 30);
-        dialog.add(phoneLabel);
-        dialog.add(phoneField);
-
-        JLabel createDateLabel = new JLabel("创建时间");
-        createDateLabel.setBounds(100, 200, 90, 50);
-        JTextField createDateField=new JTextField(30);
-        createDateField.setBounds(160, 210, 250, 30);
-        dialog.add(createDateLabel);
-        dialog.add(createDateField);
-
-
-        JButton cancelBtn = new JButton("取消");
-        cancelBtn.setBounds(160, 370, 80, 30);
-        JButton saveBtn = new JButton("保存");
-        saveBtn.setBounds(280, 370,  80, 30);
-        dialog.add(cancelBtn);
-        dialog.add(saveBtn);
-
-        if(null != oldUser){
-            idTextField.setText(oldUser.getId().toString());
-            nameField.setText(oldUser.getName());
-
-            genderField.setText(oldUser.getGender());
-            if(null != oldUser.getAge()){
-                ageField.setText(oldUser.getAge().toString());
-            }
-            phoneField.setText(oldUser.getPhone());
-            createDateField.setText(new SimpleDateFormat("yyyy-MM-dd").format(oldUser.getCreateDate()));
-
-        }
-
-
-        // 保存按钮
-        saveBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                TbUser newUser = new TbUser();
-                //user....
-
-                if(null != oldUser){
-                    newUser.setId(oldUser.getId());
-                }
-
-                if(StringUtils.isBlank(newUser.getName())){
-                    JOptionPane.showMessageDialog(new JPanel(),"请填写姓名","提示",1);
-                    return;
-                }
-                if(StringUtil.isBlank(newUser.getGender())){
-                    JOptionPane.showMessageDialog(new JPanel(),"请选择性别","提示",1);
-                    return;
-                }
-                if(null != newUser.getAge()){
-                    JOptionPane.showMessageDialog(new JPanel(),"请填写年龄","提示",1);
-                    return;
-                }
-                if(StringUtils.isBlank(newUser.getPhone())){
-                    JOptionPane.showMessageDialog(new JPanel(),"请填写联系电话","提示",1);
-                    return;
-                }
-
-                if(null != newUser.getId()){
-                    //编辑更新
-                    DaoFactory.getUserDao().update(newUser);
-                }else{
-                    //增加
-                    DaoFactory.getUserDao().insert(newUser);
-                }
-
-                dialog.dispose();
-                JOptionPane.showMessageDialog(new JPanel(),"操作成功","提示",JOptionPane.PLAIN_MESSAGE);
-
-                searchBtn.doClick();
-            }
-        });
-
-        // 取消按钮
-        cancelBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dialog.dispose();
-            }
-        });
-
-        ModalFrameUtil.showAsModal(dialog,jf);
-        // 显示对话框
-        //这个只能调用一次，不然会删两次才能删掉
-        //dialog.setVisible(true);
-        dialog.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        //添加用户框的弹出框
+         new UserAddDialog((JFrame) parentComponent,oldUser,searchBtn).showDialog();
     }
 
 
