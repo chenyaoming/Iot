@@ -14,6 +14,8 @@ public class DaoFactory {
         private static TbUserDao userDao = new TbUserDao();
 
         private static TbBorrowRecordDao borrowRecordDao = new TbBorrowRecordDao();
+
+        private static TbFingerDao fingerDao = new TbFingerDao();
     }
     /**
      * 私有化构造方法
@@ -29,7 +31,11 @@ public class DaoFactory {
         return SingletonHolder.userDao;
     }
 
-    public static  TbBorrowRecordDao getBorrowRecordDao(){
+    public static TbBorrowRecordDao getBorrowRecordDao(){
         return SingletonHolder.borrowRecordDao;
+    }
+
+    public static TbFingerDao getFingerDao(){
+        return SingletonHolder.fingerDao;
     }
 }
