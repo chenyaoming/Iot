@@ -11,9 +11,8 @@ import java.util.List;
 
 public class TbBorrowRecordDao {
 
-    public static final String[] columArr = {"deviceId","status",
-     "borrowUserId","borrowUserName","borrowDate", "borrowClerkUserId","borrowClerkUserName",
-    "returnUserId","returnUserName","returnDate","returnClerkUserId","returnClerkUserName","remark"};
+    public static final String[] columArr = {"deviceId","deviceName","deviceType","deviceCode","devicePosition","deviceImage","features","borrowNum",
+     "borrowUserId","borrowUserName","borrowDate", "borrowClerkUserId","borrowClerkUserName"};
 
 
     public List<TbBorrowRecord> findByPage(int page, int size){
@@ -56,12 +55,16 @@ public class TbBorrowRecordDao {
         return CommonDbUtil.queryReturnSimpleVal(sql.toString(),1,paramArr);
     }
 
-    public Integer insert(TbBorrowRecord record){
+    public Integer insert(TbBorrowRecord r){
         String colums = StringUtils.join(columArr, ",");
         String questionMarks = CommonDbUtil.spliceSqlQuestionMark(columArr.length);
 
         String sql = "INSERT INTO TB_BORROW_RECORD("+ colums +") VALUES("+ questionMarks +")";
-        Object[] params = CommonDbUtil.getBeanValues(record,columArr);
+        Object[] params = {r.getDeviceId(),r.getDeviceName(),r.getDeviceType(),r.getDeviceCode(),
+        r.getDevicePosition(),r.getDeviceImage(),r.getFeatures(),r.getBorrowNum(),r.getBorrowUserId(),
+        r.getBorrowUserName(),r.getBorrowDate(),r.getBorrowClerkUserId(),r.getBorrowClerkUserName()};
+
+        //CommonDbUtil.getBeanValues(record,columArr);
         return CommonDbUtil.insertOneRetureId(sql,params);
     }
 

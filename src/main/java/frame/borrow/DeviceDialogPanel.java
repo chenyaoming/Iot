@@ -1,6 +1,7 @@
 package frame.borrow;
 
 
+import bean.TbBorrowRecord;
 import bean.TbDevice;
 import controller.ExcelUtil;
 import dao.DaoFactory;
@@ -30,17 +31,12 @@ public class DeviceDialogPanel extends JPanel {
     DeviceTable table = null;
 
     private JDialog ownDialog = null ;
-    private JFrame parentFrame = null;
-    private JButton parentSearchBtn = null;
 
 
-    public DeviceDialogPanel(JFrame parentFrame,JButton parentSearchBtn, JDialog jDialog) {
+    public DeviceDialogPanel( JDialog jDialog) {
 
         this.ownDialog = jDialog;
-        this.parentFrame = parentFrame;
-        this.parentSearchBtn = parentSearchBtn;
-
-        table = new DeviceTable(parentFrame);
+        table = new DeviceTable();
         // 初始化所有控件
         initComponent();
         // 构造函数中调用initUI来向窗口中添加控件
@@ -290,7 +286,20 @@ public class DeviceDialogPanel extends JPanel {
                 }
 
                 ownDialog.dispose();
-                new BorrowDetailDialog(parentFrame,parentSearchBtn,device).showDialog();
+
+                TbBorrowRecord record = new TbBorrowRecord();
+                record.setDeviceId(device.getId());
+                record.setDeviceName(device.getName());
+                record.setDeviceCode(device.getCode());
+                record.setDeviceType(device.getTypeNum());
+                record.setDevicePosition(device.getSavePosition());
+                record.setDeviceImage(device.getImage());
+                record.setFeatures(device.getFeatures());
+
+                //借出的数量
+                //record.setBorrowNum(1);
+
+                new BorrowDetailDialog(record).showDialog();
             }
         });
 

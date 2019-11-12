@@ -1,8 +1,9 @@
 package frame.borrow;
 
 
+import bean.TbBorrowRecord;
 import bean.TbDevice;
-import bean.TbUser;
+import frame.FrameUtil;
 import frame.device.FingerImage;
 import frame.user.UserAddDialog;
 
@@ -13,40 +14,33 @@ import java.awt.event.WindowEvent;
 
 public class BorrowFingerDialog extends JDialog  {
 
-    private JFrame parentFrame;
     /**
      * 提示还要按多少次指纹的标签
      */
     private JLabel tipLabel;
 
-    /**
-     * 查询按钮
-     */
-    private JButton searchBtn;
+    private JDialog thisDialog;
 
-    private volatile JDialog thisDialog;
+    private TbBorrowRecord record;
 
     /**
      * 指纹标语
      */
     public static final String TIPTEMP = "请%s按下指纹";
 
-    public BorrowFingerDialog(JFrame parentFrame, JButton searchBtn, TbDevice device){
+    public BorrowFingerDialog(TbBorrowRecord record){
 
-        super(parentFrame,"指纹信息",true);
-
+        super(FrameUtil.currentFrame,"指纹信息",true);
         thisDialog = this;
 
-        //thisDialog = this;
-        this.parentFrame = parentFrame;
-        this.searchBtn = searchBtn;
+        this.record = record;
 
         // 处理鼠标点击
         this.setLayout(new BorderLayout());
 
         // 设置对话框的宽高
         this.setSize(550, 450);
-        this.setLocationRelativeTo(parentFrame);
+        this.setLocationRelativeTo(FrameUtil.currentFrame);
         this.toFront();
 
         FingerImage fingerImageLabel = new FingerImage();
@@ -54,7 +48,7 @@ public class BorrowFingerDialog extends JDialog  {
         this.add(fingerImageLabel, BorderLayout.CENTER);
 
         JPanel labelPanel = new JPanel();
-        JLabel tipLabel = new JLabel( String.format(TIPTEMP, 3));
+        JLabel tipLabel = new JLabel( String.format(TIPTEMP, "借用人"));
 
         Font font = new Font("宋体", Font.PLAIN, 25);
         tipLabel.setFont(font);
@@ -70,7 +64,7 @@ public class BorrowFingerDialog extends JDialog  {
             @Override
             public void windowClosing(WindowEvent e) {
                thisDialog.dispose();
-                //new UserAddDialog( parentFrame,device,searchBtn).showDialog();
+                new BorrowDetailDialog(record).showDialog();
             }
         });
 
@@ -83,15 +77,6 @@ public class BorrowFingerDialog extends JDialog  {
         this.setVisible(true);
     }
 
-    public JFrame getParentFrame() {
-        return parentFrame;
-    }
-
-    public void setParentFrame(JFrame parentFrame) {
-        this.parentFrame = parentFrame;
-    }
-
-
     public JLabel getTipLabel() {
         return tipLabel;
     }
@@ -100,11 +85,11 @@ public class BorrowFingerDialog extends JDialog  {
         this.tipLabel = tipLabel;
     }
 
-    public JButton getSearchBtn() {
-        return searchBtn;
+    public TbBorrowRecord getRecord() {
+        return record;
     }
 
-    public void setSearchBtn(JButton searchBtn) {
-        this.searchBtn = searchBtn;
+    public void setRecord(TbBorrowRecord record) {
+        this.record = record;
     }
 }

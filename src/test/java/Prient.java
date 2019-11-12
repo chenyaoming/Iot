@@ -19,7 +19,24 @@ public class Prient implements Printable {
         }
 
         Graphics2D g2d = (Graphics2D) g;
-        g2d.setFont(new Font("Default", Font.PLAIN, 14));
+
+
+
+        g2d.setFont(new Font("Default", Font.PLAIN, 12));
+
+        g2d.drawString("借用清单", 50, 10);
+        g2d.drawString("-------------------------------", 13, 20);
+
+        g2d.drawString("名称：电梯", 13, 40);
+        g2d.drawString("型号：K8-9999-9", 13, 60);
+        g2d.drawString("数量：K8-9999-9", 13, 80);
+        g2d.drawString("借用人：张三", 13, 100);
+        g2d.drawString("借用日期：2018.12.21", 13, 120);
+        g2d.drawString("借出保管员：李四", 13, 140);
+
+        g2d.drawString("-------------------------------", 13, 160);
+
+        /*
         g2d.drawString("等位排单号", 50, 10);
         g2d.drawString("-------------------------------------", 7, 20);
         g2d.drawString("手机号码：" + "11111111111", 7, 35);
@@ -31,7 +48,7 @@ public class Prient implements Printable {
         g2d.drawString("您之前还有" + 5 + "桌客人在等待", 7, 130);
         g2d.drawString("-------------------------------------", 7, 145);
         g2d.drawString("*打印时间:" + "1111" + "*", 7, 160);
-        g2d.drawString("店名：" + "11", 7, 175);
+        g2d.drawString("店名：" + "11", 7, 175);*/
 
         return PAGE_EXISTS;
     }

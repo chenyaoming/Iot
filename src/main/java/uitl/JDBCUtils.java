@@ -46,6 +46,7 @@ public final class JDBCUtils {
             try {
                 return DriverManager.getConnection(URL, USER, PASSWORD);
             } catch (SQLException e1) {
+                e1.printStackTrace();
                 throw new RuntimeException("数据库获取连接错误");
             }
         }

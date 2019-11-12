@@ -2,6 +2,8 @@ package frame.user;
 
 import bean.TbUser;
 import dao.DaoFactory;
+import frame.FrameUtil;
+import frame.PanelOperation;
 import org.apache.commons.lang3.StringUtils;
 import table.user.UserTable;
 
@@ -11,7 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-public class UserPanel extends JPanel {
+public class UserPanel extends JPanel implements PanelOperation {
     private JButton searchBtn, resetBtn, addBtn, btnEdit,prePage, nextPage, lastPage;
     private JPanel conditPanel, pagePanel;
     private JLabel userNameLabel, phoneLabel, pageInfo;
@@ -21,11 +23,9 @@ public class UserPanel extends JPanel {
 
     UserTable table = null;
 
-    public JFrame jf = null ;
 
-    public UserPanel(JFrame jFrame) {
-        jf = jFrame;
-        table = new UserTable(jf);
+    public UserPanel() {
+        table = new UserTable();
         // 初始化所有控件
         initComponent();
         // 构造函数中调用initUI来向窗口中添加控件
@@ -236,8 +236,7 @@ public class UserPanel extends JPanel {
         addBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                showCustomDialog(jf,jf,null);
-                //add1();
+                showCustomDialog(null);
             }
         });
 
@@ -287,20 +286,20 @@ public class UserPanel extends JPanel {
 
     private void doEditAction() {
         if(table.getSelectedRow() < 0){
-            JOptionPane.showMessageDialog(jf,"请选择一条记录编辑","提示",1);
+            JOptionPane.showMessageDialog(FrameUtil.currentFrame,"请选择一条记录编辑","提示",1);
             return;
         }
         String id = table.getValueAt(table.getSelectedRow(), 0).toString();
         if(StringUtils.isBlank(id)){
-            JOptionPane.showMessageDialog(jf,"此记录不存在","警告",2);
+            JOptionPane.showMessageDialog(FrameUtil.currentFrame,"此记录不存在","警告",2);
             return;
         }
         TbUser user = DaoFactory.getUserDao().queryById(Integer.valueOf(id));
         if(null == user){
-            JOptionPane.showMessageDialog(jf,"此记录不存在","警告",2);
+            JOptionPane.showMessageDialog(FrameUtil.currentFrame,"此记录不存在","警告",2);
             return;
         }
-        showCustomDialog(jf,jf,user);
+        showCustomDialog(user);
 
     }
 
@@ -311,14 +310,15 @@ public class UserPanel extends JPanel {
 
     /**
      * 显示一个自定义的对话框
-     *
-     * @param owner 对话框的拥有者
-     * @param parentComponent 对话框的父级组件
      */
-    private void showCustomDialog(Frame owner, Component parentComponent,TbUser oldUser) {
+    private void showCustomDialog(TbUser oldUser) {
         //添加用户框的弹出框
-         new UserAddDialog((JFrame) parentComponent,oldUser,searchBtn).showDialog();
+         new UserAddDialog(oldUser).showDialog();
     }
 
 
+    @Override
+    public JButton getSearchButton() {
+        return this.searchBtn;
+    }
 }

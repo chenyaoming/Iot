@@ -49,12 +49,7 @@ public class DeviceTable extends JTable {
 
 	private Component ownFrame = null;
 
-	/*public DeviceTable() {
-		initTable();
-	}*/
-
-	public DeviceTable(Component ownFrame) {
-		this.ownFrame = ownFrame;
+	public DeviceTable() {
 		initTable();
 	}
 

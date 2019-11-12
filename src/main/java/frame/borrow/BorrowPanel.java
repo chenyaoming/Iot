@@ -3,6 +3,8 @@ package frame.borrow;
 import bean.TbBorrowRecord;
 import bean.TbUser;
 import dao.DaoFactory;
+import frame.FrameUtil;
+import frame.PanelOperation;
 import frame.user.UserAddDialog;
 import org.apache.commons.lang3.StringUtils;
 import table.borrow.BorrowTable;
@@ -14,7 +16,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-public class BorrowPanel extends JPanel {
+public class BorrowPanel extends JPanel implements PanelOperation {
     private JButton searchBtn, resetBtn, addBtn, btnEdit,prePage, nextPage, lastPage;
     private JPanel conditPanel, pagePanel;
     private JLabel userNameLabel, phoneLabel, pageInfo;
@@ -24,11 +26,9 @@ public class BorrowPanel extends JPanel {
 
     BorrowTable table = null;
 
-    public JFrame jf = null ;
+    public BorrowPanel() {
 
-    public BorrowPanel(JFrame jFrame) {
-        jf = jFrame;
-        table = new BorrowTable(jf);
+        table = new BorrowTable();
         // 初始化所有控件
         initComponent();
         // 构造函数中调用initUI来向窗口中添加控件
@@ -240,8 +240,7 @@ public class BorrowPanel extends JPanel {
         addBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                showCustomDialog(jf);
-                //add1();
+                showCustomDialog();
             }
         });
 
@@ -291,20 +290,20 @@ public class BorrowPanel extends JPanel {
 
     private void doEditAction() {
         if(table.getSelectedRow() < 0){
-            JOptionPane.showMessageDialog(jf,"请选择一条记录编辑","提示",1);
+            JOptionPane.showMessageDialog(FrameUtil.currentFrame,"请选择一条记录编辑","提示",1);
             return;
         }
         String id = table.getValueAt(table.getSelectedRow(), 0).toString();
         if(StringUtils.isBlank(id)){
-            JOptionPane.showMessageDialog(jf,"此记录不存在","警告",2);
+            JOptionPane.showMessageDialog(FrameUtil.currentFrame,"此记录不存在","警告",2);
             return;
         }
         TbUser user = DaoFactory.getUserDao().queryById(Integer.valueOf(id));
         if(null == user){
-            JOptionPane.showMessageDialog(jf,"此记录不存在","警告",2);
+            JOptionPane.showMessageDialog(FrameUtil.currentFrame,"此记录不存在","警告",2);
             return;
         }
-        showCustomDialog(jf);
+        showCustomDialog();
 
     }
 
@@ -315,13 +314,15 @@ public class BorrowPanel extends JPanel {
 
     /**
      * 显示一个自定义的对话框
-     *
-     * @param parentComponent 对话框的父级组件
-     */
-    private void showCustomDialog(Component parentComponent) {
+     **/
+    private void showCustomDialog() {
         //添加用户框的弹出框
-         new BorrowSelectDialog((JFrame) parentComponent,searchBtn).showDialog();
+         new BorrowSelectDialog().showDialog();
     }
 
 
+    @Override
+    public JButton getSearchButton() {
+        return this.searchBtn;
+    }
 }

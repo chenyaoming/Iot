@@ -13,6 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class TbBorrowRecord {
 
+
     private Integer id;
 
     /**
@@ -68,7 +69,7 @@ public class TbBorrowRecord {
     /**
      * 借出保管员名称
      */
-    private Integer borrowClerkUserName;
+    private String borrowClerkUserName;
 
     /**
      * 归还人id
@@ -99,4 +100,6 @@ public class TbBorrowRecord {
      * 备注
      */
     private String remark;
+
+
 }

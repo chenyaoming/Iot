@@ -1,15 +1,14 @@
 package frame.borrow;
 
 
+import bean.TbBorrowRecord;
 import bean.TbDevice;
 import dao.DaoFactory;
+import frame.FrameUtil;
 import frame.device.ImagePanel;
 import frame.device.JScrollImagePanel;
-import frame.user.FingerDialog;
-import jodd.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import uitl.FingerHelper;
-import uitl.JFileChooserUtil;
 import uitl.ModalFrameUtil;
 
 import javax.swing.*;
@@ -25,22 +24,11 @@ import static java.util.regex.Pattern.compile;
 
 public class BorrowDetailDialog extends JFrame{
 
-    private JFrame parentFrame;
-
-    private TbDevice oldDevice;
-
-    /**
-     * 查询按钮
-     */
-    private JButton searchBtn;
-
     private volatile JFrame thisDialog;
 
-    public BorrowDetailDialog(JFrame parentFrame, JButton searchBtn, TbDevice oldDevice){
+    public BorrowDetailDialog( TbBorrowRecord record){
         this.setTitle("设备信息");
-        this.parentFrame = parentFrame;
         thisDialog = this;
-        this.searchBtn = searchBtn;
 
         // 创建一个模态对话框
        // final JFrame dialog = new JFrame("");
@@ -50,17 +38,11 @@ public class BorrowDetailDialog extends JFrame{
         // 设置对话框大小不可改变
         this.setResizable(false);
         // 设置对话框相对显示的位置
-        this.setLocationRelativeTo(parentFrame);
+        this.setLocationRelativeTo(FrameUtil.currentFrame);
         this.setLayout(null);
 
         Font f1 = new Font("楷体", Font.BOLD, 19);
         Font f2 = new Font("楷体", Font.BOLD, 16);
-
-
-        JTextField idTextField =new JTextField(30);
-        idTextField.setVisible(false);
-        this.add(idTextField);
-
 
         JLabel jNameLabel = new JLabel("设备名称");
         jNameLabel.setBounds(100, 0, 90, 50);
@@ -104,9 +86,22 @@ public class BorrowDetailDialog extends JFrame{
         JTextField jfeaturesTextField=new JTextField(30);
         jfeaturesTextField.setBounds(160, 260, 250, 30);
 
-        jfeaturesTextField.setBackground(Color.LIGHT_GRAY); //文本框背景设置为 亮灰色
-        //tf.setBackground(new Color(244, 244, 244));//文本框背景设置为指定的颜色
-        jfeaturesTextField.setEditable(false);//文本框设置为不可编辑
+
+        jNameTextField.setBackground(Color.LIGHT_GRAY);
+        jNameTextField.setEditable(false);
+
+        jTypeNumTextField.setBackground(Color.LIGHT_GRAY);
+        jTypeNumTextField.setEditable(false);
+
+        jCodeTextField.setBackground(Color.LIGHT_GRAY);
+        jCodeTextField.setEditable(false);
+
+        jPositionTextField.setBackground(Color.LIGHT_GRAY);
+        jPositionTextField.setEditable(false);
+
+        jfeaturesTextField.setBackground(Color.LIGHT_GRAY);
+        jfeaturesTextField.setEditable(false);
+
 
         this.add(jFeaturesLabel);
         this.add(jfeaturesTextField);
@@ -122,24 +117,23 @@ public class BorrowDetailDialog extends JFrame{
 
         JButton cancelBtn = new JButton("取消");
         cancelBtn.setBounds(160, 420, 80, 30);
-        JButton nextBtn = new JButton("保存");
+        JButton nextBtn = new JButton("下一步");
         nextBtn.setBounds(280, 420,  80, 30);
         this.add(cancelBtn);
         this.add(nextBtn);
 
-        if(null != oldDevice){
-            idTextField.setText(oldDevice.getId().toString());
-            jNameTextField.setText(oldDevice.getName());
-            jTypeNumTextField.setText(oldDevice.getTypeNum());
+        if(null != record){
+            jNameTextField.setText(record.getDeviceName());
+            jTypeNumTextField.setText(record.getDeviceType());
 
-            jCodeTextField.setText(oldDevice.getCode());
-            jPositionTextField.setText(oldDevice.getSavePosition());
-            if(StringUtils.isNotBlank(oldDevice.getImage())){
-                iPanel.setImagePath(oldDevice.getImage());
+            jCodeTextField.setText(record.getDeviceCode());
+            jPositionTextField.setText(record.getDevicePosition());
+            if(StringUtils.isNotBlank(record.getDeviceImage())){
+                iPanel.setImagePath(record.getDeviceImage());
                 iPanel.repaint();
                 //iPanel.setVisible(true);
             }
-            jfeaturesTextField.setText(oldDevice.getFeatures());
+            jfeaturesTextField.setText(record.getFeatures());
         }
 
         iPanel.addMouseListener(new MouseAdapter(){
@@ -151,7 +145,7 @@ public class BorrowDetailDialog extends JFrame{
 
                     // 设置对话框的宽高
                     imageFrame.setSize(550, 450);
-                    imageFrame.setLocationRelativeTo(parentFrame);
+                    imageFrame.setLocationRelativeTo(FrameUtil.currentFrame);
                     imageFrame.toFront();
 
                     JScrollImagePanel jScrollImagePanel = new JScrollImagePanel(iPanel.getImagePath());
@@ -170,41 +164,52 @@ public class BorrowDetailDialog extends JFrame{
 
         });
 
-
-
         // 下一步按钮
-        nextBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        nextBtn.addActionListener(e -> {
 
-                FingerHelper fingerThread = new FingerHelper();
-                BorrowFingerDialog fingerDialog = new BorrowFingerDialog(parentFrame,searchBtn,oldDevice);
-
-                //fingerThread.setFingerDialog(fingerDialog);
-
-                Thread dialogThread = new Thread(() -> {
-                    /**
-                     * 指纹弹窗
-                     */
-                    fingerDialog.showDialog();
-                    fingerThread.interrupt();
-                });
-                dialogThread.start();
-                fingerThread.start();
-
-               /* thisDialog.dispose();
-                JOptionPane.showMessageDialog(new JPanel(),"操作成功","提示",JOptionPane.PLAIN_MESSAGE);
-
-                searchBtn.doClick();*/
+            if(StringUtils.isBlank(borrowCountTextField.getText())){
+                JOptionPane.showMessageDialog(new JPanel(),"请输入借出数量","提示",1);
+                return;
             }
+
+            if(!isNumeric(borrowCountTextField.getText())){
+                JOptionPane.showMessageDialog(new JPanel(),"借出数量请输入正整数","提示",1);
+                return;
+            }
+
+            TbDevice device = DaoFactory.getDeviceDao().queryById(record.getDeviceId());
+
+            int borNum = Integer.parseInt(borrowCountTextField.getText().trim());
+
+            if(borNum > device.getCount()){
+                JOptionPane.showMessageDialog(new JPanel(),"此设备库存数量不足, 只剩"+device.getCount(),"提示",1);
+                return;
+            }
+            record.setBorrowNum(borNum);
+
+            BorrowFingerDialog borrowFingerDialog = new BorrowFingerDialog(record);
+            FingerHelper fingerThread = new FingerHelper(borrowFingerDialog);
+
+            /**
+             * 让添加的弹框隐藏
+             */
+            //thisDialog.setVisible(false);
+            thisDialog.dispose();
+
+            Thread dialogThread = new Thread(() -> {
+                /**
+                 * 指纹弹窗
+                 */
+                borrowFingerDialog.showDialog();
+                fingerThread.interrupt();
+            });
+            dialogThread.start();
+            fingerThread.start();
         });
 
         // 取消按钮
-        cancelBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                thisDialog.dispose();
-            }
+        cancelBtn.addActionListener(e -> {
+            thisDialog.dispose();
         });
         // 显示对话框
         //这个只能调用一次，不然会删两次才能删掉
@@ -214,7 +219,7 @@ public class BorrowDetailDialog extends JFrame{
 
     public void showDialog(){
         //会阻塞
-        ModalFrameUtil.showAsModal(this,parentFrame);
+        ModalFrameUtil.showAsModal(this,FrameUtil.currentFrame);
         //this.setVisible(true);
     }
 

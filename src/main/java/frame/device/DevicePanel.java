@@ -4,6 +4,8 @@ package frame.device;
 import bean.TbDevice;
 import controller.ExcelUtil;
 import dao.DaoFactory;
+import frame.FrameUtil;
+import frame.PanelOperation;
 import helper.DeviceExportHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -19,7 +21,7 @@ import java.util.Date;
 import java.util.List;
 import javax.swing.*;
 
-public class DevicePanel extends JPanel {
+public class DevicePanel extends JPanel implements PanelOperation {
     private JButton searchBtn, resetBtn, addBtn,btnImport,btnExport, btnEdit,prePage, nextPage, lastPage;
     private JPanel conditPanel, pagePanel;
     private JLabel devNameLabel, devTypeNumLabel, devCodeLabel, pageInfo;
@@ -29,11 +31,8 @@ public class DevicePanel extends JPanel {
 
     DeviceTable table = null;
 
-    public JFrame jf = null ;
-
-    public DevicePanel(JFrame jFrame) {
-        jf = jFrame;
-        table = new DeviceTable(jf);
+    public DevicePanel() {
+        table = new DeviceTable();
         // 初始化所有控件
         initComponent();
         // 构造函数中调用initUI来向窗口中添加控件
@@ -252,54 +251,6 @@ public class DevicePanel extends JPanel {
             }
         });
 
-        /*table.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent me) {
-                if (SwingUtilities.isRightMouseButton(me)) {
-                    final int row = table.rowAtPoint(me.getPoint());
-                    System.out.println("row:" + row);
-                    if (row != -1) {
-                        final int column = table.columnAtPoint(me.getPoint());
-
-                        final JPopupMenu popup = new JPopupMenu();
-                        JMenuItem select = new JMenuItem("选择");
-
-                        select.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                System.out.println("选择");
-                                table.setRowSelectionInterval(row, row); // 高亮选择指定的行
-                            }
-                        });
-                        popup.add(select);
-                        popup.add(new JSeparator());
-                        JMenuItem edit = new JMenuItem("编辑");
-                        popup.add(edit);
-                        edit.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                System.out.println("编辑");
-                                table.clearSelection(); // 清除高亮选择状态
-                                //table.editCellAt(row, column); // 设置某列为可编辑
-                                table.isCellEditable(row, column);
-                            }
-                        });
-                        JMenuItem calcel = new JMenuItem("取消");
-                        calcel.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                System.out.println("取消");
-                                popup.setVisible(false);
-                            }
-                        });
-                        popup.add(new JSeparator());
-                        popup.add(calcel);
-                        popup.show(me.getComponent(), me.getX(), me.getY());
-                    }
-                }
-            }
-        });*/
-
         resetBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -307,71 +258,43 @@ public class DevicePanel extends JPanel {
             }
         });
         //新增
-        addBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showCustomDialog(jf,jf,null);
-                //add1();
-            }
+        addBtn.addActionListener(e -> {
+            showCustomDialog(null);
+            //add1();
         });
 
         //导入
-        btnImport.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                doImportExcelAction(new String[]{".xls",".xlsx"});
-            }
-        });
+        btnImport.addActionListener(e -> doImportExcelAction(new String[]{".xls",".xlsx"}));
 
         //导出
-        btnExport.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                doExportExcelAction();
-            }
-        });
+        btnExport.addActionListener(e -> doExportExcelAction());
 
         //编辑
-        btnEdit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                doEditAction();
-            }
-        });
+        btnEdit.addActionListener(e -> doEditAction());
 
 
 
         // 上一页
-        prePage.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                table.getPreviousPage();
-                //查询数据并且设置分页bar信息
-                selectDataAndSetPageInfo();
-            }
+        prePage.addActionListener(e -> {
+            table.getPreviousPage();
+            //查询数据并且设置分页bar信息
+            selectDataAndSetPageInfo();
         });
         // 下一页
-        nextPage.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int i = table.getNextPage();
-                if (i == 1) {
-                    return;
-                } else {
-                    //查询数据并且设置分页bar信息
-                    selectDataAndSetPageInfo();
-                }
+        nextPage.addActionListener(e -> {
+            int i = table.getNextPage();
+            if (i == 1) {
+                return;
+            } else {
+                //查询数据并且设置分页bar信息
+                selectDataAndSetPageInfo();
             }
         });
         // 末 页
-        lastPage.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                table.getLastPage();
-                //查询数据并且设置分页bar信息
-                selectDataAndSetPageInfo();
-            }
-
+        lastPage.addActionListener(e -> {
+            table.getLastPage();
+            //查询数据并且设置分页bar信息
+            selectDataAndSetPageInfo();
         });
 
 
@@ -379,20 +302,20 @@ public class DevicePanel extends JPanel {
 
     private void doEditAction() {
         if(table.getSelectedRow() < 0){
-            JOptionPane.showMessageDialog(jf,"请选择一条记录编辑","提示",1);
+            JOptionPane.showMessageDialog(FrameUtil.currentFrame,"请选择一条记录编辑","提示",1);
             return;
         }
         String id = table.getValueAt(table.getSelectedRow(), 0).toString();
         if(StringUtils.isBlank(id)){
-            JOptionPane.showMessageDialog(jf,"此记录不存在","警告",2);
+            JOptionPane.showMessageDialog(FrameUtil.currentFrame,"此记录不存在","警告",2);
             return;
         }
         TbDevice device = DaoFactory.getDeviceDao().queryById(Integer.valueOf(id));
         if(null == device){
-            JOptionPane.showMessageDialog(jf,"此记录不存在","警告",2);
+            JOptionPane.showMessageDialog(FrameUtil.currentFrame,"此记录不存在","警告",2);
             return;
         }
-        showCustomDialog(jf,jf,device);
+        showCustomDialog(device);
 
     }
 
@@ -404,16 +327,14 @@ public class DevicePanel extends JPanel {
     /**
      * 显示一个自定义的对话框
      *
-     * @param owner 对话框的拥有者
-     * @param parentComponent 对话框的父级组件
      */
-    private void showCustomDialog(Frame owner, Component parentComponent,TbDevice oldDevice) {
-       new DeviceAddDialog((JFrame) parentComponent,searchBtn, oldDevice).showDialog();
+    private void showCustomDialog(TbDevice oldDevice) {
+       new DeviceAddDialog(oldDevice).showDialog();
     }
 
 
     private void doImportExcelAction(String[] sufixArr) {
-        File selectedFile = JFileChooserUtil.getSelectedOpenFile(sufixArr,jf);
+        File selectedFile = JFileChooserUtil.getSelectedOpenFile(sufixArr,FrameUtil.currentFrame);
         if (selectedFile != null) {
             // String name=selectedFile.getName();
             List<TbDevice> deviceList = DeviceExportHelper.getDeviceData(selectedFile.getPath());
@@ -422,7 +343,7 @@ public class DevicePanel extends JPanel {
     }
     private void doExportExcelAction() {
         String fileName = "设备表格-"+new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-        File selectedFile = JFileChooserUtil.getSelectedFile(fileName,".xlsx",jf);
+        File selectedFile = JFileChooserUtil.getSelectedFile(fileName,".xlsx",FrameUtil.currentFrame);
         if (selectedFile != null) {
             String path = selectedFile.getPath();
             ToExcel(path);
@@ -447,5 +368,10 @@ public class DevicePanel extends JPanel {
         //设置样式
         //CommonUtil.setlookandfeel();
        // DevicePanel devicePanel = new DevicePanel();
+    }
+
+    @Override
+    public JButton getSearchButton() {
+        return this.searchBtn;
     }
 }

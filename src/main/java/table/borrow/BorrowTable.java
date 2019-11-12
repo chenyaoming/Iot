@@ -50,14 +50,7 @@ public class BorrowTable extends JTable {
 	public static String[] COLUMN_NAMES = { "ID","序号","名称","型号", "管理编码", "存放位置", "图片","功用",
 			"借用人","借用日期","借出保管员","归还人","归还日期","归还保管员","备注"};
 
-	private JFrame ownFrame = null;
-
-	/*public TableBase() {
-		initTable();
-	}*/
-
-	public BorrowTable(JFrame ownFrame) {
-		this.ownFrame = ownFrame;
+	public BorrowTable() {
 		initTable();
 	}
 
@@ -115,9 +108,10 @@ public class BorrowTable extends JTable {
 				data[i][7] = record.getFeatures();
 
 				data[i][8] = record.getBorrowUserName();
-				data[i][9] = simpleDateFormat.format(record.getBorrowDate());
+				if(null != record.getBorrowDate()){
+					data[i][9] = simpleDateFormat.format(record.getBorrowDate());
+				}
 				data[i][10] = record.getBorrowClerkUserName();
-
 				data[i][11] = record.getReturnUserName();
 				if(null != record.getReturnDate()){
 					data[i][12] = simpleDateFormat.format(record.getReturnDate());

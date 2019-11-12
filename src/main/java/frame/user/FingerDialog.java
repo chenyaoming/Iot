@@ -2,6 +2,7 @@ package frame.user;
 
 
 import bean.TbUser;
+import frame.FrameUtil;
 import frame.device.FingerImage;
 
 import javax.swing.*;
@@ -11,7 +12,6 @@ import java.awt.event.WindowEvent;
 
 public class FingerDialog extends JDialog  {
 
-    private JFrame parentFrame;
 
     private TbUser newUser;
 
@@ -20,10 +20,6 @@ public class FingerDialog extends JDialog  {
      */
     private JLabel tipLabel;
 
-    /**
-     * 查询按钮
-     */
-    private JButton searchBtn;
 
     private volatile JDialog thisDialog;
 
@@ -32,23 +28,21 @@ public class FingerDialog extends JDialog  {
      */
     public static final String TIPTEMP = "还需用同一手指按 %s 次指纹";
 
-    public FingerDialog(JFrame parentFrame,JButton searchBtn,TbUser newUser){
+    public FingerDialog(TbUser newUser){
 
-        super(parentFrame,"指纹信息",true);
+        super(FrameUtil.currentFrame,"指纹信息",true);
 
         thisDialog = this;
 
         //thisDialog = this;
-        this.parentFrame = parentFrame;
         this.newUser = newUser;
-        this.searchBtn = searchBtn;
 
         // 处理鼠标点击
         this.setLayout(new BorderLayout());
 
         // 设置对话框的宽高
         this.setSize(550, 450);
-        this.setLocationRelativeTo(parentFrame);
+        this.setLocationRelativeTo(FrameUtil.currentFrame);
         this.toFront();
 
         FingerImage fingerImageLabel = new FingerImage();
@@ -72,7 +66,7 @@ public class FingerDialog extends JDialog  {
             @Override
             public void windowClosing(WindowEvent e) {
                thisDialog.dispose();
-                new UserAddDialog( parentFrame,newUser,searchBtn).showDialog();
+                new UserAddDialog(newUser).showDialog();
             }
         });
 
@@ -85,13 +79,6 @@ public class FingerDialog extends JDialog  {
         this.setVisible(true);
     }
 
-    public JFrame getParentFrame() {
-        return parentFrame;
-    }
-
-    public void setParentFrame(JFrame parentFrame) {
-        this.parentFrame = parentFrame;
-    }
 
     public TbUser getNewUser() {
         return newUser;
@@ -109,11 +96,4 @@ public class FingerDialog extends JDialog  {
         this.tipLabel = tipLabel;
     }
 
-    public JButton getSearchBtn() {
-        return searchBtn;
-    }
-
-    public void setSearchBtn(JButton searchBtn) {
-        this.searchBtn = searchBtn;
-    }
 }

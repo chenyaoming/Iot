@@ -3,6 +3,7 @@ package frame.device;
 
 import bean.TbDevice;
 import dao.DaoFactory;
+import frame.FrameUtil;
 import jodd.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import uitl.JFileChooserUtil;
@@ -21,22 +22,14 @@ import static java.util.regex.Pattern.compile;
 
 public class DeviceAddDialog extends JFrame{
 
-    private JFrame parentFrame;
 
     private TbDevice oldDevice;
 
-    /**
-     * 查询按钮
-     */
-    private JButton searchBtn;
-
     private volatile JFrame thisDialog;
 
-    public DeviceAddDialog(JFrame parentFrame,JButton searchBtn,TbDevice oldDevice){
+    public DeviceAddDialog(TbDevice oldDevice){
         this.setTitle("设备信息");
-        this.parentFrame = parentFrame;
         thisDialog = this;
-        this.searchBtn = searchBtn;
 
         // 创建一个模态对话框
        // final JFrame dialog = new JFrame("");
@@ -46,7 +39,7 @@ public class DeviceAddDialog extends JFrame{
         // 设置对话框大小不可改变
         this.setResizable(false);
         // 设置对话框相对显示的位置
-        this.setLocationRelativeTo(parentFrame);
+        this.setLocationRelativeTo(FrameUtil.currentFrame);
         this.setLayout(null);
 
         Font f1 = new Font("楷体", Font.BOLD, 19);
@@ -145,7 +138,7 @@ public class DeviceAddDialog extends JFrame{
 
                     // 设置对话框的宽高
                     imageFrame.setSize(550, 450);
-                    imageFrame.setLocationRelativeTo(parentFrame);
+                    imageFrame.setLocationRelativeTo(FrameUtil.currentFrame);
                     imageFrame.toFront();
 
                     JScrollImagePanel jScrollImagePanel = new JScrollImagePanel(iPanel.getImagePath());
@@ -217,11 +210,10 @@ public class DeviceAddDialog extends JFrame{
                     DaoFactory.getDeviceDao().insert(newDevice);
                 }
 
-
                 thisDialog.dispose();
                 JOptionPane.showMessageDialog(new JPanel(),"操作成功","提示",JOptionPane.PLAIN_MESSAGE);
 
-                searchBtn.doClick();
+                FrameUtil.doClickSearchBtn();
             }
         });
 
@@ -240,7 +232,7 @@ public class DeviceAddDialog extends JFrame{
 
     public void showDialog(){
         //会阻塞
-        ModalFrameUtil.showAsModal(this,parentFrame);
+        ModalFrameUtil.showAsModal(this, FrameUtil.currentFrame);
         //this.setVisible(true);
     }
 

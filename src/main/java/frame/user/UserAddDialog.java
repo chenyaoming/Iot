@@ -3,17 +3,15 @@ package frame.user;
 
 import bean.TbUser;
 import dao.DaoFactory;
+import frame.FrameUtil;
 import jodd.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import uitl.FingerHelper;
-import uitl.ModalFrameUtil;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Pattern;
@@ -23,13 +21,11 @@ import static java.util.regex.Pattern.compile;
 public class UserAddDialog extends JDialog {
 
 
-    private JFrame parentFrame;
+    private JDialog thisDialog;
 
-    private volatile JDialog thisDialog;
+    public UserAddDialog(TbUser oldUser){
 
-    public UserAddDialog(JFrame parentFrame,TbUser oldUser,JButton searchBtn){
-
-        super(parentFrame,"用户信息",true);
+        super(FrameUtil.currentFrame,"用户信息",true);
 
 
         thisDialog = this;
@@ -40,7 +36,7 @@ public class UserAddDialog extends JDialog {
         // 设置对话框大小不可改变
         this.setResizable(false);
         // 设置对话框相对显示的位置
-        this.setLocationRelativeTo(parentFrame);
+        this.setLocationRelativeTo(FrameUtil.currentFrame);
         this.setLayout(null);
 
         Font f1 = new Font("楷体", Font.BOLD, 19);
@@ -200,13 +196,13 @@ public class UserAddDialog extends JDialog {
 
                     thisDialog.dispose();
 
-                    searchBtn.doClick();
-
+                    FrameUtil.doClickSearchBtn();
                 }else{
                     //增加
                     //DaoFactory.getUserDao().insert(newUser);
 
-                    FingerHelper fingerThread = new FingerHelper(newUser);
+                    FingerDialog fingerDialog = new FingerDialog(newUser);
+                    FingerHelper fingerThread = new FingerHelper(fingerDialog);
 
                     /**
                      * 让添加的弹框隐藏
@@ -214,9 +210,6 @@ public class UserAddDialog extends JDialog {
                     //thisDialog.setVisible(false);
                     thisDialog.dispose();
 
-                    FingerDialog fingerDialog = new FingerDialog(parentFrame,searchBtn,newUser);
-
-                    fingerThread.setFingerDialog(fingerDialog);
                     Thread dialogThread = new Thread(() -> {
                         /**
                          * 指纹弹窗

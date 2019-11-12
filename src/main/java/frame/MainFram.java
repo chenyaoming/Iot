@@ -14,7 +14,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class MainFram extends JFrame{
+public class MainFram extends JFrame implements FrameOperation{
+
 
     private JMenuBar menubar;
     private JMenu fileMenu;
@@ -24,6 +25,8 @@ public class MainFram extends JFrame{
     final JTabbedPane tabbedPane = new JTabbedPane();
 
     public MainFram(){
+
+        FrameUtil.setCurrentFrame(this);
 
         menubar = new JMenuBar();
         fileMenu = new JMenu("文件");
@@ -55,15 +58,15 @@ public class MainFram extends JFrame{
 
 
         // 创建第 1 个选项卡（选项卡只包含 标题）
-        tabbedPane.addTab("设备管理", new DevicePanel(this));
+        tabbedPane.addTab("设备管理", new DevicePanel());
 
         // 创建第 2 个选项卡（选项卡包含 标题 和 图标）
-        tabbedPane.addTab("人员管理", new UserPanel(this));
+        tabbedPane.addTab("人员管理", new UserPanel());
 
         // 创建第 3 个选项卡（选项卡包含 标题、图标 和 tip提示）
         //tabbedPane.addTab("借出归还管理", new ImageIcon("bb.jpg"), createTextPanel("TAB 03"), "This is a tab.");
 
-        tabbedPane.addTab("借出归还管理", new BorrowPanel(this));
+        tabbedPane.addTab("借出归还管理", new BorrowPanel());
 
         // 添加选项卡选中状态改变的监听器
         tabbedPane.addChangeListener(new ChangeListener() {
@@ -92,9 +95,11 @@ public class MainFram extends JFrame{
 
     }
 
-
     public static void main(String[] args){
+
         MainFram mainFram = new MainFram();
+
+        //必须设置
 
         //设置样式
         /*CommonUtil.setlookandfeel();
@@ -194,4 +199,13 @@ public class MainFram extends JFrame{
         return panel;
     }
 
+    @Override
+    public JButton getCurrentSearchButton() {
+
+        Component component = tabbedPane.getSelectedComponent();
+        if (component instanceof PanelOperation){
+           return  ((PanelOperation) component).getSearchButton();
+        }
+        return null;
+    }
 }

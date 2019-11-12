@@ -30,14 +30,12 @@ public class UserTable extends JTable {
 	//ID为隐藏列
 	public static String[] COLUMN_NAMES = { "ID","序号","姓名", "性别", "年龄", "联系电话","创建时间"};
 
-	private JFrame ownFrame = null;
 
 	/*public TableBase() {
 		initTable();
 	}*/
 
-	public UserTable(JFrame ownFrame) {
-		this.ownFrame = ownFrame;
+	public UserTable() {
 		initTable();
 	}
 
