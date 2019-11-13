@@ -28,7 +28,7 @@ public class ImagePanel extends JLabel {
                 File file = new File(imagePath.trim());
                 if(file.exists()){
                     image = ImageIO.read(file);
-                    g.drawImage(image, 0, 0, 100, 100, null);
+                    g.drawImage(image, 0, 0, 90, 90, null);
                 }
             }
         } catch (Exception e) {

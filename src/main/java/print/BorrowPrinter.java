@@ -1,8 +1,6 @@
 package print;
 
 import bean.TbBorrowRecord;
-import bean.TbDevice;
-
 import java.awt.*;
 import java.awt.print.Book;
 import java.awt.print.PageFormat;

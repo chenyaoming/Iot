@@ -3,6 +3,8 @@ package table.borrow;
 import bean.TbBorrowRecord;
 import bean.TbUser;
 import dao.DaoFactory;
+import frame.BigImageDialog;
+import frame.FrameUtil;
 import frame.device.JScrollImagePanel;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
@@ -238,7 +240,6 @@ public class BorrowTable extends JTable {
 		table.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-
 				// 记录进入编辑状态前单元格得数据
 				try {
 					if(table.getSelectedColumn() == IMAGE_COLUM){
@@ -249,22 +250,7 @@ public class BorrowTable extends JTable {
 						if(null != obj){
 							String imgUrl = obj.toString();
 							if(StringUtils.isNotBlank(imgUrl) && new File(imgUrl.trim()).exists()){
-								JFrame imageFrame = new JFrame();
-
-								// 设置对话框的宽高
-								imageFrame.setSize(550, 450);
-								imageFrame.setLocationRelativeTo(table);
-
-								JScrollImagePanel jScrollImagePanel = new JScrollImagePanel(imgUrl);
-								JScrollPane scrollPane=new JScrollPane();
-								scrollPane.setViewportView(jScrollImagePanel);
-
-								//dialog.setSize(jScrollImagePanel.getWidth(), jScrollImagePanel.getHeight());
-								imageFrame.add(scrollPane,BorderLayout.CENTER);
-								//imageFrame.setVisible(true);
-								ModalFrameUtil.showAsModal(imageFrame,null);
-
-								imageFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+								new BigImageDialog(FrameUtil.currentFrame,imgUrl).showDialog();
 							}
 						}
 					}

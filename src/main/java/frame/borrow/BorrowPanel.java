@@ -6,10 +6,13 @@ import bean.TbUser;
 import dao.DaoFactory;
 import enums.Status;
 import frame.FrameUtil;
+import frame.InfiniteProgressPanel;
 import frame.PanelOperation;
 import frame.user.UserAddDialog;
+import helper.DeviceExportHelper;
 import org.apache.commons.lang3.StringUtils;
 import print.BorrowPrinter;
+import progress.BaseProgress;
 import table.borrow.BorrowTable;
 import table.user.UserTable;
 import uitl.FingerHelper;
@@ -245,21 +248,26 @@ public class BorrowPanel extends JPanel implements PanelOperation {
      */
     private void selectDataAndSetPageInfo() {
 
-        TbBorrowRecord record = new TbBorrowRecord();
-        record.setBorrowUserName(borrowUserNameField.getText());
-        record.setDeviceName(deviceNameField.getText());
-        record.setDeviceCode(deviceCodeField.getText());
+        new BaseProgress(FrameUtil.currentFrame,"正在查询..."){
+            @Override
+            public void invokeBusiness() {
+                TbBorrowRecord record = new TbBorrowRecord();
+                record.setBorrowUserName(borrowUserNameField.getText());
+                record.setDeviceName(deviceNameField.getText());
+                record.setDeviceCode(deviceCodeField.getText());
 
-        //设置记录总数
-        table.setTotalRowCount((int) DaoFactory.getBorrowRecordDao().countAllByCondition(record));
-        //结果集的总页数
-        table.setTotalPage(table.getTotalRowCount() % table.getPageCount() == 0
-                ? table.getTotalRowCount()/  table.getPageCount() : table.getTotalRowCount() / table.getPageCount() + 1);
+                //设置记录总数
+                table.setTotalRowCount((int) DaoFactory.getBorrowRecordDao().countAllByCondition(record));
+                //结果集的总页数
+                table.setTotalPage(table.getTotalRowCount() % table.getPageCount() == 0
+                        ? table.getTotalRowCount()/  table.getPageCount() : table.getTotalRowCount() / table.getPageCount() + 1);
 
 
-        List<TbBorrowRecord> recordList  = DaoFactory.getBorrowRecordDao().findByConditionPage(record,table.getCurrentPage(),table.getPageCount());
-        setPageInfo();
-        table.showTable(recordList);
+                List<TbBorrowRecord> recordList  = DaoFactory.getBorrowRecordDao().findByConditionPage(record,table.getCurrentPage(),table.getPageCount());
+                setPageInfo();
+                table.showTable(recordList);
+            }
+        }.doAsynWork();
     }
 
 
@@ -284,13 +292,33 @@ public class BorrowPanel extends JPanel implements PanelOperation {
 
 
 
-        /*//编辑
+        //编辑
         btnEdit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                doEditAction();
+                int[] selectedRows = table.getSelectedRows();
+                if(selectedRows.length == 0){
+                    JOptionPane.showMessageDialog(FrameUtil.currentFrame,"请选择一条借出记录修改","提示",1);
+                    return;
+                }
+
+                if(selectedRows.length > 1){
+                    JOptionPane.showMessageDialog(FrameUtil.currentFrame,"最多选择一条借出记录修改","提示",1);
+                    return;
+                }
+                String id = table.getValueAt(selectedRows[0], 0).toString();
+                if(StringUtils.isBlank(id)){
+                    JOptionPane.showMessageDialog(FrameUtil.currentFrame,"借出记录不存在, 请刷新列表","提示",2);
+                    return;
+                }
+                TbBorrowRecord record = DaoFactory.getBorrowRecordDao().queryById(Integer.valueOf(id));
+                if(null == record){
+                    JOptionPane.showMessageDialog(FrameUtil.currentFrame,"借出记录不存在, 请刷新列表","提示",1);
+                    return;
+                }
+                new BorrowEditDialog(record).showDialog();
             }
-        });*/
+        });
 
         //借出
         borrowBtn.addActionListener(new ActionListener() {
@@ -365,7 +393,7 @@ public class BorrowPanel extends JPanel implements PanelOperation {
                 JOptionPane.showMessageDialog(FrameUtil.currentFrame,"借出记录不存在, 请刷新列表","警告",2);
                 return;
             }
-            new BorrowPrinter(record).printBorrow();
+            new BorrowFinishDialog(record).showDialog();
         });
 
         // 上一页
@@ -403,24 +431,6 @@ public class BorrowPanel extends JPanel implements PanelOperation {
 
     }
 
-    private void doEditAction() {
-        if(table.getSelectedRow() < 0){
-            JOptionPane.showMessageDialog(FrameUtil.currentFrame,"请选择一条记录编辑","提示",1);
-            return;
-        }
-        String id = table.getValueAt(table.getSelectedRow(), 0).toString();
-        if(StringUtils.isBlank(id)){
-            JOptionPane.showMessageDialog(FrameUtil.currentFrame,"此记录不存在","警告",2);
-            return;
-        }
-        TbUser user = DaoFactory.getUserDao().queryById(Integer.valueOf(id));
-        if(null == user){
-            JOptionPane.showMessageDialog(FrameUtil.currentFrame,"此记录不存在","警告",2);
-            return;
-        }
-        showCustomDialog();
-
-    }
 
     private void setPageInfo() {
         pageInfo.setText("总共 " + table.getTotalRowCount() + " 条记录|当前第 "

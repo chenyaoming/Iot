@@ -16,7 +16,7 @@ public class BorrowSelectDialog extends JDialog {
         //dialog.setSize(400, 400);
         this.setSize(800, 500);
         // 设置对话框大小不可改变
-        this.setResizable(false);
+        //this.setResizable(false);
         // 设置对话框相对显示的位置
         this.setLocationRelativeTo(FrameUtil.currentFrame);
 

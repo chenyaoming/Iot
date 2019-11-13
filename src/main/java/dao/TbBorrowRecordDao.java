@@ -23,6 +23,15 @@ public class TbBorrowRecordDao {
         return CommonDbUtil.queryReturnBeanList(sql,TbBorrowRecord.class,params);
     }*/
 
+    public void updateRecord(TbBorrowRecord r){
+        String sql = "UPDATE TB_BORROW_RECORD set deviceName = ?,deviceType = ?,deviceCode = ?,devicePosition = ?," +
+                " deviceImage =? ,features = ?,borrowNum = ?,remark = ? where id = ?";
+        Object[] params = {r.getDeviceName(),r.getDeviceType(),r.getDeviceCode(),r.getDevicePosition(),
+                r.getDeviceImage(),r.getFeatures(),r.getBorrowNum(),r.getRemark(),r.getId()};
+
+        CommonDbUtil.update(sql,params);
+    }
+
     public void updateReturnData(TbBorrowRecord r){
 
         String sql = "UPDATE TB_BORROW_RECORD set returnUserId = ? ,returnUserName = ? " +

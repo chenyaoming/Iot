@@ -1,10 +1,14 @@
 package frame.user;
 
+import bean.TbDevice;
 import bean.TbUser;
 import dao.DaoFactory;
 import frame.FrameUtil;
+import frame.InfiniteProgressPanel;
 import frame.PanelOperation;
+import helper.DeviceExportHelper;
 import org.apache.commons.lang3.StringUtils;
+import progress.BaseProgress;
 import table.user.UserTable;
 
 import javax.swing.*;
@@ -199,18 +203,23 @@ public class UserPanel extends JPanel implements PanelOperation {
      */
     private void selectDataAndSetPageInfo() {
 
-        TbUser user = new TbUser(userNameField.getText(),phoneField.getText());
+        new BaseProgress(FrameUtil.currentFrame,"正在查询..."){
+            @Override
+            public void invokeBusiness() {
+                TbUser user = new TbUser(userNameField.getText(),phoneField.getText());
 
-        //设置记录总数
-        table.setTotalRowCount((int) DaoFactory.getUserDao().countAllByCondition(user));
-        //结果集的总页数
-        table.setTotalPage(table.getTotalRowCount() % table.getPageCount() == 0
-                ? table.getTotalRowCount()/  table.getPageCount() : table.getTotalRowCount() / table.getPageCount() + 1);
+                //设置记录总数
+                table.setTotalRowCount((int) DaoFactory.getUserDao().countAllByCondition(user));
+                //结果集的总页数
+                table.setTotalPage(table.getTotalRowCount() % table.getPageCount() == 0
+                        ? table.getTotalRowCount()/  table.getPageCount() : table.getTotalRowCount() / table.getPageCount() + 1);
 
 
-        List<TbUser> userList  = DaoFactory.getUserDao().findByConditionPage(user,table.getCurrentPage(),table.getPageCount());
-        setPageInfo();
-        table.showTable(userList);
+                List<TbUser> userList  = DaoFactory.getUserDao().findByConditionPage(user,table.getCurrentPage(),table.getPageCount());
+                setPageInfo();
+                table.showTable(userList);
+            }
+        }.doAsynWork();
     }
 
 

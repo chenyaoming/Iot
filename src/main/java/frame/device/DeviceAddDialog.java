@@ -3,6 +3,7 @@ package frame.device;
 
 import bean.TbDevice;
 import dao.DaoFactory;
+import frame.BigImageDialog;
 import frame.FrameUtil;
 import jodd.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -134,23 +135,7 @@ public class DeviceAddDialog extends JFrame{
             public void mouseClicked(MouseEvent e) {
                 // 处理鼠标点击
                 if(StringUtils.isNotBlank(iPanel.getImagePath()) && new File(iPanel.getImagePath().trim()).exists()){
-                    JFrame imageFrame = new JFrame();
-
-                    // 设置对话框的宽高
-                    imageFrame.setSize(550, 450);
-                    imageFrame.setLocationRelativeTo(FrameUtil.currentFrame);
-                    imageFrame.toFront();
-
-                    JScrollImagePanel jScrollImagePanel = new JScrollImagePanel(iPanel.getImagePath());
-                    JScrollPane scrollPane=new JScrollPane();
-                    scrollPane.setViewportView(jScrollImagePanel);
-
-                    //dialog.setSize(jScrollImagePanel.getWidth(), jScrollImagePanel.getHeight());
-                    imageFrame.add(scrollPane,BorderLayout.CENTER);
-                    //imageFrame.setVisible(true);
-                    ModalFrameUtil.showAsModal(imageFrame,thisDialog);
-
-                    imageFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                    new BigImageDialog(thisDialog,iPanel.getImagePath()).showDialog();
                 }
 
             }
@@ -158,6 +143,18 @@ public class DeviceAddDialog extends JFrame{
         });
 
 
+        // 选择图片
+        imageBtn.addActionListener(e -> {
+
+            String[] picSufix = new String[]{".jpg",".jpeg",".png"};
+
+            File selectedFile = JFileChooserUtil.getSelectedOpenFile(picSufix,FrameUtil.currentFrame);
+            if(null != selectedFile){
+                iPanel.setImagePath(selectedFile.getPath());
+                iPanel.repaint();
+                iPanel.setVisible(true);
+            }
+        });
 
         // 保存按钮
         saveBtn.addActionListener(new ActionListener() {
@@ -227,7 +224,6 @@ public class DeviceAddDialog extends JFrame{
         // 显示对话框
         //这个只能调用一次，不然会删两次才能删掉
         //dialog.setVisible(true);
-        //this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
     public void showDialog(){

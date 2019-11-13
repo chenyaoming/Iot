@@ -354,6 +354,7 @@ public class FingerHelper extends Thread {
             new ReturnFinishDialog(record).showDialog();
 
             //JOptionPane.showMessageDialog(new JPanel(),"归还成功","提示",1);
+            //FrameUtil.getCurrentSearchBtn().doClick();
 
         }
 

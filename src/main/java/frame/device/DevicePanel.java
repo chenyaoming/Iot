@@ -9,6 +9,7 @@ import frame.PanelOperation;
 import helper.DeviceExportHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import progress.BaseProgress;
 import table.device.DeviceTable;
 import uitl.JFileChooserUtil;
 
@@ -213,29 +214,37 @@ public class DevicePanel extends JPanel implements PanelOperation {
 
     // 查询
     private void searchData() {
-        table.setCurrentPage(1);
 
+
+
+        table.setCurrentPage(1);
         //查询数据并且设置分页bar信息
         selectDataAndSetPageInfo();
+
+
     }
 
     /**
      * 查询数据并且设置分页bar信息
      */
     private void selectDataAndSetPageInfo() {
+        new BaseProgress(FrameUtil.currentFrame,"正在查询..."){
+            @Override
+            public void invokeBusiness() {
+                TbDevice device = new TbDevice(deviceNameField.getText(),deviceTypeNumField.getText(),deviceCodeField.getText());
 
-        TbDevice device = new TbDevice(deviceNameField.getText(),deviceTypeNumField.getText(),deviceCodeField.getText());
-
-        //设置记录总数
-        table.setTotalRowCount((int) DaoFactory.getDeviceDao().countAllByCondition(device));
-        //结果集的总页数
-        table.setTotalPage(table.getTotalRowCount() % table.getPageCount() == 0
-                ? table.getTotalRowCount()/  table.getPageCount() : table.getTotalRowCount() / table.getPageCount() + 1);
+                //设置记录总数
+                table.setTotalRowCount((int) DaoFactory.getDeviceDao().countAllByCondition(device));
+                //结果集的总页数
+                table.setTotalPage(table.getTotalRowCount() % table.getPageCount() == 0
+                        ? table.getTotalRowCount()/  table.getPageCount() : table.getTotalRowCount() / table.getPageCount() + 1);
 
 
-        List<TbDevice> deviceList  = DaoFactory.getDeviceDao().findByConditionPage(device,table.getCurrentPage(),table.getPageCount());
-        setPageInfo();
-        table.showTable(deviceList);
+                List<TbDevice> deviceList  = DaoFactory.getDeviceDao().findByConditionPage(device,table.getCurrentPage(),table.getPageCount());
+                setPageInfo();
+                table.showTable(deviceList);
+            }
+        }.doAsynWork();
     }
 
 
@@ -336,17 +345,28 @@ public class DevicePanel extends JPanel implements PanelOperation {
     private void doImportExcelAction(String[] sufixArr) {
         File selectedFile = JFileChooserUtil.getSelectedOpenFile(sufixArr,FrameUtil.currentFrame);
         if (selectedFile != null) {
-            // String name=selectedFile.getName();
-            List<TbDevice> deviceList = DeviceExportHelper.getDeviceData(selectedFile.getPath());
-            DaoFactory.getDeviceDao().insertBatch(deviceList);
+            new BaseProgress(FrameUtil.currentFrame,"正在导入..."){
+                @Override
+                public void invokeBusiness() {
+                    // String name=selectedFile.getName();
+                    List<TbDevice> deviceList = DeviceExportHelper.getDeviceData(selectedFile.getPath());
+                    DaoFactory.getDeviceDao().insertBatch(deviceList);
+                }
+            }.doAsynWork();
         }
     }
     private void doExportExcelAction() {
         String fileName = "设备表格-"+new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         File selectedFile = JFileChooserUtil.getSelectedFile(fileName,".xlsx",FrameUtil.currentFrame);
         if (selectedFile != null) {
-            String path = selectedFile.getPath();
-            ToExcel(path);
+
+            new BaseProgress(FrameUtil.currentFrame,"正在导出..."){
+                @Override
+                public void invokeBusiness() {
+                    String path = selectedFile.getPath();
+                    ToExcel(path);
+                }
+            }.doAsynWork();
         }
     }
 

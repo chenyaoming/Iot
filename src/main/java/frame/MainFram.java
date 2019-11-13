@@ -72,6 +72,8 @@ public class MainFram extends JFrame implements FrameOperation{
         tabbedPane.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
+
+
                 System.out.println("当前选中的选项卡: " + tabbedPane.getSelectedIndex());
             }
         });

@@ -5,9 +5,12 @@ import bean.TbBorrowRecord;
 import bean.TbDevice;
 import controller.ExcelUtil;
 import dao.DaoFactory;
+import frame.FrameUtil;
+import frame.InfiniteProgressPanel;
 import helper.DeviceExportHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import progress.BaseProgress;
 import table.device.DeviceTable;
 import uitl.JFileChooserUtil;
 
@@ -213,18 +216,24 @@ public class DeviceDialogPanel extends JPanel {
      */
     private void selectDataAndSetPageInfo() {
 
-        TbDevice device = new TbDevice(deviceNameField.getText(),deviceTypeNumField.getText(),deviceCodeField.getText());
+        new BaseProgress(ownDialog,"正在查询..."){
+            @Override
+            public void invokeBusiness() {
+                TbDevice device = new TbDevice(deviceNameField.getText(),deviceTypeNumField.getText(),deviceCodeField.getText());
 
-        //设置记录总数
-        table.setTotalRowCount((int) DaoFactory.getDeviceDao().countAllByCondition(device));
-        //结果集的总页数
-        table.setTotalPage(table.getTotalRowCount() % table.getPageCount() == 0
-                ? table.getTotalRowCount()/  table.getPageCount() : table.getTotalRowCount() / table.getPageCount() + 1);
+                //设置记录总数
+                table.setTotalRowCount((int) DaoFactory.getDeviceDao().countAllByCondition(device));
+                //结果集的总页数
+                table.setTotalPage(table.getTotalRowCount() % table.getPageCount() == 0
+                        ? table.getTotalRowCount()/  table.getPageCount() : table.getTotalRowCount() / table.getPageCount() + 1);
 
 
-        List<TbDevice> deviceList  = DaoFactory.getDeviceDao().findByConditionPage(device,table.getCurrentPage(),table.getPageCount());
-        setPageInfo();
-        table.showTable(deviceList);
+                List<TbDevice> deviceList  = DaoFactory.getDeviceDao().findByConditionPage(device,table.getCurrentPage(),table.getPageCount());
+                setPageInfo();
+                table.showTable(deviceList);
+            }
+        }.doAsynWork();
+
     }
 
 

@@ -230,7 +230,6 @@ public class UserAddDialog extends JDialog {
         // 显示对话框
         //这个只能调用一次，不然会删两次才能删掉
         //dialog.setVisible(true);
-        //  this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
     }
 

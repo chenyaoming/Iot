@@ -4,27 +4,29 @@ package frame.borrow;
 import bean.TbBorrowRecord;
 import bean.TbDevice;
 import dao.DaoFactory;
+import frame.BigImageDialog;
 import frame.FrameUtil;
+import frame.InfiniteProgressPanel;
 import frame.device.ImagePanel;
-import frame.device.JScrollImagePanel;
+import helper.DeviceExportHelper;
 import org.apache.commons.lang3.StringUtils;
+import progress.BaseProgress;
 import uitl.FingerHelper;
 import uitl.ModalFrameUtil;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import static java.util.regex.Pattern.compile;
 
 public class BorrowDetailDialog extends JFrame{
 
-    private volatile JFrame thisDialog;
+    private JFrame thisDialog;
 
     public BorrowDetailDialog( TbBorrowRecord record){
         this.setTitle("设备信息");
@@ -141,23 +143,7 @@ public class BorrowDetailDialog extends JFrame{
             public void mouseClicked(MouseEvent e) {
                 // 处理鼠标点击
                 if(StringUtils.isNotBlank(iPanel.getImagePath()) && new File(iPanel.getImagePath().trim()).exists()){
-                    JFrame imageFrame = new JFrame();
-
-                    // 设置对话框的宽高
-                    imageFrame.setSize(550, 450);
-                    imageFrame.setLocationRelativeTo(FrameUtil.currentFrame);
-                    imageFrame.toFront();
-
-                    JScrollImagePanel jScrollImagePanel = new JScrollImagePanel(iPanel.getImagePath());
-                    JScrollPane scrollPane=new JScrollPane();
-                    scrollPane.setViewportView(jScrollImagePanel);
-
-                    //dialog.setSize(jScrollImagePanel.getWidth(), jScrollImagePanel.getHeight());
-                    imageFrame.add(scrollPane,BorderLayout.CENTER);
-                    //imageFrame.setVisible(true);
-                    ModalFrameUtil.showAsModal(imageFrame,thisDialog);
-
-                    imageFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                    new BigImageDialog(FrameUtil.currentFrame,iPanel.getImagePath()).showDialog();
                 }
 
             }
@@ -187,24 +173,30 @@ public class BorrowDetailDialog extends JFrame{
             }
             record.setBorrowNum(borNum);
 
-            BorrowFingerDialog borrowFingerDialog = new BorrowFingerDialog(record);
-            FingerHelper fingerThread = new FingerHelper(borrowFingerDialog);
+            new BaseProgress(thisDialog,"正在执行..."){
+                @Override
+                public void invokeBusiness() {
+                    try {
+                        BorrowFingerDialog borrowFingerDialog = new BorrowFingerDialog(record);
+                        FingerHelper fingerThread = new FingerHelper(borrowFingerDialog);
 
-            /**
-             * 让添加的弹框隐藏
-             */
-            //thisDialog.setVisible(false);
-            thisDialog.dispose();
+                        Thread dialogThread = new Thread(() -> {
+                            /**
+                             * 指纹弹窗
+                             */
+                            borrowFingerDialog.showDialog();
+                            fingerThread.interrupt();
+                        });
+                        dialogThread.start();
+                        fingerThread.start();
 
-            Thread dialogThread = new Thread(() -> {
-                /**
-                 * 指纹弹窗
-                 */
-                borrowFingerDialog.showDialog();
-                fingerThread.interrupt();
-            });
-            dialogThread.start();
-            fingerThread.start();
+                        thisDialog.dispose();
+
+                    }catch (Exception ex){
+
+                    }
+                }
+            }.doAsynWork();
         });
 
         // 取消按钮
@@ -214,7 +206,6 @@ public class BorrowDetailDialog extends JFrame{
         // 显示对话框
         //这个只能调用一次，不然会删两次才能删掉
         //dialog.setVisible(true);
-        //this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
     public void showDialog(){
