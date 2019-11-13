@@ -2,10 +2,8 @@ package frame.borrow;
 
 
 import bean.TbBorrowRecord;
-import bean.TbDevice;
 import frame.FrameUtil;
 import frame.device.FingerImage;
-import frame.user.UserAddDialog;
 
 import javax.swing.*;
 import java.awt.*;
@@ -48,7 +46,13 @@ public class BorrowFingerDialog extends JDialog  {
         this.add(fingerImageLabel, BorderLayout.CENTER);
 
         JPanel labelPanel = new JPanel();
-        JLabel tipLabel = new JLabel( String.format(TIPTEMP, "借用人"));
+        JLabel tipLabel = null;
+        if(null == record.getId()){
+            tipLabel = new JLabel( String.format(TIPTEMP, "借用人"));
+        }else{
+            tipLabel = new JLabel( String.format(TIPTEMP, "归还人"));
+        }
+
 
         Font font = new Font("宋体", Font.PLAIN, 25);
         tipLabel.setFont(font);
@@ -64,7 +68,10 @@ public class BorrowFingerDialog extends JDialog  {
             @Override
             public void windowClosing(WindowEvent e) {
                thisDialog.dispose();
-                new BorrowDetailDialog(record).showDialog();
+               //借出时才弹出
+               if(null == record.getId()){
+                   new BorrowDetailDialog(record).showDialog();
+               }
             }
         });
 

@@ -1,7 +1,6 @@
 package dao;
 
 import bean.TbBorrowRecord;
-import bean.TbDevice;
 import org.apache.commons.lang3.StringUtils;
 import uitl.CommonDbUtil;
 
@@ -12,23 +11,43 @@ import java.util.List;
 public class TbBorrowRecordDao {
 
     public static final String[] columArr = {"deviceId","deviceName","deviceType","deviceCode","devicePosition","deviceImage","features","borrowNum",
-     "borrowUserId","borrowUserName","borrowDate", "borrowClerkUserId","borrowClerkUserName"};
+     "borrowUserId","borrowUserName","borrowDate", "borrowClerkUserId","borrowClerkUserName","status"};
 
 
-    public List<TbBorrowRecord> findByPage(int page, int size){
+    public static final String[] returnArr = {"returnUserId","returnUserName","returnDate","returnClerkUserId","returnClerkUserName"};
+
+    /*public List<TbBorrowRecord> findByPage(int page, int size){
         Object[] params = {(page -1)*size ,size};
-        String sql = "select * from TB_BORROW_RECORD  limit ?,?";
+        String sql = "select * from TB_BORROW_RECORD order by id desc limit ?,? ";
 
         return CommonDbUtil.queryReturnBeanList(sql,TbBorrowRecord.class,params);
+    }*/
+
+    public void updateReturnData(TbBorrowRecord r){
+
+        String sql = "UPDATE TB_BORROW_RECORD set returnUserId = ? ,returnUserName = ? " +
+                " ,returnDate = ? ,returnClerkUserId =?  ,returnClerkUserName = ? ,status = ? where id = ?";
+        Object[] params = {r.getReturnUserId(),r.getReturnUserName(),r.getReturnDate(),
+                r.getReturnClerkUserId(),r.getReturnClerkUserName(),r.getStatus(),r.getId()};
+
+        CommonDbUtil.update(sql,params);
     }
+
+    public void updateRemark(String remark,Integer id){
+        String sql = "UPDATE TB_BORROW_RECORD set remark = ? where id = ?";
+        Object[] params = {remark,id};
+        CommonDbUtil.update(sql,params);
+    }
+
 
     public List<TbBorrowRecord> findByConditionPage(TbBorrowRecord record,int page,int size){
 
-        StringBuilder sql = new StringBuilder("select * from TB_BORROW_RECORD where 1=1 ");
+        StringBuilder sql = new StringBuilder("select * from TB_BORROW_RECORD  where 1=1 ");
 
         List<Object> params = new ArrayList<>();
         getSearchCondition(record, sql, params);
 
+        sql.append(" order by status asc, id desc ");
         sql.append(" limit ?,? ");
         params.add((page -1)*size);
         params.add(size);
@@ -62,10 +81,16 @@ public class TbBorrowRecordDao {
         String sql = "INSERT INTO TB_BORROW_RECORD("+ colums +") VALUES("+ questionMarks +")";
         Object[] params = {r.getDeviceId(),r.getDeviceName(),r.getDeviceType(),r.getDeviceCode(),
         r.getDevicePosition(),r.getDeviceImage(),r.getFeatures(),r.getBorrowNum(),r.getBorrowUserId(),
-        r.getBorrowUserName(),r.getBorrowDate(),r.getBorrowClerkUserId(),r.getBorrowClerkUserName()};
+        r.getBorrowUserName(),r.getBorrowDate(),r.getBorrowClerkUserId(),r.getBorrowClerkUserName(),r.getStatus()};
 
         //CommonDbUtil.getBeanValues(record,columArr);
         return CommonDbUtil.insertOneRetureId(sql,params);
+    }
+
+    public TbBorrowRecord queryById(Integer id){
+        String sql = "SELECT * FROM TB_BORROW_RECORD WHERE id = ?";
+        Object[] params ={id};
+        return CommonDbUtil.queryReturnBean(sql,TbBorrowRecord.class,params);
     }
 
     private void getSearchCondition(TbBorrowRecord record, StringBuilder sql, List<Object> params) {

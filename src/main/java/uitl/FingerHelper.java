@@ -1,15 +1,18 @@
 package uitl;
 
 
+import bean.TbBorrowRecord;
 import bean.TbDevice;
 import bean.TbFinger;
 import bean.TbUser;
 import com.zkteco.biometric.FingerprintSensorErrorCode;
 import com.zkteco.biometric.FingerprintSensorEx;
 import dao.DaoFactory;
+import enums.Status;
 import frame.FrameUtil;
 import frame.borrow.BorrowFingerDialog;
 import frame.borrow.BorrowFinishDialog;
+import frame.borrow.ReturnFinishDialog;
 import frame.user.FingerDialog;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -155,12 +158,23 @@ public class FingerHelper extends Thread {
 
     @Override
     public void run() {
-        if(null != fingerDialog && null != fingerDialog.getNewUser()){
-            //处理用户输入的指纹
-            addUserFinger();
-        } else if(null != borrowFingerDialog && null != borrowFingerDialog.getRecord()){
-            //处理借出指纹
-            addBorrowFinger();
+        try {
+            if(null != fingerDialog && null != fingerDialog.getNewUser()){
+                //处理用户输入的指纹
+                addUserFinger();
+            } else if(null != borrowFingerDialog && null != borrowFingerDialog.getRecord()){
+                if(borrowFingerDialog.getRecord().getId() == null){
+                    //处理借出指纹
+                    addBorrowFinger();
+                }else {
+                    //处理归还指纹
+                    addReturnFinger();
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            FreeSensor();
         }
 
     }
@@ -197,7 +211,10 @@ public class FingerHelper extends Thread {
 
                 //1:N识别
                 if (FingerprintSensorEx.DBIdentify(mhDB, template, fid, score) ==0 ){
-                    TbUser user = DaoFactory.getUserDao().queryByFingerId(fid[0]);
+
+                    TbFinger finger = DaoFactory.getFingerDao().queryById(fid[0]);
+                    TbUser user = DaoFactory.getUserDao().queryById(finger.getUserId());
+
                     if(null != user){
                         if(borrowPressTimes == 2){
                             borrowFingerDialog.getRecord().setBorrowUserId(user.getId());
@@ -208,10 +225,28 @@ public class FingerHelper extends Thread {
                         }else if(borrowPressTimes == 1){
                             borrowFingerDialog.getRecord().setBorrowClerkUserId(user.getId());
                             borrowFingerDialog.getRecord().setBorrowClerkUserName(user.getName());
+                            borrowFingerDialog.getRecord().setBorrowDate(new Date());
 
-                            borrowPressTimes--;
-                            fingerFinish = true;
-                            break;
+                            int yesOrNo = JOptionPane.showConfirmDialog(new JPanel(),"请确定 借用人："+borrowFingerDialog.getRecord().getBorrowUserName()
+                                    +"  出借保管员："+borrowFingerDialog.getRecord().getBorrowClerkUserName()+"？","借用信息提示",0);
+
+                            if(yesOrNo == 0){
+                                //保存借用记录
+
+                                borrowFingerDialog.getRecord().setStatus(Status.BORROWING.name());
+                                DaoFactory.getBorrowRecordDao().insert(borrowFingerDialog.getRecord());
+
+                                //减去设备的库存
+                                TbDevice device = DaoFactory.getDeviceDao().queryById(borrowFingerDialog.getRecord().getDeviceId());
+                                DaoFactory.getDeviceDao().update(device.getId(),"count",device.getCount() - borrowFingerDialog.getRecord().getBorrowNum());
+
+                                borrowPressTimes--;
+                                fingerFinish = true;
+                                break;
+                            }else {
+                                borrowPressTimes = 2;
+                                borrowFingerDialog.getTipLabel().setText(String.format(BorrowFingerDialog.TIPTEMP,"借用人"));
+                            }
                         }
                     }else {
                         JOptionPane.showMessageDialog(new JPanel(),"此指纹还未注册, 请到人员管理新增人员信息","提示",0);
@@ -224,23 +259,101 @@ public class FingerHelper extends Thread {
             totalMillis = dealSleepAndInterrupt(totalMillis);
         }
 
-        FreeSensor();
+        TbBorrowRecord record = borrowFingerDialog.getRecord();
         disposeDialog();
-
         if(fingerFinish){
-
-            borrowFingerDialog.getRecord().setBorrowDate(new Date());
-
-            //保存借用记录
-            DaoFactory.getBorrowRecordDao().insert(borrowFingerDialog.getRecord());
-
-            //减去设备的库存
-            TbDevice device = DaoFactory.getDeviceDao().queryById(borrowFingerDialog.getRecord().getDeviceId());
-            DaoFactory.getDeviceDao().update(device.getId(),"count",device.getCount() - borrowFingerDialog.getRecord().getBorrowNum());
 
             //JOptionPane.showMessageDialog(new JPanel(),"借出成功","提示",1);
             FrameUtil.getCurrentSearchBtn().doClick();
-            new BorrowFinishDialog(borrowFingerDialog.getRecord()).showDialog();
+            new BorrowFinishDialog(record).showDialog();
+        }
+
+        System.out.println("线程执行完了");
+    }
+
+
+    private void addReturnFinger() {
+
+        //归还时按的指纹次数，分别是归还人和归还保管人
+        int returnPressTimes = 2;
+
+        /**
+         * 是否已经按完指纹
+         */
+        boolean fingerFinish = false;
+
+        //指纹模板大小
+        byte[] template = new byte[2048];
+
+        long totalMillis = 0;
+        while (!mbStop && !this.isInterrupted()) {
+            int[] templateLength = new int[1];
+            templateLength[0] = 2048;
+            //采集指纹图像，指纹模板
+            System.out.println("采集指纹图像，指纹模板.......");
+            if (0 == FingerprintSensorEx.AcquireFingerprint(mhDevice, imgbuf, template, templateLength))
+            {
+                //双重保险初始化高速内存数据
+                addZkRam();
+
+                int[] fid = new int[1];
+                int[] score = new int [1];
+
+                //1:N识别
+                if (FingerprintSensorEx.DBIdentify(mhDB, template, fid, score) ==0 ){
+
+                    TbFinger finger = DaoFactory.getFingerDao().queryById(fid[0]);
+                    TbUser user = DaoFactory.getUserDao().queryById(finger.getUserId());
+
+                    if(null != user){
+                        if(returnPressTimes == 2){
+                            borrowFingerDialog.getRecord().setReturnUserId(user.getId());
+                            borrowFingerDialog.getRecord().setReturnUserName(user.getName());
+
+                            returnPressTimes--;
+                            borrowFingerDialog.getTipLabel().setText(String.format(BorrowFingerDialog.TIPTEMP,"归还保管员"));
+                        }else if(returnPressTimes == 1){
+                            borrowFingerDialog.getRecord().setReturnClerkUserId(user.getId());
+                            borrowFingerDialog.getRecord().setReturnClerkUserName(user.getName());
+                            borrowFingerDialog.getRecord().setReturnDate(new Date());
+
+                            int yesOrNo = JOptionPane.showConfirmDialog(new JPanel(),"请确定 归还人："+borrowFingerDialog.getRecord().getReturnUserName()
+                                    +"  归还保管员："+borrowFingerDialog.getRecord().getReturnClerkUserName()+"？","归还信息提示",0);
+
+                            if(yesOrNo == 0){
+                                TbDevice device = DaoFactory.getDeviceDao().queryById(borrowFingerDialog.getRecord().getDeviceId());
+
+                                borrowFingerDialog.getRecord().setStatus(Status.RETURNED.name());
+                                //保存借用记录
+                                DaoFactory.getBorrowRecordDao().updateReturnData(borrowFingerDialog.getRecord());
+                                //加上设备的库存
+                                DaoFactory.getDeviceDao().update(device.getId(),"count",device.getCount() + borrowFingerDialog.getRecord().getBorrowNum());
+
+                                returnPressTimes--;
+                                fingerFinish = true;
+                                break;
+                            }else{
+                                returnPressTimes = 2;
+                                borrowFingerDialog.getTipLabel().setText(String.format(BorrowFingerDialog.TIPTEMP,"归还人"));
+                            }
+                        }
+                    }else {
+                        JOptionPane.showMessageDialog(new JPanel(),"此指纹还未注册, 请到人员管理新增人员信息","提示",0);
+                    }
+                }else {
+                    JOptionPane.showMessageDialog(new JPanel(),"此指纹还未注册, 请到人员管理新增人员信息","提示",0);
+                }
+
+            }
+            totalMillis = dealSleepAndInterrupt(totalMillis);
+        }
+
+        TbBorrowRecord record = borrowFingerDialog.getRecord();
+        disposeDialog();
+        if(fingerFinish){
+            new ReturnFinishDialog(record).showDialog();
+
+            //JOptionPane.showMessageDialog(new JPanel(),"归还成功","提示",1);
 
         }
 
@@ -249,8 +362,8 @@ public class FingerHelper extends Thread {
 
     private long dealSleepAndInterrupt(long totalMillis) {
         try {
-            //每0.5秒搜集一次
-            long millis = 500;
+            //每0.3秒搜集一次
+            long millis = 300;
             Thread.sleep(millis);
             totalMillis += millis;
             //五分钟超时
@@ -332,7 +445,6 @@ public class FingerHelper extends Thread {
 
         }
 
-        FreeSensor();
         disposeDialog();
 
         if(fingerFinish){
@@ -343,13 +455,13 @@ public class FingerHelper extends Thread {
     }
 
     private Integer saveUserAndFingerData(byte[] mergerTemp) {
+        Integer userId = DaoFactory.getUserDao().insert(fingerDialog.getNewUser());
+
         TbFinger finger = new TbFinger();
         finger.setTemplate(mergerTemp);
-        Integer fingerId = DaoFactory.getFingerDao().insert(finger);
+        finger.setUserId(userId);
+        return DaoFactory.getFingerDao().insert(finger);
 
-        fingerDialog.getNewUser().setFingerId(fingerId);
-        DaoFactory.getUserDao().insert(fingerDialog.getNewUser());
-        return fingerId;
     }
 
 
@@ -396,7 +508,8 @@ public class FingerHelper extends Thread {
         //enroll_idx表示按手指的次数
         if (FingerprintSensorEx.DBIdentify(mhDB, template, fid, score) ==0 ){
 
-            TbUser user = DaoFactory.getUserDao().queryByFingerId(fid[0]);
+            TbFinger finger = DaoFactory.getFingerDao().queryById(fid[0]);
+            TbUser user = DaoFactory.getUserDao().queryById(finger.getUserId());
 
             JOptionPane.showMessageDialog(new JPanel(),user.getName()+"指纹已经注册，请勿重复注册","提示",1);
             //清除之前录入的指纹，和设置还需录入的指纹数

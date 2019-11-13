@@ -1,14 +1,18 @@
 package frame.borrow;
 
 import bean.TbBorrowRecord;
+import bean.TbDevice;
 import bean.TbUser;
 import dao.DaoFactory;
+import enums.Status;
 import frame.FrameUtil;
 import frame.PanelOperation;
 import frame.user.UserAddDialog;
 import org.apache.commons.lang3.StringUtils;
+import print.BorrowPrinter;
 import table.borrow.BorrowTable;
 import table.user.UserTable;
+import uitl.FingerHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,10 +21,10 @@ import java.awt.event.ActionListener;
 import java.util.List;
 
 public class BorrowPanel extends JPanel implements PanelOperation {
-    private JButton searchBtn, resetBtn, addBtn, btnEdit,prePage, nextPage, lastPage;
+    private JButton searchBtn, resetBtn, borrowBtn, btnEdit,returnBtn,printBtn, prePage, nextPage, lastPage;
     private JPanel conditPanel, pagePanel;
-    private JLabel userNameLabel, phoneLabel, pageInfo;
-    private JTextField userNameField = null, phoneField = null;
+    private JLabel borrowUserNameLabel, deviceNameLabel,deviceCodeLabel,pageInfo;
+    private JTextField borrowUserNameField = null, deviceNameField = null,deviceCodeField = null;
 
     private JScrollPane jsp;
 
@@ -52,17 +56,23 @@ public class BorrowPanel extends JPanel implements PanelOperation {
 
         resetBtn = new JButton("重置");
 
-        addBtn = new JButton("借出");
+        borrowBtn = new JButton("出借");
         btnEdit = new JButton("编辑");
+
+        returnBtn = new JButton("归还");
+        printBtn = new JButton("打印");
 
 
         prePage = new JButton("上一页");
         nextPage = new JButton("下一页");
         lastPage = new JButton("末  页");
-        userNameLabel = new JLabel("姓名");
-        userNameField = new JTextField(15);
-        phoneLabel = new JLabel("联系电话");
-        phoneField = new JTextField(15);
+        borrowUserNameLabel = new JLabel("借用人");
+        borrowUserNameField = new JTextField(15);
+        deviceNameLabel = new JLabel("设备名称");
+        deviceNameField = new JTextField(15);
+
+        deviceCodeLabel = new JLabel("设备编码");
+        deviceCodeField = new JTextField(15);
 
         jsp = new JScrollPane(table);
 
@@ -94,34 +104,50 @@ public class BorrowPanel extends JPanel implements PanelOperation {
         gridBagConstraints.gridy=0;
         gridBagConstraints.gridwidth=1;
         gridBagConstraints.gridheight=1;
-        gridBagLayout.setConstraints(userNameLabel, gridBagConstraints);
+        gridBagLayout.setConstraints(borrowUserNameLabel, gridBagConstraints);
         //组件2
         gridBagConstraints.gridx=1;
         gridBagConstraints.gridy=0;
         gridBagConstraints.gridwidth=3;
         gridBagConstraints.gridheight=1;
-        gridBagLayout.setConstraints(userNameField, gridBagConstraints);
+        gridBagLayout.setConstraints(borrowUserNameField, gridBagConstraints);
 
         gridBagConstraints.gridx=4;
         gridBagConstraints.gridy=0;
         gridBagConstraints.gridwidth=1;
         gridBagConstraints.gridheight=1;
-        gridBagLayout.setConstraints(phoneLabel, gridBagConstraints);
+        gridBagLayout.setConstraints(deviceNameLabel, gridBagConstraints);
 
         gridBagConstraints.gridx=5;
         gridBagConstraints.gridy=0;
         gridBagConstraints.gridwidth=3;
         gridBagConstraints.gridheight=1;
         gridBagConstraints.insets = new Insets(0, 0, 0, 10);
-        gridBagLayout.setConstraints(phoneField, gridBagConstraints);
+        gridBagLayout.setConstraints(deviceNameField, gridBagConstraints);
+
 
         gridBagConstraints.gridx=8;
         gridBagConstraints.gridy=0;
         gridBagConstraints.gridwidth=1;
         gridBagConstraints.gridheight=1;
-        gridBagLayout.setConstraints(searchBtn, gridBagConstraints);
+        gridBagLayout.setConstraints(deviceCodeLabel, gridBagConstraints);
 
         gridBagConstraints.gridx=9;
+        gridBagConstraints.gridy=0;
+        gridBagConstraints.gridwidth=3;
+        gridBagConstraints.gridheight=1;
+        //gridBagConstraints.insets = new Insets(0, 0, 0, 10);
+        gridBagLayout.setConstraints(deviceCodeField, gridBagConstraints);
+
+
+
+        gridBagConstraints.gridx=12;
+        gridBagConstraints.gridy=0;
+        gridBagConstraints.gridwidth=1;
+        gridBagConstraints.gridheight=1;
+        gridBagLayout.setConstraints(searchBtn, gridBagConstraints);
+
+        gridBagConstraints.gridx=13;
         gridBagConstraints.gridy=0;
         gridBagConstraints.gridwidth=1;
         gridBagConstraints.gridheight=1;
@@ -133,7 +159,7 @@ public class BorrowPanel extends JPanel implements PanelOperation {
         gridBagConstraints.gridy=1;
         gridBagConstraints.gridwidth=1;
         gridBagConstraints.gridheight=1;
-        gridBagLayout.setConstraints(addBtn, gridBagConstraints);
+        gridBagLayout.setConstraints(printBtn, gridBagConstraints);
 
         gridBagConstraints.gridx=1;
         gridBagConstraints.gridy=1;
@@ -142,17 +168,33 @@ public class BorrowPanel extends JPanel implements PanelOperation {
         gridBagLayout.setConstraints(btnEdit, gridBagConstraints);
 
 
+        gridBagConstraints.gridx=4;
+        gridBagConstraints.gridy=1;
+        gridBagConstraints.gridwidth=1;
+        gridBagConstraints.gridheight=1;
+        gridBagLayout.setConstraints(borrowBtn, gridBagConstraints);
 
-        conditPanel.add(userNameLabel);
-        conditPanel.add(userNameField);
-        conditPanel.add(phoneLabel);
-        conditPanel.add(phoneField);
+        gridBagConstraints.gridx=5;
+        gridBagConstraints.gridy=1;
+        gridBagConstraints.gridwidth=1;
+        gridBagConstraints.gridheight=1;
+        gridBagLayout.setConstraints(returnBtn, gridBagConstraints);
+
+        conditPanel.add(borrowUserNameLabel);
+        conditPanel.add(borrowUserNameField);
+        conditPanel.add(deviceNameLabel);
+        conditPanel.add(deviceNameField);
+        conditPanel.add(deviceCodeLabel);
+        conditPanel.add(deviceCodeField);
 
         conditPanel.add(searchBtn);
         conditPanel.add(resetBtn);
 
-        conditPanel.add(addBtn);
+        conditPanel.add(borrowBtn);
         conditPanel.add(btnEdit);
+
+        conditPanel.add(returnBtn);
+        conditPanel.add(printBtn);
 
 
         this.setLayout(new BorderLayout());
@@ -184,8 +226,9 @@ public class BorrowPanel extends JPanel implements PanelOperation {
 
     // 重置文本输入框
     private void clear() {
-        userNameField.setText("");
-        phoneField.setText("");
+        borrowUserNameField.setText("");
+        deviceNameField.setText("");
+        deviceCodeField.setText("");
     }
 
 
@@ -203,7 +246,9 @@ public class BorrowPanel extends JPanel implements PanelOperation {
     private void selectDataAndSetPageInfo() {
 
         TbBorrowRecord record = new TbBorrowRecord();
-        //record.......设置条件
+        record.setBorrowUserName(borrowUserNameField.getText());
+        record.setDeviceName(deviceNameField.getText());
+        record.setDeviceCode(deviceCodeField.getText());
 
         //设置记录总数
         table.setTotalRowCount((int) DaoFactory.getBorrowRecordDao().countAllByCondition(record));
@@ -236,13 +281,7 @@ public class BorrowPanel extends JPanel implements PanelOperation {
                 clear();
             }
         });
-        //新增
-        addBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showCustomDialog();
-            }
-        });
+
 
 
         /*//编辑
@@ -252,6 +291,82 @@ public class BorrowPanel extends JPanel implements PanelOperation {
                 doEditAction();
             }
         });*/
+
+        //借出
+        borrowBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showCustomDialog();
+            }
+        });
+        //归还
+        returnBtn.addActionListener(e -> {
+
+            int[] selectedRows = table.getSelectedRows();
+
+            if(selectedRows.length == 0){
+                JOptionPane.showMessageDialog(FrameUtil.currentFrame,"请选择一条借出记录归还","提示",1);
+                return;
+            }
+
+            if(selectedRows.length > 1){
+                JOptionPane.showMessageDialog(FrameUtil.currentFrame,"最多选择一条借出记录归还","提示",1);
+                return;
+            }
+            String id = table.getValueAt(selectedRows[0], 0).toString();
+            if(StringUtils.isBlank(id)){
+                JOptionPane.showMessageDialog(FrameUtil.currentFrame,"借出记录不存在, 请刷新列表","提示",2);
+                return;
+            }
+            TbBorrowRecord record = DaoFactory.getBorrowRecordDao().queryById(Integer.valueOf(id));
+            if(null == record){
+                JOptionPane.showMessageDialog(FrameUtil.currentFrame,"借出记录不存在, 请刷新列表","提示",1);
+                return;
+            }
+            if(Status.RETURNED.name().equals(record.getStatus())){
+                JOptionPane.showMessageDialog(FrameUtil.currentFrame,"此借出记录已经归还, 请选择其它借出记录","提示",1);
+                return;
+            }
+
+            BorrowFingerDialog borrowFingerDialog = new BorrowFingerDialog(record);
+            FingerHelper fingerThread = new FingerHelper(borrowFingerDialog);
+
+            Thread dialogThread = new Thread(() -> {
+                /**
+                 * 指纹弹窗
+                 */
+                borrowFingerDialog.showDialog();
+                fingerThread.interrupt();
+            });
+            dialogThread.start();
+            fingerThread.start();
+        });
+
+        //打印
+        printBtn.addActionListener(e -> {
+            int[] selectedRows = table.getSelectedRows();
+
+            if(selectedRows.length == 0){
+                JOptionPane.showMessageDialog(FrameUtil.currentFrame,"请选择一条借出记录打印","提示",1);
+                return;
+            }
+
+            if(selectedRows.length > 1){
+                JOptionPane.showMessageDialog(FrameUtil.currentFrame,"最多选择一条借出记录打印","提示",1);
+                return;
+            }
+            String id = table.getValueAt(selectedRows[0], 0).toString();
+            if(StringUtils.isBlank(id)){
+                JOptionPane.showMessageDialog(FrameUtil.currentFrame,"借出记录不存在, 请刷新列表","警告",2);
+                return;
+            }
+            TbBorrowRecord record = DaoFactory.getBorrowRecordDao().queryById(Integer.valueOf(id));
+            if(null == record){
+                JOptionPane.showMessageDialog(FrameUtil.currentFrame,"借出记录不存在, 请刷新列表","警告",2);
+                return;
+            }
+            new BorrowPrinter(record).printBorrow();
+        });
 
         // 上一页
         prePage.addActionListener(new ActionListener() {

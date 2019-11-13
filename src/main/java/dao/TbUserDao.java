@@ -9,7 +9,7 @@ import java.util.List;
 
 public class TbUserDao {
 
-    public static final String COLUMS = "name,gender,age,phone,createDate,fingerId";
+    public static final String[] COLUM_ARR = {"name","gender","age","phone","createDate"};
 
     public long countAll(){
         String sql = "select count(*) FROM TB_USER";
@@ -55,10 +55,13 @@ public class TbUserDao {
 
     public Integer insert(TbUser user){
 
-        String sql = "INSERT INTO TB_USER("+ COLUMS +") VALUES(?,?,?,?,?,?)";
+        String colums = StringUtils.join(COLUM_ARR, ",");
+        String questionMarks = CommonDbUtil.spliceSqlQuestionMark(COLUM_ARR.length);
+
+        String sql = "INSERT INTO TB_USER("+ colums +") VALUES("+questionMarks+")";
 
         Object[] params = {user.getName(),user.getGender(),user.getAge(),
-                user.getPhone(),user.getCreateDate(),user.getFingerId()};
+                user.getPhone(),user.getCreateDate()};
         return CommonDbUtil.insertOneRetureId(sql,params);
     }
 
@@ -76,11 +79,11 @@ public class TbUserDao {
         return CommonDbUtil.queryReturnBean(sql,TbUser.class,params);
     }
 
-    public TbUser queryByFingerId(int fingerId){
+    /*public TbUser queryByFingerId(int fingerId){
         String sql = "SELECT * FROM TB_USER WHERE fingerId = ?";
         Object[] params ={fingerId};
         return CommonDbUtil.queryReturnBean(sql,TbUser.class,params);
-    }
+    }*/
 
     private void getSearchCondition(TbUser user, StringBuilder sql, List<Object> params) {
         if (null != user) {

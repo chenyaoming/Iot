@@ -16,4 +16,9 @@ public class TbFinger {
      */
     private byte[] template;
 
+    /**
+     * 指纹对应用户id
+     */
+    private Integer userId;
+
 }

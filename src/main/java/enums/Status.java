@@ -6,12 +6,12 @@ public enum Status {
     /**
      * 出借状态
      */
-    LENDING,
+    BORROWING,
 
     /**
      * 已归还
      */
-    RESTORE;
+    RETURNED;
 
 
 }

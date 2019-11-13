@@ -79,7 +79,7 @@ public class TbBorrowRecord {
     /**
      * 归还人名称
      */
-    private Integer returnUserName;
+    private String returnUserName;
 
     /**
      * 归还日期
@@ -94,7 +94,7 @@ public class TbBorrowRecord {
     /**
      * 归还保管员名称
      */
-    private Integer returnClerkUserName;
+    private String returnClerkUserName;
 
     /**
      * 备注

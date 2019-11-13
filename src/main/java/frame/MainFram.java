@@ -84,9 +84,9 @@ public class MainFram extends JFrame implements FrameOperation{
         this.add(tabbedPane, BorderLayout.CENTER);
 
 
-        this.setPreferredSize(new Dimension(900, 600));
+        this.setPreferredSize(new Dimension(1100, 680));
         // 设置主窗体显示在屏幕的位置
-        this.setLocation(280, 50);
+        this.setLocation(100, 20);
         // 设置是否显示
         this.setVisible(true);
         this.pack();

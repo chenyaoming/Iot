@@ -63,17 +63,17 @@ public class BorrowPrinter implements Printable {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setFont(new Font("Default", Font.PLAIN, 12));
 
-        g2d.drawString("借用清单", 50, 20);
-        g2d.drawString("-------------------------------", 13, 30);
+        g2d.drawString("借用清单", 50, 30);
+        g2d.drawString("-------------------------------", 13, 40);
 
-        g2d.drawString("名称："+record.getDeviceName(), 13, 50);
-        g2d.drawString("型号："+record.getDeviceType(), 13, 70);
-        g2d.drawString("数量："+record.getBorrowNum(), 13, 90);
-        g2d.drawString("借用人："+record.getBorrowUserName(), 13, 110);
-        g2d.drawString("借用日期："+new SimpleDateFormat("yyyy-MM-dd").format(record.getBorrowDate()), 13, 130);
-        g2d.drawString("借出保管员："+record.getBorrowClerkUserName(), 13, 150);
+        g2d.drawString("名称："+record.getDeviceName(), 13, 60);
+        g2d.drawString("型号："+record.getDeviceType(), 13, 80);
+        g2d.drawString("数量："+record.getBorrowNum(), 13, 100);
+        g2d.drawString("借用人："+record.getBorrowUserName(), 13, 120);
+        g2d.drawString("借用日期："+new SimpleDateFormat("yyyy-MM-dd").format(record.getBorrowDate()), 13, 140);
+        g2d.drawString("借出保管员："+record.getBorrowClerkUserName(), 13, 160);
 
-        g2d.drawString("-------------------------------", 13, 170);
+        g2d.drawString("-------------------------------", 13, 180);
 
         return PAGE_EXISTS;
     }

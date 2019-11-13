@@ -37,10 +37,6 @@ public class TbUser {
      */
     private Date createDate;
 
-    /**
-     * 指纹id,这个唯一
-     */
-    private Integer fingerId;
 
     public TbUser(String name, String phone) {
         this.name = name;

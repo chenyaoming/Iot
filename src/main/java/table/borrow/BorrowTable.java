@@ -31,7 +31,7 @@ public class BorrowTable extends JTable {
 	//从0开始，第0个列是id隐藏列
 	public static final int ID_HIDDEN_COLUM = 0;
 	//从0开始，第6个列是图片列
-	public static final int IMAGE_COLUM = 7;
+	public static final int IMAGE_COLUM = 6;
 	//图片列宽度
 	public static final int IMAGE_COLUM_WIDTH = 100;
 	//表格行高大小
@@ -58,7 +58,7 @@ public class BorrowTable extends JTable {
 	public void initTable() {
 
         this.setTotalRowCount((int) DaoFactory.getUserDao().countAll());
-		List<TbBorrowRecord> borrowList = DaoFactory.getBorrowRecordDao().findByPage(this.getCurrentPage(),this.getPageCount());
+		List<TbBorrowRecord> borrowList = DaoFactory.getBorrowRecordDao().findByConditionPage(null,this.getCurrentPage(),this.getPageCount());
 		//结果集的总页数
 		this.setTotalPage(totalRowCount % pageCount == 0 ? totalRowCount/ pageCount : totalRowCount / pageCount + 1);
         this.showTable(borrowList);
