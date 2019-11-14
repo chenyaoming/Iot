@@ -356,18 +356,26 @@ public class BorrowPanel extends JPanel implements PanelOperation {
                 return;
             }
 
-            BorrowFingerDialog borrowFingerDialog = new BorrowFingerDialog(record);
-            FingerHelper fingerThread = new FingerHelper(borrowFingerDialog);
+            new BaseProgress(FrameUtil.currentFrame,"正在加载"){
+                @Override
+                public void invokeBusiness() {
+                    BorrowFingerDialog borrowFingerDialog = new BorrowFingerDialog(record);
+                    FingerHelper fingerThread = new FingerHelper(borrowFingerDialog);
 
-            Thread dialogThread = new Thread(() -> {
-                /**
-                 * 指纹弹窗
-                 */
-                borrowFingerDialog.showDialog();
-                fingerThread.interrupt();
-            });
-            dialogThread.start();
-            fingerThread.start();
+                    Thread dialogThread = new Thread(() -> {
+                        /**
+                         * 指纹弹窗
+                         */
+                        borrowFingerDialog.showDialog();
+                        fingerThread.interrupt();
+                    });
+                    dialogThread.start();
+                    fingerThread.start();
+
+                }
+            }.doAsynWork();
+
+
         });
 
         //打印

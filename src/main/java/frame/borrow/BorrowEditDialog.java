@@ -3,6 +3,7 @@ package frame.borrow;
 
 import bean.TbBorrowRecord;
 import bean.TbDevice;
+import constant.ImageConstant;
 import dao.DaoFactory;
 import frame.BigImageDialog;
 import frame.FrameUtil;
@@ -33,6 +34,8 @@ public class BorrowEditDialog extends JFrame{
     public BorrowEditDialog(TbBorrowRecord record){
         this.setTitle("借出详情");
         thisDialog = this;
+
+        this.setIconImage(new ImageIcon(ImageConstant.LOGO).getImage());
 
         // 创建一个模态对话框
        // final JFrame dialog = new JFrame("");

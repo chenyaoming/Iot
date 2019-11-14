@@ -2,10 +2,12 @@ package frame.device;
 
 
 import bean.TbDevice;
+import constant.ImageConstant;
 import dao.DaoFactory;
 import frame.BigImageDialog;
 import frame.FrameUtil;
 import jodd.util.StringUtil;
+import label.RequiredLabel;
 import org.apache.commons.lang3.StringUtils;
 import uitl.JFileChooserUtil;
 import uitl.ModalFrameUtil;
@@ -32,6 +34,8 @@ public class DeviceAddDialog extends JFrame{
         this.setTitle("设备信息");
         thisDialog = this;
 
+        this.setIconImage(new ImageIcon(ImageConstant.LOGO).getImage());
+
         // 创建一个模态对话框
        // final JFrame dialog = new JFrame("");
         // 设置对话框的宽高
@@ -51,30 +55,30 @@ public class DeviceAddDialog extends JFrame{
         idTextField.setVisible(false);
         this.add(idTextField);
 
-
-        JLabel jNameLabel = new JLabel("设备名称");
-        jNameLabel.setBounds(100, 0, 90, 50);
+        //RequiredLabel jNameLabel = new RequiredLabel("设备名称");
+        RequiredLabel jNameLabel = new RequiredLabel("设备名称");
+        jNameLabel.setBounds(90, 0, 90, 50);
         JTextField jNameTextField=new JTextField(30);
         jNameTextField.setBounds(160, 10, 250, 30);
         this.add(jNameLabel);
         this.add(jNameTextField);
 
-        JLabel jTypeNumLabel = new JLabel("设备型号");
-        jTypeNumLabel.setBounds(100, 50, 90, 50);
+        RequiredLabel jTypeNumLabel = new RequiredLabel("设备型号");
+        jTypeNumLabel.setBounds(90, 50, 90, 50);
         JTextField jTypeNumTextField=new JTextField(30);
         jTypeNumTextField.setBounds(160, 60, 250, 30);
         this.add(jTypeNumLabel);
         this.add(jTypeNumTextField);
 
-        JLabel jCodeLabel = new JLabel("设备编码");
-        jCodeLabel.setBounds(100, 100, 90, 50);
+        RequiredLabel jCodeLabel = new RequiredLabel("设备编码");
+        jCodeLabel.setBounds(90, 100, 90, 50);
         JTextField jCodeTextField=new JTextField(30);
         jCodeTextField.setBounds(160, 110, 250, 30);
         this.add(jCodeLabel);
         this.add(jCodeTextField);
 
-        JLabel countLabel = new JLabel("库存数量");
-        countLabel.setBounds(100, 150, 90, 50);
+        RequiredLabel countLabel = new RequiredLabel("库存数量");
+        countLabel.setBounds(90, 150, 90, 50);
         JTextField countTextField=new JTextField(30);
         countTextField.setBounds(160, 160, 250, 30);
         this.add(countLabel);

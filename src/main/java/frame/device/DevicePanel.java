@@ -109,7 +109,11 @@ public class DevicePanel extends JPanel implements PanelOperation {
         gridBagConstraints.gridy=0;
         gridBagConstraints.gridwidth=3;
         gridBagConstraints.gridheight=1;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 20);
+
         gridBagLayout.setConstraints(deviceNameField, gridBagConstraints);
+
+        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
 
         gridBagConstraints.gridx=4;
         gridBagConstraints.gridy=0;
@@ -351,6 +355,9 @@ public class DevicePanel extends JPanel implements PanelOperation {
                     // String name=selectedFile.getName();
                     List<TbDevice> deviceList = DeviceExportHelper.getDeviceData(selectedFile.getPath());
                     DaoFactory.getDeviceDao().insertBatch(deviceList);
+                    FrameUtil.doClickSearchBtn();
+
+                    JOptionPane.showMessageDialog(FrameUtil.currentFrame,"导入成功","提示",1);
                 }
             }.doAsynWork();
         }

@@ -1,5 +1,6 @@
 package frame;
 
+import constant.ImageConstant;
 import frame.borrow.BorrowPanel;
 import frame.device.DevicePanel;
 import frame.user.UserPanel;
@@ -16,10 +17,10 @@ import java.awt.event.ActionListener;
 
 public class MainFram extends JFrame implements FrameOperation{
 
-
+    private JTree tree;
     private JMenuBar menubar;
     private JMenu fileMenu;
-    private JMenuItem imput, export,exit;
+    private JMenuItem exit;
 
     // 创建选项卡面板
     final JTabbedPane tabbedPane = new JTabbedPane();
@@ -28,19 +29,21 @@ public class MainFram extends JFrame implements FrameOperation{
 
         FrameUtil.setCurrentFrame(this);
 
+
+
         menubar = new JMenuBar();
         fileMenu = new JMenu("文件");
-        imput = new JMenuItem("导入");
-        export=new JMenuItem("导出");
+        /*imput = new JMenuItem("导入");
+        export=new JMenuItem("导出");*/
         exit = new JMenuItem("退出");
 
         // 设置菜单
         setJMenuBar(menubar);
         menubar.add(fileMenu);
-        fileMenu.add(imput);
-        fileMenu.addSeparator();
-        fileMenu.add(export);
-        fileMenu.addSeparator();
+        //fileMenu.add(imput);
+        //fileMenu.addSeparator();
+        //fileMenu.add(export);
+        //fileMenu.addSeparator();
         fileMenu.add(exit);
 
 
@@ -53,7 +56,7 @@ public class MainFram extends JFrame implements FrameOperation{
 
         // 主界面标题
         this.setTitle("出入库系统");
-        this.setIconImage(new ImageIcon("images/logo.png").getImage());
+        this.setIconImage(new ImageIcon(ImageConstant.LOGO).getImage());
 
 
 
@@ -69,19 +72,14 @@ public class MainFram extends JFrame implements FrameOperation{
         tabbedPane.addTab("借出归还管理", new BorrowPanel());
 
         // 添加选项卡选中状态改变的监听器
-        tabbedPane.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-
-
-                System.out.println("当前选中的选项卡: " + tabbedPane.getSelectedIndex());
-            }
+        tabbedPane.addChangeListener(e -> {
+            tree.setSelectionRow(tabbedPane.getSelectedIndex()+1);
         });
 
         // 设置默认选中的选项卡
         tabbedPane.setSelectedIndex(0);
 
-
+        initOperator();
 
         this.add(tabbedPane, BorderLayout.CENTER);
 
@@ -124,23 +122,24 @@ public class MainFram extends JFrame implements FrameOperation{
         rootNode.add(borrowNode);
 
         // 使用根节点创建树组件
-        JTree tree = new JTree(rootNode);
+        tree = new JTree(rootNode);
 
         // 设置树显示根节点句柄
         tree.setShowsRootHandles(true);
         // 设置树节点不可编辑
         tree.setEditable(false);
 
-        // 设置节点选中监听器
-        tree.addTreeSelectionListener(new TreeSelectionListener() {
-            @Override
-            public void valueChanged(TreeSelectionEvent e) {
-                JTree jTree = (JTree) e.getSource();
-                // 设置默认选中的选项卡
-                tabbedPane.setSelectedIndex(jTree.getSelectionModel().getLeadSelectionRow() - 1);
+        tree.setSelectionRow(1);
 
-                //System.out.println("当前被选中的节点: " + e.getPath());
-            }
+        // 设置节点选中监听器
+        tree.addTreeSelectionListener(e -> {
+            JTree jTree = (JTree) e.getSource();
+            // 设置默认选中的选项卡
+            tabbedPane.setSelectedIndex(jTree.getSelectionModel().getLeadSelectionRow() - 1);
+
+            FrameUtil.doClickSearchBtn();
+
+            //System.out.println("当前被选中的节点: " + e.getPath());
         });
 
         // 创建滚动面板，包裹树（因为树节点展开后可能需要很大的空间来显示，所以需要用一个滚动面板来包裹）
@@ -161,19 +160,6 @@ public class MainFram extends JFrame implements FrameOperation{
             }
         });
 
-        export.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //doExportExcelAction();
-            }
-        });
-
-        imput.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //doImportExcelAction(new String[]{".xls",".xlsx"});
-            }
-        });
     }
 
     // 退出窗口

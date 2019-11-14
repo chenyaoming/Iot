@@ -37,7 +37,7 @@ public class BorrowFingerDialog extends JDialog  {
         this.setLayout(new BorderLayout());
 
         // 设置对话框的宽高
-        this.setSize(550, 450);
+        this.setSize(500, 400);
         this.setLocationRelativeTo(FrameUtil.currentFrame);
         this.toFront();
 

@@ -3,6 +3,7 @@ package frame.borrow;
 
 import bean.TbBorrowRecord;
 import bean.TbDevice;
+import constant.ImageConstant;
 import dao.DaoFactory;
 import frame.BigImageDialog;
 import frame.FrameUtil;
@@ -31,6 +32,8 @@ public class BorrowDetailDialog extends JFrame{
     public BorrowDetailDialog( TbBorrowRecord record){
         this.setTitle("设备信息");
         thisDialog = this;
+
+        this.setIconImage(new ImageIcon(ImageConstant.LOGO).getImage());
 
         // 创建一个模态对话框
        // final JFrame dialog = new JFrame("");
@@ -173,7 +176,7 @@ public class BorrowDetailDialog extends JFrame{
             }
             record.setBorrowNum(borNum);
 
-            new BaseProgress(thisDialog,"正在执行..."){
+            new BaseProgress(thisDialog,"正在加载..."){
                 @Override
                 public void invokeBusiness() {
                     try {

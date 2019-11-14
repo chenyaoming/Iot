@@ -33,10 +33,16 @@ public abstract class BaseProgress {
                 throw new RuntimeException("传的组件错误");
             }
             glasspane.start();
-            //执行业务代码
-            invokeBusiness();
-            // 在合适的地方关闭动画效果
-            glasspane.stop();
+
+            try {
+                //执行业务代码
+                invokeBusiness();
+            }catch (Exception e){
+
+            }finally {
+                // 在合适的地方关闭动画效果
+                glasspane.stop();
+            }
         }).start();
     }
 

@@ -1,12 +1,9 @@
 package frame.user;
 
-import bean.TbDevice;
 import bean.TbUser;
 import dao.DaoFactory;
 import frame.FrameUtil;
-import frame.InfiniteProgressPanel;
 import frame.PanelOperation;
-import helper.DeviceExportHelper;
 import org.apache.commons.lang3.StringUtils;
 import progress.BaseProgress;
 import table.user.UserTable;
@@ -60,7 +57,7 @@ public class UserPanel extends JPanel implements PanelOperation {
         prePage = new JButton("上一页");
         nextPage = new JButton("下一页");
         lastPage = new JButton("末  页");
-        userNameLabel = new JLabel("姓名");
+        userNameLabel = new JLabel("人员姓名");
         userNameField = new JTextField(15);
         phoneLabel = new JLabel("联系电话");
         phoneField = new JTextField(15);
@@ -101,7 +98,10 @@ public class UserPanel extends JPanel implements PanelOperation {
         gridBagConstraints.gridy=0;
         gridBagConstraints.gridwidth=3;
         gridBagConstraints.gridheight=1;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 20);
         gridBagLayout.setConstraints(userNameField, gridBagConstraints);
+
+        gridBagConstraints.insets = new Insets(0, 0, 0, 5);
 
         gridBagConstraints.gridx=4;
         gridBagConstraints.gridy=0;

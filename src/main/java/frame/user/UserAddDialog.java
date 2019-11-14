@@ -5,7 +5,9 @@ import bean.TbUser;
 import dao.DaoFactory;
 import frame.FrameUtil;
 import jodd.util.StringUtil;
+import label.RequiredLabel;
 import org.apache.commons.lang3.StringUtils;
+import progress.BaseProgress;
 import uitl.FingerHelper;
 
 import javax.swing.*;
@@ -48,8 +50,8 @@ public class UserAddDialog extends JDialog {
         this.add(idTextField);
 
 
-        JLabel nameLabel = new JLabel("用户姓名");
-        nameLabel.setBounds(100, 0, 90, 50);
+        RequiredLabel nameLabel = new RequiredLabel("用户姓名");
+        nameLabel.setBounds(90, 0, 90, 50);
         JTextField nameField=new JTextField(30);
         nameField.setBounds(160, 10, 250, 30);
         this.add(nameLabel);
@@ -67,8 +69,8 @@ public class UserAddDialog extends JDialog {
         manBtn.setSelected(true);
 
 
-        JLabel genderLabel = new JLabel("用户性别");
-        genderLabel.setBounds(100, 50, 90, 50);
+        RequiredLabel genderLabel = new RequiredLabel("用户性别");
+        genderLabel.setBounds(90, 50, 90, 50);
 
         manBtn.setBounds(170, 50, 50, 50);
         remanBtn.setBounds(230, 50, 50, 50);
@@ -78,15 +80,15 @@ public class UserAddDialog extends JDialog {
         this.add(remanBtn);
 
 
-        JLabel ageLabel = new JLabel("用户年龄");
-        ageLabel.setBounds(100, 100, 90, 50);
+        RequiredLabel ageLabel = new RequiredLabel("用户年龄");
+        ageLabel.setBounds(90, 100, 90, 50);
         JTextField ageField=new JTextField(30);
         ageField.setBounds(160, 110, 250, 30);
         this.add(ageLabel);
         this.add(ageField);
 
-        JLabel phoneLabel = new JLabel("联系电话");
-        phoneLabel.setBounds(100, 150, 90, 50);
+        RequiredLabel phoneLabel = new RequiredLabel("联系电话");
+        phoneLabel.setBounds(90, 150, 90, 50);
         JTextField phoneField=new JTextField(30);
         phoneField.setBounds(160, 160, 250, 30);
         this.add(phoneLabel);
@@ -199,27 +201,29 @@ public class UserAddDialog extends JDialog {
                     FrameUtil.doClickSearchBtn();
                 }else{
                     //增加
-                    //DaoFactory.getUserDao().insert(newUser);
 
-                    FingerDialog fingerDialog = new FingerDialog(newUser);
-                    FingerHelper fingerThread = new FingerHelper(fingerDialog);
+                    new BaseProgress(thisDialog,"正在加载..."){
+                        @Override
+                        public void invokeBusiness() {
+                            FingerDialog fingerDialog = new FingerDialog(newUser);
+                            FingerHelper fingerThread = new FingerHelper(fingerDialog);
 
-                    /**
-                     * 让添加的弹框隐藏
-                     */
-                    //thisDialog.setVisible(false);
-                    thisDialog.dispose();
+                            Thread dialogThread = new Thread(() -> {
+                                /**
+                                 * 指纹弹窗
+                                 */
+                                fingerDialog.showDialog();
+                                fingerThread.interrupt();
+                            });
+                            dialogThread.start();
+                            fingerThread.start();
 
-                    Thread dialogThread = new Thread(() -> {
-                        /**
-                         * 指纹弹窗
-                         */
-                        fingerDialog.showDialog();
-                        fingerThread.interrupt();
-                    });
-                    dialogThread.start();
-                    fingerThread.start();
-
+                            /**
+                             * 让添加的弹框隐藏
+                             */
+                            thisDialog.dispose();
+                        }
+                    }.doAsynWork();
                 }
             }
         });
