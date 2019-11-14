@@ -3,7 +3,7 @@ package frame.user;
 import bean.TbUser;
 import dao.DaoFactory;
 import frame.FrameUtil;
-import frame.PanelOperation;
+import interfaces.PanelOperation;
 import org.apache.commons.lang3.StringUtils;
 import progress.BaseProgress;
 import table.user.UserTable;

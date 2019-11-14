@@ -10,6 +10,7 @@ import frame.FrameUtil;
 import frame.InfiniteProgressPanel;
 import frame.device.ImagePanel;
 import helper.DeviceExportHelper;
+import label.RequiredLabel;
 import org.apache.commons.lang3.StringUtils;
 import progress.BaseProgress;
 import uitl.FingerHelper;
@@ -70,7 +71,7 @@ public class BorrowDetailDialog extends JFrame{
         this.add(jCodeLabel);
         this.add(jCodeTextField);
 
-        JLabel countLabel = new JLabel("借出数量");
+        RequiredLabel countLabel = new RequiredLabel("借出数量");
         countLabel.setBounds(100, 150, 90, 50);
 
         JTextField borrowCountTextField=new JTextField(30);

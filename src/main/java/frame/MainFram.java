@@ -4,18 +4,18 @@ import constant.ImageConstant;
 import frame.borrow.BorrowPanel;
 import frame.device.DevicePanel;
 import frame.user.UserPanel;
+import interfaces.BorrowUserNameFieldFrameOperation;
+import interfaces.BorrowUserNameFieldOperation;
+import interfaces.FrameOperation;
+import interfaces.PanelOperation;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class MainFram extends JFrame implements FrameOperation{
+public class MainFram extends JFrame implements FrameOperation, BorrowUserNameFieldFrameOperation {
 
     private JTree tree;
     private JMenuBar menubar;
@@ -84,7 +84,7 @@ public class MainFram extends JFrame implements FrameOperation{
         this.add(tabbedPane, BorderLayout.CENTER);
 
 
-        this.setPreferredSize(new Dimension(1100, 680));
+        this.setPreferredSize(new Dimension(1200, 680));
         // 设置主窗体显示在屏幕的位置
         this.setLocation(100, 20);
         // 设置是否显示
@@ -193,6 +193,15 @@ public class MainFram extends JFrame implements FrameOperation{
         Component component = tabbedPane.getSelectedComponent();
         if (component instanceof PanelOperation){
            return  ((PanelOperation) component).getSearchButton();
+        }
+        return null;
+    }
+
+    @Override
+    public JTextField getCurrentBorrowUserNameField() {
+        Component component = tabbedPane.getSelectedComponent();
+        if (component instanceof BorrowUserNameFieldOperation){
+            return  ((BorrowUserNameFieldOperation) component).getBorrowUserNameField();
         }
         return null;
     }

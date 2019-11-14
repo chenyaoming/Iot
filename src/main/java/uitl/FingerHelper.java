@@ -12,6 +12,7 @@ import enums.Status;
 import frame.FrameUtil;
 import frame.borrow.BorrowFingerDialog;
 import frame.borrow.BorrowFinishDialog;
+import frame.borrow.BorrowSearchDialog;
 import frame.borrow.ReturnFinishDialog;
 import frame.user.FingerDialog;
 import org.apache.commons.collections4.CollectionUtils;
@@ -48,6 +49,8 @@ public class FingerHelper extends Thread {
     private FingerDialog fingerDialog ;
 
     private BorrowFingerDialog borrowFingerDialog;
+
+    private BorrowSearchDialog borrowSearchDialog;
 
 
     //按下指纹次数合并
@@ -98,6 +101,14 @@ public class FingerHelper extends Thread {
             throw new RuntimeException("用户信息不能为空");
         }
         this.fingerDialog =fingerDialog;
+        initFingerDevice();
+    }
+
+    public FingerHelper(BorrowSearchDialog borrowSearchDialog){
+        if(null == borrowSearchDialog){
+            throw new RuntimeException("用户信息不能为空");
+        }
+        this.borrowSearchDialog = borrowSearchDialog;
         initFingerDevice();
     }
 
@@ -170,6 +181,8 @@ public class FingerHelper extends Thread {
                     //处理归还指纹
                     addReturnFinger();
                 }
+            }else if(null != borrowSearchDialog){
+                dealBorrowSearchFinger();
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -361,6 +374,55 @@ public class FingerHelper extends Thread {
         System.out.println("线程执行完了");
     }
 
+    private void dealBorrowSearchFinger() {
+
+        /**
+         * 是否已经按完指纹
+         */
+        boolean fingerFinish = false;
+
+        //指纹模板大小
+        byte[] template = new byte[2048];
+
+        long totalMillis = 0;
+        while (!mbStop && !this.isInterrupted()) {
+            int[] templateLength = new int[1];
+            templateLength[0] = 2048;
+            //采集指纹图像，指纹模板
+            System.out.println("采集指纹图像，指纹模板.......");
+            if (0 == FingerprintSensorEx.AcquireFingerprint(mhDevice, imgbuf, template, templateLength))
+            {
+                //双重保险初始化高速内存数据
+                addZkRam();
+
+                int[] fid = new int[1];
+                int[] score = new int [1];
+
+                //1:N识别
+                if (FingerprintSensorEx.DBIdentify(mhDB, template, fid, score) ==0 ){
+
+                    TbFinger finger = DaoFactory.getFingerDao().queryById(fid[0]);
+                    TbUser user = DaoFactory.getUserDao().queryById(finger.getUserId());
+
+                    if(null != user){
+                        FrameUtil.getCurrentBorrowUserNameField().setText(user.getName());
+                        FrameUtil.getCurrentSearchBtn().doClick();
+                    }else {
+                        JOptionPane.showMessageDialog(new JPanel(),"此指纹还未注册, 请到人员管理新增人员信息","提示",1);
+                    }
+                    break;
+                }else {
+                    JOptionPane.showMessageDialog(new JPanel(),"此指纹还未注册, 请到人员管理新增人员信息","提示",1);
+                    break;
+                }
+
+            }
+            totalMillis = dealSleepAndInterrupt(totalMillis);
+        }
+        disposeDialog();
+        System.out.println("线程执行完了");
+    }
+
     private long dealSleepAndInterrupt(long totalMillis) {
         try {
             //每0.3秒搜集一次
@@ -386,13 +448,14 @@ public class FingerHelper extends Thread {
          */
         boolean fingerFinish = false;
 
-        //指纹模板大小
-        byte[] template = new byte[2048];
+
 
         List<byte[]> templateList = new ArrayList<>();
 
         long totalMillis = 0;
         while (!mbStop && !this.isInterrupted()) {
+            //指纹模板大小
+            byte[] template = new byte[2048];
             int[] templateLength = new int[1];
             templateLength[0] = 2048;
             //采集指纹图像，指纹模板
@@ -494,6 +557,9 @@ public class FingerHelper extends Thread {
         if(null != borrowFingerDialog && borrowFingerDialog.isShowing()){
             borrowFingerDialog.dispose();
         }
+        if(null != borrowSearchDialog && borrowSearchDialog.isShowing()){
+            borrowSearchDialog.dispose();
+        }
     }
 
 
@@ -526,6 +592,9 @@ public class FingerHelper extends Thread {
         if (tmplateList.size() > 0 && FingerprintSensorEx.DBMatch(mhDB, tmplateList.get(tmplateList.size()-1),template) <= 0)
         {
             JOptionPane.showMessageDialog(new JPanel(),"请重新用同一个手指按三次","提示",1);
+
+            //清除之前录入的指纹，和设置还需录入的指纹数
+            clearTempAndSetText(tmplateList);
             //textArea.setText("please press the same finger 3 times for the enrollment\n");
             return;
         }
@@ -534,7 +603,7 @@ public class FingerHelper extends Thread {
         byte[] newTemp = new byte[2048];
         System.arraycopy(template, 0, newTemp, 0, 2048);
 
-        tmplateList.add(template);
+        tmplateList.add(newTemp);
     }
 
     private void clearTempAndSetText(List<byte[]> tmplateList) {

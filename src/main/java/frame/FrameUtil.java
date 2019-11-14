@@ -1,7 +1,12 @@
 package frame;
 
 
+import interfaces.BorrowUserNameFieldFrameOperation;
+import interfaces.FrameOperation;
+import interfaces.PanelOperation;
+
 import javax.swing.*;
+import java.awt.*;
 
 public class FrameUtil {
 
@@ -28,6 +33,13 @@ public class FrameUtil {
         if(null != searchBtn){
             searchBtn.doClick();
         }
+    }
+
+    public static JTextField getCurrentBorrowUserNameField() {
+        if (null != currentFrame && currentFrame instanceof BorrowUserNameFieldFrameOperation){
+            return ((BorrowUserNameFieldFrameOperation) currentFrame).getCurrentBorrowUserNameField();
+        }
+        return null;
     }
 
 }

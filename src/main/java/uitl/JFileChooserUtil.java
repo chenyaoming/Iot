@@ -1,33 +1,17 @@
 package uitl;
 
-
-import bean.DeviceExcelColum;
-import bean.TbDevice;
 import jodd.io.FileUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.PictureData;
-import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
-import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
-import org.apache.poi.xssf.usermodel.XSSFDrawing;
-import org.apache.poi.xssf.usermodel.XSSFFont;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
@@ -125,20 +109,23 @@ public class JFileChooserUtil {
         // 目标文件路径+文件名
 
         String fileName =  randomUUID.toString() + suffix;
-        File toFile = new File(UPLOAD_PATH);
+
+        String lastPath = UPLOAD_PATH+new SimpleDateFormat("yyyyMM").format(new Date())+"/";
+
+        File toFile = new File(lastPath);
         if (!toFile.getParentFile().exists()) {
             // when file is not existed, will create.
             toFile.mkdirs();
         }
         // write to target file.
         try {
-            FileUtil.copyFile(imgFile,new File(UPLOAD_PATH+fileName));
+            FileUtil.copyFile(imgFile,new File(lastPath+fileName));
 
             //FileOutputStream fops = new FileOutputStream(new File(desPathName));
             /*fops.write(imgFile.to);
             fops.close();*/
 
-            return UPLOAD_PATH+fileName;
+            return lastPath+fileName;
         } catch (Exception e) {
             e.printStackTrace();
         }

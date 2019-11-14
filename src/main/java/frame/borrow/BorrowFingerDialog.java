@@ -54,7 +54,7 @@ public class BorrowFingerDialog extends JDialog  {
         }
 
 
-        Font font = new Font("宋体", Font.PLAIN, 25);
+        Font font = new Font("宋体", Font.PLAIN, 20);
         tipLabel.setFont(font);
         tipLabel.setForeground(Color.RED);
 

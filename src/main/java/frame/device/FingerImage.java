@@ -23,7 +23,7 @@ public class FingerImage extends JPanel{
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         if (image != null) {
-            g.drawImage(image, 110, 0, this);
+            g.drawImage(image, 100, 0, this);
         }
     }
 

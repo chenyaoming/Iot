@@ -1,20 +1,15 @@
 package frame.borrow;
 
 import bean.TbBorrowRecord;
-import bean.TbDevice;
-import bean.TbUser;
 import dao.DaoFactory;
 import enums.Status;
 import frame.FrameUtil;
-import frame.InfiniteProgressPanel;
-import frame.PanelOperation;
-import frame.user.UserAddDialog;
-import helper.DeviceExportHelper;
+import interfaces.BorrowUserNameFieldOperation;
+import interfaces.PanelOperation;
 import org.apache.commons.lang3.StringUtils;
-import print.BorrowPrinter;
+import org.apache.xmlbeans.impl.jam.JField;
 import progress.BaseProgress;
 import table.borrow.BorrowTable;
-import table.user.UserTable;
 import uitl.FingerHelper;
 
 import javax.swing.*;
@@ -23,8 +18,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-public class BorrowPanel extends JPanel implements PanelOperation {
-    private JButton searchBtn, resetBtn, borrowBtn, btnEdit,returnBtn,printBtn, prePage, nextPage, lastPage;
+public class BorrowPanel extends JPanel implements PanelOperation, BorrowUserNameFieldOperation {
+    private JButton searchBtn, resetBtn, borrowBtn, btnEdit,returnBtn,printBtn, fingerSearchBtn, prePage, nextPage, lastPage;
     private JPanel conditPanel, pagePanel;
     private JLabel borrowUserNameLabel, deviceNameLabel,deviceCodeLabel,pageInfo;
     private JTextField borrowUserNameField = null, deviceNameField = null,deviceCodeField = null;
@@ -64,6 +59,8 @@ public class BorrowPanel extends JPanel implements PanelOperation {
 
         returnBtn = new JButton("归还");
         printBtn = new JButton("打印");
+
+        fingerSearchBtn = new JButton("借用人指纹查询");
 
 
         prePage = new JButton("上一页");
@@ -183,6 +180,12 @@ public class BorrowPanel extends JPanel implements PanelOperation {
         gridBagConstraints.gridheight=1;
         gridBagLayout.setConstraints(returnBtn, gridBagConstraints);
 
+        gridBagConstraints.gridx=7;
+        gridBagConstraints.gridy=1;
+        gridBagConstraints.gridwidth=3;
+        gridBagConstraints.gridheight=1;
+        gridBagLayout.setConstraints(fingerSearchBtn, gridBagConstraints);
+
         conditPanel.add(borrowUserNameLabel);
         conditPanel.add(borrowUserNameField);
         conditPanel.add(deviceNameLabel);
@@ -199,6 +202,7 @@ public class BorrowPanel extends JPanel implements PanelOperation {
         conditPanel.add(returnBtn);
         conditPanel.add(printBtn);
 
+        conditPanel.add(fingerSearchBtn);
 
         this.setLayout(new BorderLayout());
         this.add(conditPanel, BorderLayout.NORTH);
@@ -404,6 +408,26 @@ public class BorrowPanel extends JPanel implements PanelOperation {
             new BorrowFinishDialog(record).showDialog();
         });
 
+        fingerSearchBtn.addActionListener(e -> {
+            new BaseProgress(FrameUtil.currentFrame,"正在加载..."){
+                @Override
+                public void invokeBusiness() {
+                    BorrowSearchDialog borrowSearchDialog = new BorrowSearchDialog();
+                    FingerHelper fingerThread = new FingerHelper(borrowSearchDialog);
+
+                    Thread dialogThread = new Thread(() -> {
+                        /**
+                         * 指纹弹窗
+                         */
+                        borrowSearchDialog.showDialog();
+                        fingerThread.interrupt();
+                    });
+                    dialogThread.start();
+                    fingerThread.start();
+                }
+            }.doAsynWork();
+        });
+
         // 上一页
         prePage.addActionListener(new ActionListener() {
             @Override
@@ -457,5 +481,10 @@ public class BorrowPanel extends JPanel implements PanelOperation {
     @Override
     public JButton getSearchButton() {
         return this.searchBtn;
+    }
+
+    @Override
+    public JTextField getBorrowUserNameField() {
+        return borrowUserNameField;
     }
 }

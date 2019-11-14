@@ -1,7 +1,6 @@
-package frame.user;
+package frame.borrow;
 
 
-import bean.TbUser;
 import frame.FrameUtil;
 import frame.device.FingerImage;
 
@@ -10,32 +9,24 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-public class FingerDialog extends JDialog  {
-
-
-    private TbUser newUser;
+public class BorrowSearchDialog extends JDialog  {
 
     /**
      * 提示还要按多少次指纹的标签
      */
     private JLabel tipLabel;
 
-
-    private volatile JDialog thisDialog;
+    private JDialog thisDialog;
 
     /**
      * 指纹标语
      */
-    public static final String TIPTEMP = "还需用同一手指按 %s 次指纹";
+    public static final String TIPTEMP = "请借用人按下指纹";
 
-    public FingerDialog(TbUser newUser){
+    public BorrowSearchDialog(){
 
         super(FrameUtil.currentFrame,"指纹信息",true);
-
         thisDialog = this;
-
-        //thisDialog = this;
-        this.newUser = newUser;
 
         // 处理鼠标点击
         this.setLayout(new BorderLayout());
@@ -50,7 +41,8 @@ public class FingerDialog extends JDialog  {
         this.add(fingerImageLabel, BorderLayout.CENTER);
 
         JPanel labelPanel = new JPanel();
-        JLabel tipLabel = new JLabel( String.format(TIPTEMP, 3));
+        JLabel tipLabel = new JLabel(TIPTEMP);
+
 
         Font font = new Font("宋体", Font.PLAIN, 20);
         tipLabel.setFont(font);
@@ -66,7 +58,6 @@ public class FingerDialog extends JDialog  {
             @Override
             public void windowClosing(WindowEvent e) {
                thisDialog.dispose();
-                new UserAddDialog(newUser).showDialog();
             }
         });
 
@@ -79,15 +70,6 @@ public class FingerDialog extends JDialog  {
         this.setVisible(true);
     }
 
-
-    public TbUser getNewUser() {
-        return newUser;
-    }
-
-    public void setNewUser(TbUser newUser) {
-        this.newUser = newUser;
-    }
-
     public JLabel getTipLabel() {
         return tipLabel;
     }
@@ -95,5 +77,4 @@ public class FingerDialog extends JDialog  {
     public void setTipLabel(JLabel tipLabel) {
         this.tipLabel = tipLabel;
     }
-
 }

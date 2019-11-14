@@ -34,7 +34,7 @@ public class UserAddDialog extends JDialog {
 
         // 设置对话框的宽高
         //dialog.setSize(400, 400);
-        this.setSize(500, 500);
+        this.setSize(500, 400);
         // 设置对话框大小不可改变
         this.setResizable(false);
         // 设置对话框相对显示的位置
@@ -105,10 +105,10 @@ public class UserAddDialog extends JDialog {
 
 
         JButton cancelBtn = new JButton("取消");
-        cancelBtn.setBounds(160, 370, 80, 30);
+        cancelBtn.setBounds(160, 280, 80, 30);
 
         JButton saveBtn = new JButton("保存");
-        saveBtn.setBounds(310, 370,  80, 30);
+        saveBtn.setBounds(290, 280,  80, 30);
 
         this.add(cancelBtn);
         this.add(saveBtn);
