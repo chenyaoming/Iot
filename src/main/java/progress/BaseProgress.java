@@ -1,7 +1,6 @@
 package progress;
 
 
-import frame.FrameUtil;
 import frame.InfiniteProgressPanel;
 
 import javax.swing.*;
@@ -26,9 +25,9 @@ public abstract class BaseProgress {
 
             InfiniteProgressPanel glasspane =null;
             if(component instanceof JFrame){
-                glasspane = new InfiniteProgressPanel((JFrame) component,text);
+                glasspane = new InfiniteProgressPanel((JFrame) component,"");
             }else if(component instanceof JDialog){
-                glasspane = new InfiniteProgressPanel((JDialog) component,text);
+                glasspane = new InfiniteProgressPanel((JDialog) component,"");
             }else {
                 throw new RuntimeException("传的组件错误");
             }
@@ -47,5 +46,10 @@ public abstract class BaseProgress {
     }
 
     public abstract void invokeBusiness();
+
+
+    public void process(){
+
+    }
 
 }

@@ -6,6 +6,7 @@ import frame.FrameUtil;
 import interfaces.PanelOperation;
 import org.apache.commons.lang3.StringUtils;
 import progress.BaseProgress;
+import progress.MySwingWorker;
 import table.user.UserTable;
 
 import javax.swing.*;
@@ -203,7 +204,7 @@ public class UserPanel extends JPanel implements PanelOperation {
      */
     private void selectDataAndSetPageInfo() {
 
-        new BaseProgress(FrameUtil.currentFrame,"正在查询..."){
+        new MySwingWorker(FrameUtil.currentFrame){
             @Override
             public void invokeBusiness() {
                 TbUser user = new TbUser(userNameField.getText(),phoneField.getText());
@@ -219,7 +220,7 @@ public class UserPanel extends JPanel implements PanelOperation {
                 setPageInfo();
                 table.showTable(userList);
             }
-        }.doAsynWork();
+        }.execute();
     }
 
 

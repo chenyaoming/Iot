@@ -13,6 +13,7 @@ import helper.DeviceExportHelper;
 import label.RequiredLabel;
 import org.apache.commons.lang3.StringUtils;
 import progress.BaseProgress;
+import progress.MySwingWorker;
 import uitl.FingerHelper;
 import uitl.ModalFrameUtil;
 
@@ -177,7 +178,7 @@ public class BorrowDetailDialog extends JFrame{
             }
             record.setBorrowNum(borNum);
 
-            new BaseProgress(thisDialog,"正在加载..."){
+            new MySwingWorker(thisDialog){
                 @Override
                 public void invokeBusiness() {
                     try {
@@ -200,7 +201,7 @@ public class BorrowDetailDialog extends JFrame{
 
                     }
                 }
-            }.doAsynWork();
+            }.execute();
         });
 
         // 取消按钮

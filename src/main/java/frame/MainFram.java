@@ -8,6 +8,7 @@ import interfaces.BorrowUserNameFieldFrameOperation;
 import interfaces.BorrowUserNameFieldOperation;
 import interfaces.FrameOperation;
 import interfaces.PanelOperation;
+import uitl.JDBCUtils;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -27,9 +28,9 @@ public class MainFram extends JFrame implements FrameOperation, BorrowUserNameFi
 
     public MainFram(){
 
+        JDBCUtils.initDatabaseTabel();
+
         FrameUtil.setCurrentFrame(this);
-
-
 
         menubar = new JMenuBar();
         fileMenu = new JMenu("文件");

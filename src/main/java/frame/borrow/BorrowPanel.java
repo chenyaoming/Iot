@@ -9,6 +9,7 @@ import interfaces.PanelOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlbeans.impl.jam.JField;
 import progress.BaseProgress;
+import progress.MySwingWorker;
 import table.borrow.BorrowTable;
 import uitl.FingerHelper;
 
@@ -252,7 +253,7 @@ public class BorrowPanel extends JPanel implements PanelOperation, BorrowUserNam
      */
     private void selectDataAndSetPageInfo() {
 
-        new BaseProgress(FrameUtil.currentFrame,"正在查询..."){
+        new MySwingWorker(FrameUtil.currentFrame){
             @Override
             public void invokeBusiness() {
                 TbBorrowRecord record = new TbBorrowRecord();
@@ -271,7 +272,7 @@ public class BorrowPanel extends JPanel implements PanelOperation, BorrowUserNam
                 setPageInfo();
                 table.showTable(recordList);
             }
-        }.doAsynWork();
+        }.execute();
     }
 
 
@@ -360,7 +361,7 @@ public class BorrowPanel extends JPanel implements PanelOperation, BorrowUserNam
                 return;
             }
 
-            new BaseProgress(FrameUtil.currentFrame,"正在加载"){
+            new MySwingWorker(FrameUtil.currentFrame){
                 @Override
                 public void invokeBusiness() {
                     BorrowFingerDialog borrowFingerDialog = new BorrowFingerDialog(record);
@@ -377,7 +378,7 @@ public class BorrowPanel extends JPanel implements PanelOperation, BorrowUserNam
                     fingerThread.start();
 
                 }
-            }.doAsynWork();
+            }.execute();
 
 
         });
@@ -409,7 +410,7 @@ public class BorrowPanel extends JPanel implements PanelOperation, BorrowUserNam
         });
 
         fingerSearchBtn.addActionListener(e -> {
-            new BaseProgress(FrameUtil.currentFrame,"正在加载..."){
+            new MySwingWorker(FrameUtil.currentFrame){
                 @Override
                 public void invokeBusiness() {
                     BorrowSearchDialog borrowSearchDialog = new BorrowSearchDialog();
@@ -425,7 +426,7 @@ public class BorrowPanel extends JPanel implements PanelOperation, BorrowUserNam
                     dialogThread.start();
                     fingerThread.start();
                 }
-            }.doAsynWork();
+            }.execute();
         });
 
         // 上一页

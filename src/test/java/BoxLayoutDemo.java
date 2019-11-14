@@ -1,14 +1,10 @@
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 import java.awt.*;
 public class BoxLayoutDemo
 {
     public static void main(String[] agrs)
     {
+
         JFrame frame=new JFrame("Java示例程序");
         Box b1=Box.createHorizontalBox();    //创建横向Box容器
         Box b2=Box.createVerticalBox();    //创建纵向Box容器

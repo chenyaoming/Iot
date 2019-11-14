@@ -10,6 +10,7 @@ import helper.DeviceExportHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import progress.BaseProgress;
+import progress.MySwingWorker;
 import table.device.DeviceTable;
 import uitl.JFileChooserUtil;
 
@@ -232,7 +233,7 @@ public class DevicePanel extends JPanel implements PanelOperation {
      * 查询数据并且设置分页bar信息
      */
     private void selectDataAndSetPageInfo() {
-        new BaseProgress(FrameUtil.currentFrame,"正在查询..."){
+        new MySwingWorker(FrameUtil.currentFrame){
             @Override
             public void invokeBusiness() {
                 TbDevice device = new TbDevice(deviceNameField.getText(),deviceTypeNumField.getText(),deviceCodeField.getText());
@@ -248,7 +249,7 @@ public class DevicePanel extends JPanel implements PanelOperation {
                 setPageInfo();
                 table.showTable(deviceList);
             }
-        }.doAsynWork();
+        }.execute();
     }
 
 
@@ -349,7 +350,7 @@ public class DevicePanel extends JPanel implements PanelOperation {
     private void doImportExcelAction(String[] sufixArr) {
         File selectedFile = JFileChooserUtil.getSelectedOpenFile(sufixArr,FrameUtil.currentFrame);
         if (selectedFile != null) {
-            new BaseProgress(FrameUtil.currentFrame,"正在导入..."){
+            new MySwingWorker(FrameUtil.currentFrame){
                 @Override
                 public void invokeBusiness() {
                     // String name=selectedFile.getName();
@@ -359,21 +360,20 @@ public class DevicePanel extends JPanel implements PanelOperation {
 
                     JOptionPane.showMessageDialog(FrameUtil.currentFrame,"导入成功","提示",1);
                 }
-            }.doAsynWork();
+            }.execute();
         }
     }
     private void doExportExcelAction() {
         String fileName = "设备表格-"+new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         File selectedFile = JFileChooserUtil.getSelectedFile(fileName,".xlsx",FrameUtil.currentFrame);
         if (selectedFile != null) {
-
-            new BaseProgress(FrameUtil.currentFrame,"正在导出..."){
+            new MySwingWorker(FrameUtil.currentFrame){
                 @Override
                 public void invokeBusiness() {
                     String path = selectedFile.getPath();
                     ToExcel(path);
                 }
-            }.doAsynWork();
+            }.execute();
         }
     }
 

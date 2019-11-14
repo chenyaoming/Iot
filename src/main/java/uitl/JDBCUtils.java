@@ -117,4 +117,86 @@ public final class JDBCUtils {
         System.out.println("");
 
     }
+
+
+    public static void initDatabaseTabel() {
+        Connection conn = getConnection();
+        Statement statement = null;
+        try {
+            statement = conn.createStatement();
+            conn.setAutoCommit(false);
+
+            statement.execute("create table IF not EXISTS TB_BORROW_RECORD\n" +
+                    "(\n" +
+                    "   id                   int IDENTITY not null,\n" +
+                    "   status               varchar(128),\n" +
+                    "   deviceId             int,\n" +
+                    "   deviceName           varchar(255),\n" +
+                    "   deviceType           varchar(255),\n" +
+                    "   deviceCode           varchar(255),\n" +
+                    "   devicePosition       varchar(255),\n" +
+                    "   deviceImage          varchar(255),\n" +
+                    "   features             varchar(255),\n" +
+                    "   borrowNum            int DEFAULT 0,\n" +
+                    "   borrowUserId         int,\n" +
+                    "   borrowUserName       varchar(128),\n" +
+                    "   borrowDate           datetime,\n" +
+                    "   borrowClerkUserId    int,\n" +
+                    "   borrowClerkUserName  varchar(128),\n" +
+                    "   returnUserId         int,\n" +
+                    "   returnUserName       varchar(128),\n" +
+                    "   returnDate           datetime,\n" +
+                    "   returnClerkUserId    int,\n" +
+                    "   returnClerkUserName  varchar(128),\n" +
+                    "   remark               varchar(512),\n" +
+                    "   primary key (id)\n" +
+                    ")");
+
+            statement.execute("create table IF not EXISTS TB_FINGER\n" +
+                    "(\n" +
+                    "   id                   int IDENTITY not null,\n" +
+                    "   template             BINARY(2048),\n" +
+                    "   userId               int,\n" +
+                    "   primary key (id)\n" +
+                    ")");
+
+            statement.execute("create table IF not EXISTS TB_USER\n" +
+                    "(\n" +
+                    "   id                   int IDENTITY not null,\n" +
+                    "   name                 varchar(255),\n" +
+                    "   gender               varchar(8),\n" +
+                    "   age                  int,\n" +
+                    "   phone                varchar(255),\n" +
+                    "   createDate           datetime,\n" +
+                    "   primary key (id)\n" +
+                    ")");
+
+            statement.execute("create table IF not EXISTS TB_DEVICE\n" +
+                    "(\n" +
+                    "   id                   int IDENTITY not null,\n" +
+                    "   name                 varchar(512),\n" +
+                    "   typeNum              varchar(255),\n" +
+                    "   code                 varchar(255),\n" +
+                    "   count                int DEFAULT 0,\n" +
+                    "   savePosition         varchar(512),\n" +
+                    "   image                varchar(255),\n" +
+                    "   features             varchar(512),\n" +
+                    "   primary key (id)\n" +
+                    ")");
+
+            conn.commit();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            try {
+                conn.rollback();
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
+            throw new RuntimeException("初始化表结构错误");
+        } finally {
+            closeStatement(statement);
+            closeConnection(conn);
+        }
+    }
 }

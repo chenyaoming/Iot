@@ -8,6 +8,7 @@ import jodd.util.StringUtil;
 import label.RequiredLabel;
 import org.apache.commons.lang3.StringUtils;
 import progress.BaseProgress;
+import progress.MySwingWorker;
 import uitl.FingerHelper;
 
 import javax.swing.*;
@@ -202,7 +203,7 @@ public class UserAddDialog extends JDialog {
                 }else{
                     //增加
 
-                    new BaseProgress(thisDialog,"正在加载..."){
+                    new MySwingWorker(thisDialog){
                         @Override
                         public void invokeBusiness() {
                             FingerDialog fingerDialog = new FingerDialog(newUser);
@@ -223,7 +224,7 @@ public class UserAddDialog extends JDialog {
                              */
                             thisDialog.dispose();
                         }
-                    }.doAsynWork();
+                    }.execute();
                 }
             }
         });

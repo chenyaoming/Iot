@@ -11,6 +11,7 @@ import helper.DeviceExportHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import progress.BaseProgress;
+import progress.MySwingWorker;
 import table.device.DeviceTable;
 import uitl.JFileChooserUtil;
 
@@ -216,7 +217,7 @@ public class DeviceDialogPanel extends JPanel {
      */
     private void selectDataAndSetPageInfo() {
 
-        new BaseProgress(ownDialog,"正在查询..."){
+        new MySwingWorker(ownDialog){
             @Override
             public void invokeBusiness() {
                 TbDevice device = new TbDevice(deviceNameField.getText(),deviceTypeNumField.getText(),deviceCodeField.getText());
@@ -232,7 +233,7 @@ public class DeviceDialogPanel extends JPanel {
                 setPageInfo();
                 table.showTable(deviceList);
             }
-        }.doAsynWork();
+        }.execute();
 
     }
 

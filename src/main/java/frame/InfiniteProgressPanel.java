@@ -34,7 +34,7 @@ public class InfiniteProgressPanel extends JComponent implements MouseListener {
         this(text);
         ownFrame.setGlassPane(this);
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-        this.setBounds(100, 100, (dimension.width) / 2, (dimension.height) / 2);
+        this.setBounds(100, 100, (dimension.width)/ 2, (dimension.height)/ 2);
     }
 
     public InfiniteProgressPanel(JDialog ownDialog,String text) {
@@ -63,7 +63,7 @@ public class InfiniteProgressPanel extends JComponent implements MouseListener {
     }
 
     public InfiniteProgressPanel(String text, int barsCount, float shield, float fps) {
-        this(text, barsCount, shield, fps, 100);
+        this(text, barsCount, shield, fps, 50);
     }
 
     public InfiniteProgressPanel(String text, int barsCount, float shield, float fps, int rampDelay) {
@@ -150,16 +150,18 @@ public class InfiniteProgressPanel extends JComponent implements MouseListener {
         }
     }
 
+    private Point2D.Double center  = null;
+
     private Area[] buildTicker() {
         Area[] ticker = new Area[barsCount];
-        Point2D.Double center = new Point2D.Double((double) getWidth() / 2, (double) getHeight() / 2);
+        center = new Point2D.Double((double) getWidth() / 2, (double) getHeight() / 2);
         double fixedAngle = 2.0 * Math.PI / (barsCount);
 
         for (double i = 0.0; i < barsCount; i++) {
             Area primitive = buildPrimitive();
 
             AffineTransform toCenter = AffineTransform.getTranslateInstance(center.getX(), center.getY());
-            AffineTransform toBorder = AffineTransform.getTranslateInstance(45.0, -6.0);
+            AffineTransform toBorder = AffineTransform.getTranslateInstance(30.0, -6.0);
             AffineTransform toCircle = AffineTransform.getRotateInstance(-i * fixedAngle, center.getX(), center.getY());
 
             AffineTransform toWheel = new AffineTransform();
@@ -176,9 +178,9 @@ public class InfiniteProgressPanel extends JComponent implements MouseListener {
     }
 
     private Area buildPrimitive() {
-        Rectangle2D.Double body = new Rectangle2D.Double(6, 0, 30, 12);
+        Rectangle2D.Double body = new Rectangle2D.Double(6, 0, 10, 12);
         Ellipse2D.Double head = new Ellipse2D.Double(0, 0, 12, 12);
-        Ellipse2D.Double tail = new Ellipse2D.Double(30, 0, 12, 12);
+        Ellipse2D.Double tail = new Ellipse2D.Double(10, 0, 12, 12);
 
         Area tick = new Area(body);
         tick.add(new Area(head));
@@ -196,8 +198,8 @@ public class InfiniteProgressPanel extends JComponent implements MouseListener {
 
         @Override
         public void run() {
-            Point2D.Double center = new Point2D.Double((double) getWidth() / 2, (double) getHeight() / 2);
-            double fixedIncrement = 2.0 * Math.PI / (barsCount);
+            //Point2D.Double center = new Point2D.Double((double) getWidth() / 2, (double) getHeight() / 2);
+            double fixedIncrement = 2* Math.PI / (barsCount);
             AffineTransform toCircle = AffineTransform.getRotateInstance(fixedIncrement, center.getX(), center.getY());
 
             long start = System.currentTimeMillis();
