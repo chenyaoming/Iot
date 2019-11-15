@@ -162,59 +162,54 @@ public class DeviceAddDialog extends JFrame{
         });
 
         // 保存按钮
-        saveBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        saveBtn.addActionListener(e -> {
 
-                TbDevice newDevice = new TbDevice(jNameTextField.getText(),jTypeNumTextField.getText(),jCodeTextField.getText(),
-                        jPositionTextField.getText(),iPanel.getImagePath(),jfeaturesTextField.getText());
+            TbDevice newDevice = new TbDevice(jNameTextField.getText(),jTypeNumTextField.getText(),jCodeTextField.getText(),
+                    jPositionTextField.getText(),iPanel.getImagePath(),jfeaturesTextField.getText());
 
+            if(null != oldDevice){
+                newDevice.setId(oldDevice.getId());
+            }
 
-
-                if(null != oldDevice){
-                    newDevice.setId(oldDevice.getId());
-                }
-
-                if(StringUtils.isBlank(newDevice.getName())){
-                    JOptionPane.showMessageDialog(new JPanel(),"请填写设备名称","提示",1);
-                    return;
-                }
-                if(StringUtil.isBlank(newDevice.getTypeNum())){
-                    JOptionPane.showMessageDialog(new JPanel(),"请填写设备型号","提示",1);
-                    return;
-                }
-                if(StringUtils.isBlank(newDevice.getCode())){
-                    JOptionPane.showMessageDialog(new JPanel(),"请填写设备编码","提示",1);
-                    return;
-                }
-                if(StringUtils.isBlank(countTextField.getText())){
-                    JOptionPane.showMessageDialog(new JPanel(),"请填写库存数量","提示",1);
+            if(StringUtils.isBlank(newDevice.getName())){
+                JOptionPane.showMessageDialog(new JPanel(),"请填写设备名称","提示",1);
+                return;
+            }
+            if(StringUtil.isBlank(newDevice.getTypeNum())){
+                JOptionPane.showMessageDialog(new JPanel(),"请填写设备型号","提示",1);
+                return;
+            }
+            if(StringUtils.isBlank(newDevice.getCode())){
+                JOptionPane.showMessageDialog(new JPanel(),"请填写设备编码","提示",1);
+                return;
+            }
+            if(StringUtils.isBlank(countTextField.getText())){
+                JOptionPane.showMessageDialog(new JPanel(),"请填写库存数量","提示",1);
+                return;
+            }else {
+                if(!NumberUtil.isNumeric(countTextField.getText())){
+                    JOptionPane.showMessageDialog(new JPanel(),"库存数量请输入正整数","提示",1);
                     return;
                 }else {
-                    if(!NumberUtil.isNumeric(countTextField.getText())){
-                        JOptionPane.showMessageDialog(new JPanel(),"库存数量请输入正整数","提示",1);
-                        return;
-                    }else {
-                        newDevice.setCount(Integer.valueOf(countTextField.getText().trim()));
-                    }
+                    newDevice.setCount(Integer.valueOf(countTextField.getText().trim()));
                 }
-
-                if(StringUtils.isNotBlank(newDevice.getImage())){
-                    newDevice.setImage(JFileChooserUtil.writeImgToUpload(new File(newDevice.getImage().trim())));
-                }
-                if(null != newDevice.getId()){
-                    //编辑更新
-                    DaoFactory.getDeviceDao().update(newDevice);
-                }else{
-                    //增加
-                    DaoFactory.getDeviceDao().insert(newDevice);
-                }
-
-                thisDialog.dispose();
-                JOptionPane.showMessageDialog(new JPanel(),"操作成功","提示",JOptionPane.PLAIN_MESSAGE);
-
-                FrameUtil.doClickSearchBtn();
             }
+
+            if(StringUtils.isNotBlank(newDevice.getImage())){
+                newDevice.setImage(JFileChooserUtil.writeImgToUpload(new File(newDevice.getImage().trim())));
+            }
+            if(null != newDevice.getId()){
+                //编辑更新
+                DaoFactory.getDeviceDao().update(newDevice);
+            }else{
+                //增加
+                DaoFactory.getDeviceDao().insert(newDevice);
+            }
+
+            thisDialog.dispose();
+            JOptionPane.showMessageDialog(FrameUtil.currentFrame,"操作成功","提示",1);
+
+            FrameUtil.doClickSearchBtn();
         });
 
         // 取消按钮

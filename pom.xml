@@ -10,6 +10,11 @@
 
   <name>Iot</name>
 
+  <properties>
+     <slf4j-api.version>1.7.25</slf4j-api.version>
+     <logback.version>1.1.7</logback.version>
+  </properties>
+
   <dependencies>
     <!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
     <dependency>
@@ -89,6 +94,27 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.12</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j-api.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-core</artifactId>
+      <version>${logback.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-access</artifactId>
+      <version>${logback.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>${logback.version}</version>
     </dependency>
 
   </dependencies>

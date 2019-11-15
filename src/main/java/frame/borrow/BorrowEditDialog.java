@@ -229,69 +229,63 @@ public class BorrowEditDialog extends JFrame{
 
 
         // 保存按钮
-        saveBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        saveBtn.addActionListener(e -> {
 
-                TbBorrowRecord newRecord = new TbBorrowRecord();
-                newRecord.setId(record.getId());
+            TbBorrowRecord newRecord = new TbBorrowRecord();
+            newRecord.setId(record.getId());
 
-                newRecord.setDeviceName(jNameTextField.getText());
-                newRecord.setDeviceType(jTypeNumTextField.getText());
-                newRecord.setDeviceCode(jCodeTextField.getText());
-                newRecord.setDevicePosition( jPositionTextField.getText());
-                newRecord.setDeviceImage(iPanel.getImagePath());
-                newRecord.setFeatures(jfeaturesTextField.getText());
-                newRecord.setRemark(remarkField.getText());
+            newRecord.setDeviceName(jNameTextField.getText());
+            newRecord.setDeviceType(jTypeNumTextField.getText());
+            newRecord.setDeviceCode(jCodeTextField.getText());
+            newRecord.setDevicePosition( jPositionTextField.getText());
+            newRecord.setDeviceImage(iPanel.getImagePath());
+            newRecord.setFeatures(jfeaturesTextField.getText());
+            newRecord.setRemark(remarkField.getText());
 
 
-                if(StringUtils.isBlank(countTextField.getText())){
-                    JOptionPane.showMessageDialog(new JPanel(),"请填写借出数量","提示",1);
+            if(StringUtils.isBlank(countTextField.getText())){
+                JOptionPane.showMessageDialog(new JPanel(),"请填写借出数量","提示",1);
+                return;
+            }else {
+                if(!NumberUtil.isNumeric(countTextField.getText())){
+                    JOptionPane.showMessageDialog(new JPanel(),"借出数量请输入正整数","提示",1);
                     return;
                 }else {
-                    if(!NumberUtil.isNumeric(countTextField.getText())){
-                        JOptionPane.showMessageDialog(new JPanel(),"借出数量请输入正整数","提示",1);
-                        return;
-                    }else {
-                        newRecord.setBorrowNum(Integer.valueOf(countTextField.getText().trim()));
-                    }
+                    newRecord.setBorrowNum(Integer.valueOf(countTextField.getText().trim()));
                 }
-
-                if(StringUtils.isBlank(newRecord.getDeviceName())){
-                    JOptionPane.showMessageDialog(new JPanel(),"请填写设备名称","提示",1);
-                    return;
-                }
-                if(StringUtil.isBlank(newRecord.getDeviceType())){
-                    JOptionPane.showMessageDialog(new JPanel(),"请填写设备型号","提示",1);
-                    return;
-                }
-                if(StringUtils.isBlank(newRecord.getDeviceCode())){
-                    JOptionPane.showMessageDialog(new JPanel(),"请填写设备编码","提示",1);
-                    return;
-                }
-                if(null == newRecord.getBorrowNum()){
-                    JOptionPane.showMessageDialog(new JPanel(),"请填写借出数量数量","提示",1);
-                    return;
-                }
-
-                if(StringUtils.isNotBlank(newRecord.getDeviceImage())){
-                    newRecord.setDeviceImage(JFileChooserUtil.writeImgToUpload(new File(newRecord.getDeviceImage().trim())));
-                }
-                DaoFactory.getBorrowRecordDao().updateRecord(newRecord);
-
-                thisDialog.dispose();
-                JOptionPane.showMessageDialog(new JPanel(),"操作成功","提示",JOptionPane.PLAIN_MESSAGE);
-
-                FrameUtil.doClickSearchBtn();
             }
+
+            if(StringUtils.isBlank(newRecord.getDeviceName())){
+                JOptionPane.showMessageDialog(new JPanel(),"请填写设备名称","提示",1);
+                return;
+            }
+            if(StringUtil.isBlank(newRecord.getDeviceType())){
+                JOptionPane.showMessageDialog(new JPanel(),"请填写设备型号","提示",1);
+                return;
+            }
+            if(StringUtils.isBlank(newRecord.getDeviceCode())){
+                JOptionPane.showMessageDialog(new JPanel(),"请填写设备编码","提示",1);
+                return;
+            }
+            if(null == newRecord.getBorrowNum()){
+                JOptionPane.showMessageDialog(new JPanel(),"请填写借出数量数量","提示",1);
+                return;
+            }
+
+            if(StringUtils.isNotBlank(newRecord.getDeviceImage())){
+                newRecord.setDeviceImage(JFileChooserUtil.writeImgToUpload(new File(newRecord.getDeviceImage().trim())));
+            }
+            DaoFactory.getBorrowRecordDao().updateRecord(newRecord);
+
+            thisDialog.dispose();
+            JOptionPane.showMessageDialog(FrameUtil.currentFrame,"操作成功","提示",1);
+
+            FrameUtil.doClickSearchBtn();
         });
 
         // 取消按钮
-        cancelBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                thisDialog.dispose();
-            }
+        cancelBtn.addActionListener(e -> {
+            thisDialog.dispose();
         });
         // 显示对话框
         //这个只能调用一次，不然会删两次才能删掉

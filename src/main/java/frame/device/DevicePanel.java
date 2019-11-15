@@ -9,6 +9,8 @@ import interfaces.PanelOperation;
 import helper.DeviceExportHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import progress.BaseProgress;
 import progress.MySwingWorker;
 import table.device.DeviceTable;
@@ -233,6 +235,7 @@ public class DevicePanel extends JPanel implements PanelOperation {
      * 查询数据并且设置分页bar信息
      */
     private void selectDataAndSetPageInfo() {
+
         new MySwingWorker(FrameUtil.currentFrame){
             @Override
             public void invokeBusiness() {

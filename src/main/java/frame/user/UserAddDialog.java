@@ -197,7 +197,7 @@ public class UserAddDialog extends JDialog {
                     DaoFactory.getUserDao().update(newUser);
 
 
-                    JOptionPane.showMessageDialog(new JPanel(),"操作成功","提示",JOptionPane.PLAIN_MESSAGE);
+                    JOptionPane.showMessageDialog(new JPanel(),"操作成功","提示",1);
 
                     thisDialog.dispose();
 

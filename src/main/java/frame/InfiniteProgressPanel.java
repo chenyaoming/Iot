@@ -30,8 +30,11 @@ public class InfiniteProgressPanel extends JComponent implements MouseListener {
 
     protected RenderingHints hints = null;
 
+    private Point2D.Double center  = null;
+
     public InfiniteProgressPanel(JFrame ownFrame,String text) {
         this(text);
+        center = new Point2D.Double((double) ownFrame.getWidth() / 2, (double) ownFrame.getHeight() / 2);
         ownFrame.setGlassPane(this);
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
         this.setBounds(100, 100, (dimension.width)/ 2, (dimension.height)/ 2);
@@ -39,6 +42,7 @@ public class InfiniteProgressPanel extends JComponent implements MouseListener {
 
     public InfiniteProgressPanel(JDialog ownDialog,String text) {
         this(text);
+        center = new Point2D.Double((double) ownDialog.getWidth() / 2, (double) ownDialog.getHeight() / 2);
         ownDialog.setGlassPane(this);
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
         this.setBounds(100, 100, (dimension.width) / 2, (dimension.height) / 2);
@@ -150,11 +154,8 @@ public class InfiniteProgressPanel extends JComponent implements MouseListener {
         }
     }
 
-    private Point2D.Double center  = null;
-
     private Area[] buildTicker() {
         Area[] ticker = new Area[barsCount];
-        center = new Point2D.Double((double) getWidth() / 2, (double) getHeight() / 2);
         double fixedAngle = 2.0 * Math.PI / (barsCount);
 
         for (double i = 0.0; i < barsCount; i++) {
