@@ -137,7 +137,7 @@ public final class JDBCUtils {
                     "   devicePosition       varchar(255),\n" +
                     "   deviceImage          varchar(255),\n" +
                     "   features             varchar(255),\n" +
-                    "   borrowNum            int DEFAULT 0,\n" +
+                    "   borrowNum            int not null DEFAULT 0,\n" +
                     "   borrowUserId         int,\n" +
                     "   borrowUserName       varchar(128),\n" +
                     "   borrowDate           datetime,\n" +
@@ -156,7 +156,7 @@ public final class JDBCUtils {
                     "(\n" +
                     "   id                   int IDENTITY not null,\n" +
                     "   template             BINARY(2048),\n" +
-                    "   userId               int,\n" +
+                    "   userId               int not null,\n" +
                     "   primary key (id)\n" +
                     ")");
 
