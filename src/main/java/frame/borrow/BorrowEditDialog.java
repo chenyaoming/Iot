@@ -13,6 +13,7 @@ import jodd.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import uitl.JFileChooserUtil;
 import uitl.ModalFrameUtil;
+import uitl.NumberUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -244,12 +245,16 @@ public class BorrowEditDialog extends JFrame{
                 newRecord.setRemark(remarkField.getText());
 
 
-                if(!isNumeric(countTextField.getText())){
-                    JOptionPane.showMessageDialog(new JPanel(),"借出数量请输入正整数","提示",1);
+                if(StringUtils.isBlank(countTextField.getText())){
+                    JOptionPane.showMessageDialog(new JPanel(),"请填写借出数量","提示",1);
                     return;
-                }
-                if(StringUtils.isNotBlank(countTextField.getText())){
-                    newRecord.setBorrowNum(Integer.valueOf(countTextField.getText()));
+                }else {
+                    if(!NumberUtil.isNumeric(countTextField.getText())){
+                        JOptionPane.showMessageDialog(new JPanel(),"借出数量请输入正整数","提示",1);
+                        return;
+                    }else {
+                        newRecord.setBorrowNum(Integer.valueOf(countTextField.getText().trim()));
+                    }
                 }
 
                 if(StringUtils.isBlank(newRecord.getDeviceName())){
@@ -297,11 +302,6 @@ public class BorrowEditDialog extends JFrame{
         //会阻塞
         ModalFrameUtil.showAsModal(this, FrameUtil.currentFrame);
         //this.setVisible(true);
-    }
-
-    public boolean isNumeric(String string){
-        Pattern pattern = compile("[0-9]*");
-        return pattern.matcher(string).matches();
     }
 
 }

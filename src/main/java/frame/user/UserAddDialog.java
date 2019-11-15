@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import progress.BaseProgress;
 import progress.MySwingWorker;
 import uitl.FingerHelper;
+import uitl.NumberUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -157,14 +158,6 @@ public class UserAddDialog extends JDialog {
                 newUser.setCreateDate(new Date());
                 newUser.setPhone(phoneField.getText());
 
-                if(!isNumeric(ageField.getText())){
-                    JOptionPane.showMessageDialog(new JPanel(),"年龄请输入正整数","提示",1);
-                    return;
-                }
-                if(StringUtils.isNotBlank(ageField.getText())){
-                    newUser.setAge(Integer.valueOf(ageField.getText()));
-                }
-
                 newUser.setGender("男");
                 if(remanBtn.isSelected()){
                     newUser.setGender("女");
@@ -181,10 +174,19 @@ public class UserAddDialog extends JDialog {
                     JOptionPane.showMessageDialog(new JPanel(),"请选择性别","提示",1);
                     return;
                 }
-                if(null == newUser.getAge()){
+
+                if(StringUtils.isBlank(ageField.getText())){
                     JOptionPane.showMessageDialog(new JPanel(),"请填写年龄","提示",1);
                     return;
+                }else {
+                    if(!NumberUtil.isNumeric(ageField.getText())){
+                        JOptionPane.showMessageDialog(new JPanel(),"年龄请输入正整数","提示",1);
+                        return;
+                    }else {
+                        newUser.setAge(Integer.valueOf(ageField.getText().trim()));
+                    }
                 }
+
                 if(StringUtils.isBlank(newUser.getPhone())){
                     JOptionPane.showMessageDialog(new JPanel(),"请填写联系电话","提示",1);
                     return;
@@ -251,12 +253,6 @@ public class UserAddDialog extends JDialog {
                 thisDialog.dispose();
             }
         });
-    }
-
-
-    public boolean isNumeric(String string){
-        Pattern pattern = compile("[0-9]*");
-        return pattern.matcher(string).matches();
     }
 
 

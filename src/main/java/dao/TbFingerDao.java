@@ -2,8 +2,12 @@ package dao;
 
 import bean.TbFinger;
 import bean.TbUser;
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.ScalarHandler;
 import uitl.CommonDbUtil;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 public class TbFingerDao {
@@ -17,6 +21,15 @@ public class TbFingerDao {
         String sql = "INSERT INTO TB_FINGER(template,userId) VALUES(?,?)";
         Object[] params = {finger.getTemplate(),finger.getUserId()};
         return CommonDbUtil.insertOneRetureId(sql,params);
+    }
+
+    public Integer insertFinger(Connection connection, TbFinger finger) throws SQLException {
+        QueryRunner runner = new QueryRunner();
+
+        String sql = "INSERT INTO TB_FINGER(template,userId) VALUES(?,?)";
+        Object[] fingerParams = {finger.getTemplate(),finger.getUserId()};
+
+        return (Integer) runner.insert(connection,sql,new ScalarHandler(1),fingerParams);
     }
 
     public TbFinger queryById(Integer id){

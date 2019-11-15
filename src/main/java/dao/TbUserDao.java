@@ -1,9 +1,13 @@
 package dao;
 
 import bean.TbUser;
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.commons.lang3.StringUtils;
 import uitl.CommonDbUtil;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,6 +68,23 @@ public class TbUserDao {
                 user.getPhone(),user.getCreateDate()};
         return CommonDbUtil.insertOneRetureId(sql,params);
     }
+
+
+    public Integer insertUser(Connection connection,TbUser user) throws SQLException {
+
+        QueryRunner runner = new QueryRunner();
+
+        String colums = StringUtils.join(TbUserDao.COLUM_ARR, ",");
+        String questionMarks = CommonDbUtil.spliceSqlQuestionMark(TbUserDao.COLUM_ARR.length);
+
+        String sql = "INSERT INTO TB_USER("+ colums +") VALUES("+questionMarks+")";
+
+        Object[] params = {user.getName(),user.getGender(),user.getAge(),
+                user.getPhone(),user.getCreateDate()};
+
+        return (Integer) runner.insert(connection,sql,new ScalarHandler(1),params);
+    }
+
 
     public void update(TbUser user){
 

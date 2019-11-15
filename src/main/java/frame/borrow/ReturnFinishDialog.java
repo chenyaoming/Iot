@@ -59,9 +59,9 @@ public class ReturnFinishDialog extends JDialog{
             public void actionPerformed(ActionEvent e) {
                 if(StringUtils.isNotBlank(remarkField.getText())){
                     DaoFactory.getBorrowRecordDao().updateRemark(remarkField.getText().trim(),record.getId());
-                    FrameUtil.getCurrentSearchBtn().doClick();
-                    thisDialog.dispose();
                 }
+                FrameUtil.getCurrentSearchBtn().doClick();
+                thisDialog.dispose();
             }
         });
 

@@ -16,6 +16,7 @@ import progress.BaseProgress;
 import progress.MySwingWorker;
 import uitl.FingerHelper;
 import uitl.ModalFrameUtil;
+import uitl.NumberUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -161,11 +162,11 @@ public class BorrowDetailDialog extends JFrame{
             if(StringUtils.isBlank(borrowCountTextField.getText())){
                 JOptionPane.showMessageDialog(new JPanel(),"请输入借出数量","提示",1);
                 return;
-            }
-
-            if(!isNumeric(borrowCountTextField.getText())){
-                JOptionPane.showMessageDialog(new JPanel(),"借出数量请输入正整数","提示",1);
-                return;
+            }else {
+                if(!NumberUtil.isNumeric(borrowCountTextField.getText())){
+                    JOptionPane.showMessageDialog(new JPanel(),"借出数量请输入正整数","提示",1);
+                    return;
+                }
             }
 
             TbDevice device = DaoFactory.getDeviceDao().queryById(record.getDeviceId());
@@ -217,11 +218,6 @@ public class BorrowDetailDialog extends JFrame{
         //会阻塞
         ModalFrameUtil.showAsModal(this,FrameUtil.currentFrame);
         //this.setVisible(true);
-    }
-
-    public boolean isNumeric(String string){
-        Pattern pattern = compile("[0-9]*");
-        return pattern.matcher(string).matches();
     }
 
 }

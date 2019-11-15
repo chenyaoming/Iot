@@ -11,6 +11,7 @@ import label.RequiredLabel;
 import org.apache.commons.lang3.StringUtils;
 import uitl.JFileChooserUtil;
 import uitl.ModalFrameUtil;
+import uitl.NumberUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -169,13 +170,6 @@ public class DeviceAddDialog extends JFrame{
                         jPositionTextField.getText(),iPanel.getImagePath(),jfeaturesTextField.getText());
 
 
-                if(!isNumeric(countTextField.getText())){
-                    JOptionPane.showMessageDialog(new JPanel(),"库存数量请输入正整数","提示",1);
-                    return;
-                }
-                if(StringUtils.isNotBlank(countTextField.getText())){
-                    newDevice.setCount(Integer.valueOf(countTextField.getText()));
-                }
 
                 if(null != oldDevice){
                     newDevice.setId(oldDevice.getId());
@@ -193,12 +187,17 @@ public class DeviceAddDialog extends JFrame{
                     JOptionPane.showMessageDialog(new JPanel(),"请填写设备编码","提示",1);
                     return;
                 }
-                if(null == newDevice.getCount()){
-                    JOptionPane.showMessageDialog(new JPanel(),"请填写设备库存数量","提示",1);
+                if(StringUtils.isBlank(countTextField.getText())){
+                    JOptionPane.showMessageDialog(new JPanel(),"请填写库存数量","提示",1);
                     return;
+                }else {
+                    if(!NumberUtil.isNumeric(countTextField.getText())){
+                        JOptionPane.showMessageDialog(new JPanel(),"库存数量请输入正整数","提示",1);
+                        return;
+                    }else {
+                        newDevice.setCount(Integer.valueOf(countTextField.getText().trim()));
+                    }
                 }
-
-
 
                 if(StringUtils.isNotBlank(newDevice.getImage())){
                     newDevice.setImage(JFileChooserUtil.writeImgToUpload(new File(newDevice.getImage().trim())));
@@ -235,10 +234,4 @@ public class DeviceAddDialog extends JFrame{
         ModalFrameUtil.showAsModal(this, FrameUtil.currentFrame);
         //this.setVisible(true);
     }
-
-    public boolean isNumeric(String string){
-        Pattern pattern = compile("[0-9]*");
-        return pattern.matcher(string).matches();
-    }
-
 }

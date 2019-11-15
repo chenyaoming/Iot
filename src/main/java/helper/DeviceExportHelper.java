@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.PictureData;
 import uitl.ExcleHelper;
 import uitl.JFileChooserUtil;
+import uitl.NumberUtil;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -53,11 +54,11 @@ public class DeviceExportHelper {
                         JOptionPane.showMessageDialog(FrameUtil.currentFrame,"库存数量不能为空","错误",0);
                         throw new RuntimeException("库存数量不能为空");
                     }
-                    if(!isNumeric(values.get(i))){
+                    if(!NumberUtil.isNumeric(values.get(i))){
                         JOptionPane.showMessageDialog(FrameUtil.currentFrame,"库存数量请输入正整数","错误",0);
                         throw new RuntimeException("库存数量请输入正整数");
                     }
-                    BeanUtil.pojo.setProperty(device,d.colums[i], values.get(i));
+                    BeanUtil.pojo.setProperty(device,d.colums[i], values.get(i).trim());
                 }else if(d.image.equals(d.colums[i]) ){
                     //处理图片字段
                     String picKey = (n+1)+"-"+i;
@@ -79,11 +80,6 @@ public class DeviceExportHelper {
             deviceList.add(device);
         }
         return deviceList;
-    }
-
-    public static boolean isNumeric(String string){
-        Pattern pattern = compile("[0-9]*");
-        return pattern.matcher(string).matches();
     }
 
     private static void checkDevice(TbDevice device) {

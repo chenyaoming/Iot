@@ -2,9 +2,12 @@ package dao;
 
 import bean.TbDevice;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.lang3.StringUtils;
 import uitl.CommonDbUtil;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -124,6 +127,14 @@ public class TbDeviceDao {
         Object[] params = {value,id};
         String sql = "update TB_DEVICE set "+colum+" = ? where id = ?";
         CommonDbUtil.update(sql,params);
+    }
+
+    public void update(Connection connection,Integer id , String colum, Object value) throws SQLException {
+        QueryRunner runner = new QueryRunner();
+
+        Object[] params = {value,id};
+        String sql = "update TB_DEVICE set "+colum+" = ? where id = ?";
+        runner.update(connection,sql,params);
     }
 
     private void getSearchCondition(TbDevice device, StringBuilder sql, List<Object> params) {

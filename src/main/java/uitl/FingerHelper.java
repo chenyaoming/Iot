@@ -8,6 +8,8 @@ import bean.TbUser;
 import com.zkteco.biometric.FingerprintSensorErrorCode;
 import com.zkteco.biometric.FingerprintSensorEx;
 import dao.DaoFactory;
+import dao.TbFingerDao;
+import dao.TbUserDao;
 import enums.Status;
 import frame.FrameUtil;
 import frame.borrow.BorrowFingerDialog;
@@ -16,8 +18,14 @@ import frame.borrow.BorrowSearchDialog;
 import frame.borrow.ReturnFinishDialog;
 import frame.user.FingerDialog;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.ScalarHandler;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.formula.functions.T;
 
 import javax.swing.*;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -186,6 +194,8 @@ public class FingerHelper extends Thread {
             }
         }catch (Exception e){
             e.printStackTrace();
+            disposeDialog();
+            JOptionPane.showMessageDialog(new JPanel(),"系统繁忙，请联系管理员","错误 ",0);
         }finally {
             FreeSensor();
         }
@@ -246,12 +256,7 @@ public class FingerHelper extends Thread {
                             if(yesOrNo == 0){
                                 //保存借用记录
 
-                                borrowFingerDialog.getRecord().setStatus(Status.BORROWING.name());
-                                DaoFactory.getBorrowRecordDao().insert(borrowFingerDialog.getRecord());
-
-                                //减去设备的库存
-                                TbDevice device = DaoFactory.getDeviceDao().queryById(borrowFingerDialog.getRecord().getDeviceId());
-                                DaoFactory.getDeviceDao().update(device.getId(),"count",device.getCount() - borrowFingerDialog.getRecord().getBorrowNum());
+                                updateRecordAndDevice();
 
                                 borrowPressTimes--;
                                 fingerFinish = true;
@@ -282,6 +287,26 @@ public class FingerHelper extends Thread {
         }
 
         System.out.println("线程执行完了");
+    }
+
+    private void updateRecordAndDevice() {
+        //减去设备的库存
+        TbDevice device = DaoFactory.getDeviceDao().queryById(borrowFingerDialog.getRecord().getDeviceId());
+
+        new JDBCTemplate<Void>(){
+
+            @Override
+            public Void sqlTask(Connection connection) throws SQLException {
+
+                DaoFactory.getBorrowRecordDao().insertBorrowRecord(connection,borrowFingerDialog.getRecord());
+                DaoFactory.getDeviceDao().update(connection,device.getId(),"count",device.getCount() - borrowFingerDialog.getRecord().getBorrowNum());
+
+                return null;
+            }
+        }.doTask();
+
+        //DaoFactory.getBorrowRecordDao().insert(borrowFingerDialog.getRecord());
+       // DaoFactory.getDeviceDao().update(device.getId(),"count",device.getCount() - borrowFingerDialog.getRecord().getBorrowNum());
     }
 
 
@@ -334,13 +359,8 @@ public class FingerHelper extends Thread {
                                     +"  归还保管员："+borrowFingerDialog.getRecord().getReturnClerkUserName()+"？","归还信息提示",0);
 
                             if(yesOrNo == 0){
-                                TbDevice device = DaoFactory.getDeviceDao().queryById(borrowFingerDialog.getRecord().getDeviceId());
 
-                                borrowFingerDialog.getRecord().setStatus(Status.RETURNED.name());
-                                //保存借用记录
-                                DaoFactory.getBorrowRecordDao().updateReturnData(borrowFingerDialog.getRecord());
-                                //加上设备的库存
-                                DaoFactory.getDeviceDao().update(device.getId(),"count",device.getCount() + borrowFingerDialog.getRecord().getBorrowNum());
+                                returnDeviceAndUpdateRecord();
 
                                 returnPressTimes--;
                                 fingerFinish = true;
@@ -372,6 +392,29 @@ public class FingerHelper extends Thread {
         }
 
         System.out.println("线程执行完了");
+    }
+
+    private void returnDeviceAndUpdateRecord() {
+        TbDevice device = DaoFactory.getDeviceDao().queryById(borrowFingerDialog.getRecord().getDeviceId());
+
+        borrowFingerDialog.getRecord().setStatus(Status.RETURNED.name());
+
+        new JDBCTemplate<Void>(){
+
+            @Override
+            public Void sqlTask(Connection connection) throws SQLException {
+                //保存借用记录
+                DaoFactory.getBorrowRecordDao().updateReturnData(connection,borrowFingerDialog.getRecord());
+                //加上设备的库存
+                DaoFactory.getDeviceDao().update(connection,device.getId(),"count",device.getCount() + borrowFingerDialog.getRecord().getBorrowNum());
+                return null;
+            }
+        }.doTask();
+
+        //保存借用记录
+        //DaoFactory.getBorrowRecordDao().updateReturnData(borrowFingerDialog.getRecord());
+        //加上设备的库存
+        //DaoFactory.getDeviceDao().update(device.getId(),"count",device.getCount() + borrowFingerDialog.getRecord().getBorrowNum());
     }
 
     private void dealBorrowSearchFinger() {
@@ -492,7 +535,6 @@ public class FingerHelper extends Thread {
                         JOptionPane.showMessageDialog(new JPanel(),"指纹已经注册过","提示",1);
                         continue;
                     }
-
                     Integer fingerId = saveUserAndFingerData(mergerTemp);
 
                     if(0 == FingerprintSensorEx.DBAdd(mhDB, fingerId, mergerTemp)){
@@ -519,13 +561,25 @@ public class FingerHelper extends Thread {
     }
 
     private Integer saveUserAndFingerData(byte[] mergerTemp) {
-        Integer userId = DaoFactory.getUserDao().insert(fingerDialog.getNewUser());
+
+       return new JDBCTemplate<Integer>(){
+           @Override
+           public Integer sqlTask(Connection connection) throws SQLException {
+               Integer userId = DaoFactory.getUserDao().insertUser(connection,fingerDialog.getNewUser());
+               TbFinger finger = new TbFinger();
+               finger.setTemplate(mergerTemp);
+               finger.setUserId(userId);
+
+               return DaoFactory.getFingerDao().insertFinger(connection, finger);
+           }
+
+       }.doTask();
+        /*Integer userId = DaoFactory.getUserDao().insert(fingerDialog.getNewUser());
 
         TbFinger finger = new TbFinger();
         finger.setTemplate(mergerTemp);
         finger.setUserId(userId);
-        return DaoFactory.getFingerDao().insert(finger);
-
+        return DaoFactory.getFingerDao().insert(finger);*/
     }
 
 

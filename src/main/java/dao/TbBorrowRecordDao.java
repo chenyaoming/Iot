@@ -1,9 +1,13 @@
 package dao;
 
 import bean.TbBorrowRecord;
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.commons.lang3.StringUtils;
 import uitl.CommonDbUtil;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +44,18 @@ public class TbBorrowRecordDao {
                 r.getReturnClerkUserId(),r.getReturnClerkUserName(),r.getStatus(),r.getId()};
 
         CommonDbUtil.update(sql,params);
+    }
+
+    public void updateReturnData(Connection connection,TbBorrowRecord r) throws SQLException {
+
+        QueryRunner runner = new QueryRunner();
+
+        String sql = "UPDATE TB_BORROW_RECORD set returnUserId = ? ,returnUserName = ? " +
+                " ,returnDate = ? ,returnClerkUserId =?  ,returnClerkUserName = ? ,status = ? where id = ?";
+        Object[] params = {r.getReturnUserId(),r.getReturnUserName(),r.getReturnDate(),
+                r.getReturnClerkUserId(),r.getReturnClerkUserName(),r.getStatus(),r.getId()};
+
+        runner.update(connection,sql,params);
     }
 
     public void updateRemark(String remark,Integer id){
@@ -94,6 +110,21 @@ public class TbBorrowRecordDao {
 
         //CommonDbUtil.getBeanValues(record,columArr);
         return CommonDbUtil.insertOneRetureId(sql,params);
+    }
+
+
+    public Integer insertBorrowRecord(Connection connection,TbBorrowRecord r) throws SQLException {
+        QueryRunner runner = new QueryRunner();
+
+        String colums = StringUtils.join(columArr, ",");
+        String questionMarks = CommonDbUtil.spliceSqlQuestionMark(columArr.length);
+
+        String sql = "INSERT INTO TB_BORROW_RECORD("+ colums +") VALUES("+ questionMarks +")";
+        Object[] params = {r.getDeviceId(),r.getDeviceName(),r.getDeviceType(),r.getDeviceCode(),
+                r.getDevicePosition(),r.getDeviceImage(),r.getFeatures(),r.getBorrowNum(),r.getBorrowUserId(),
+                r.getBorrowUserName(),r.getBorrowDate(),r.getBorrowClerkUserId(),r.getBorrowClerkUserName(),r.getStatus()};
+
+        return (Integer) runner.insert(connection,sql,new ScalarHandler(1),params);
     }
 
     public TbBorrowRecord queryById(Integer id){
