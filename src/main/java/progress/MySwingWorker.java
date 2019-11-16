@@ -1,12 +1,16 @@
 package progress;
 
 import frame.InfiniteProgressPanel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
 
 
 public abstract class MySwingWorker extends SwingWorker {
+
+    private static Logger LOG = LoggerFactory.getLogger(MySwingWorker.class);
 
     /**
      * 这里只能是Frame和Dialog
@@ -34,7 +38,7 @@ public abstract class MySwingWorker extends SwingWorker {
             //执行业务代码
             invokeBusiness();
         }catch (Exception e){
-
+            LOG.error("执行任务出错：",e);
         }
         return null;
     }
@@ -47,8 +51,7 @@ public abstract class MySwingWorker extends SwingWorker {
         try {
             Object result = get();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.error("获取结果：",e);
         }finally {
             // 关闭旋转等待框
             if(glasspane != null) {

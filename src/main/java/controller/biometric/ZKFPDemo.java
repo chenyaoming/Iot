@@ -516,7 +516,7 @@ public class ZKFPDemo extends JFrame{
 			while (!mbStop) {
 				templateLen[0] = 2048;
 				//采集指纹图像，指纹模板
-				System.out.println("采集指纹图像，指纹模板.......");
+				//System.out.println("采集指纹图像，指纹模板.......");
 				if (0 == (ret = FingerprintSensorEx.AcquireFingerprint(mhDevice, imgbuf, template, templateLen)))
 				{
 					System.out.println(ret);

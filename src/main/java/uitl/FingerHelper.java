@@ -22,6 +22,8 @@ import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.formula.functions.T;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.sql.Connection;
@@ -33,6 +35,8 @@ import java.util.List;
 import java.util.Map;
 
 public class FingerHelper extends Thread {
+
+    private static Logger LOG = LoggerFactory.getLogger(FingerHelper.class);
 
     //the width of fingerprint image 指纹宽度
     int fpWidth = 0;
@@ -193,7 +197,7 @@ public class FingerHelper extends Thread {
                 dealBorrowSearchFinger();
             }
         }catch (Exception e){
-            e.printStackTrace();
+            LOG.error("执行录入指纹操作报错：",e);
             disposeDialog();
             JOptionPane.showMessageDialog(new JPanel(),"系统繁忙，请联系管理员","错误 ",0);
         }finally {
@@ -219,7 +223,7 @@ public class FingerHelper extends Thread {
             int[] templateLength = new int[1];
             templateLength[0] = 2048;
             //采集指纹图像，指纹模板
-            System.out.println("采集指纹图像，指纹模板.......");
+            //System.out.println("采集指纹图像，指纹模板.......");
             if (0 == FingerprintSensorEx.AcquireFingerprint(mhDevice, imgbuf, template, templateLength))
             {
                 //图片数据写到文件
@@ -286,7 +290,7 @@ public class FingerHelper extends Thread {
             new BorrowFinishDialog(record).showDialog();
         }
 
-        System.out.println("线程执行完了");
+        //System.out.println("线程执行完了");
     }
 
     private void updateRecordAndDevice() {
@@ -328,7 +332,7 @@ public class FingerHelper extends Thread {
             int[] templateLength = new int[1];
             templateLength[0] = 2048;
             //采集指纹图像，指纹模板
-            System.out.println("采集指纹图像，指纹模板.......");
+            //System.out.println("采集指纹图像，指纹模板.......");
             if (0 == FingerprintSensorEx.AcquireFingerprint(mhDevice, imgbuf, template, templateLength))
             {
                 //双重保险初始化高速内存数据
@@ -391,7 +395,7 @@ public class FingerHelper extends Thread {
 
         }
 
-        System.out.println("线程执行完了");
+        //ystem.out.println("线程执行完了");
     }
 
     private void returnDeviceAndUpdateRecord() {
@@ -432,7 +436,7 @@ public class FingerHelper extends Thread {
             int[] templateLength = new int[1];
             templateLength[0] = 2048;
             //采集指纹图像，指纹模板
-            System.out.println("采集指纹图像，指纹模板.......");
+            //System.out.println("采集指纹图像，指纹模板.......");
             if (0 == FingerprintSensorEx.AcquireFingerprint(mhDevice, imgbuf, template, templateLength))
             {
                 //双重保险初始化高速内存数据
@@ -463,7 +467,7 @@ public class FingerHelper extends Thread {
             totalMillis = dealSleepAndInterrupt(totalMillis);
         }
         disposeDialog();
-        System.out.println("线程执行完了");
+        //System.out.println("线程执行完了");
     }
 
     private long dealSleepAndInterrupt(long totalMillis) {
@@ -476,9 +480,11 @@ public class FingerHelper extends Thread {
             if(totalMillis > 600*millis){
                 // 重新设置中断标志位
                 this.interrupt();
+                LOG.info("录指纹超时了");
+
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             // 重新设置中断标志位
             this.interrupt();
         }
@@ -502,11 +508,11 @@ public class FingerHelper extends Thread {
             int[] templateLength = new int[1];
             templateLength[0] = 2048;
             //采集指纹图像，指纹模板
-            System.out.println("采集指纹图像，指纹模板.......");
+            //System.out.println("采集指纹图像，指纹模板.......");
             int ret =0;
             if (0 == (ret = FingerprintSensorEx.AcquireFingerprint(mhDevice, imgbuf, template, templateLength)))
             {
-                System.out.println(ret);
+                //System.out.println(ret);
                 //检查是否是假手指
                 if (checkFakeFinger()) {
                     continue;
@@ -538,7 +544,8 @@ public class FingerHelper extends Thread {
                     Integer fingerId = saveUserAndFingerData(mergerTemp);
 
                     if(0 == FingerprintSensorEx.DBAdd(mhDB, fingerId, mergerTemp)){
-                        System.out.println("成功添加到高速缓存");
+                        LOG.info("成功添加到高速缓存，fingerId：{}",fingerId);
+                        //System.out.println("成功添加到高速缓存");
                     }
 
                     fingerFinish = true;
@@ -752,11 +759,12 @@ public class FingerHelper extends Thread {
             //低五位全为 1 表 示 真 手 指 (value&31==31)
             ret = FingerprintSensorEx.GetParameters(mhDevice, 2004, paramValue, size);
             nFakeStatus = byteArrayToInt(paramValue);
-            System.out.println("ret = "+ ret +",nFakeStatus=" + nFakeStatus);
+            //System.out.println("ret = "+ ret +",nFakeStatus=" + nFakeStatus);
             if (0 == ret && (byte)(nFakeStatus & 31) != 31)
             {
-                System.out.println("Is a fake finger----------------------------------------");
+                //System.out.println("Is a fake finger----------------------------------------");
                 //textArea.setText("Is a fake finger?\n");
+                LOG.info("Is a fake finger?");
                 return true;
             }
         }

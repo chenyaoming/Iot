@@ -3,6 +3,9 @@ package frame.device;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import uitl.CommonDbUtil;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -14,6 +17,8 @@ import java.io.IOException;
 @Data
 @NoArgsConstructor
 public class JScrollImagePanel extends JPanel{
+
+    private static Logger LOG = LoggerFactory.getLogger(JScrollImagePanel.class);
 
     BufferedImage image = null;
     private String imagePath = "";
@@ -31,7 +36,7 @@ public class JScrollImagePanel extends JPanel{
                 height = image.getHeight();
                 this.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
             } catch (IOException e) {
-                e.printStackTrace();
+                LOG.error("加载图片报错:",e);
             }
         }
     }
@@ -49,7 +54,7 @@ public class JScrollImagePanel extends JPanel{
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("加载图片paint报错:",e);
         }
     }
 

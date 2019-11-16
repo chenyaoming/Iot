@@ -3,6 +3,8 @@ package frame.device;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -12,6 +14,8 @@ import java.io.File;
 @Data
 @NoArgsConstructor
 public class ImagePanel extends JLabel {
+
+    private static Logger LOG = LoggerFactory.getLogger(ImagePanel.class);
 
     Image image = null;
 
@@ -32,7 +36,7 @@ public class ImagePanel extends JLabel {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("加载图片paint报错:",e);
         }
     }
 

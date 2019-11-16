@@ -1,5 +1,8 @@
 package uitl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -9,6 +12,8 @@ import java.util.ResourceBundle;
 
 
 public final class JDBCUtils {
+    private static Logger LOG = LoggerFactory.getLogger(JDBCUtils.class);
+
     private static final String DRIVER;
     private static final String URL;
     private static final String USER;
@@ -30,6 +35,8 @@ public final class JDBCUtils {
         try {
             Class.forName(DRIVER);
         } catch (ClassNotFoundException e) {
+
+            LOG.error("加载驱动错误：",e);
             throw new ExceptionInInitializerError(e);
         }
     }
@@ -46,7 +53,7 @@ public final class JDBCUtils {
             try {
                 return DriverManager.getConnection(URL, USER, PASSWORD);
             } catch (SQLException e1) {
-                e1.printStackTrace();
+                LOG.error("数据库获取连接错误：",e1);
                 throw new RuntimeException("数据库获取连接错误");
             }
         }
@@ -73,7 +80,7 @@ public final class JDBCUtils {
             try {
                 conn.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                LOG.error("关闭数据库连接错误：",e);
             }
         }
         //等待垃圾回收
@@ -89,7 +96,7 @@ public final class JDBCUtils {
             try {
                 st.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                LOG.error("关闭数据库Statement错误：",e);
             }
         }
         //等待垃圾回收
@@ -105,17 +112,11 @@ public final class JDBCUtils {
             try {
                 rs.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                LOG.error("释放结果集错误：",e);
             }
         }
         //等待垃圾回收
         rs = null;
-    }
-
-    public static void main(String[] args ){
-        Connection connection = getConnection();
-        System.out.println("");
-
     }
 
 
@@ -187,11 +188,11 @@ public final class JDBCUtils {
             conn.commit();
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("初始化表结构错误：",e);
             try {
                 conn.rollback();
             } catch (SQLException e1) {
-                e1.printStackTrace();
+                LOG.error("初始化表结构事务回滚错误：",e);
             }
             throw new RuntimeException("初始化表结构错误");
         } finally {

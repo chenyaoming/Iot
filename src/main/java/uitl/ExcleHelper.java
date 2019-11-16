@@ -20,6 +20,8 @@ import org.apache.poi.xssf.usermodel.XSSFShape;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTMarker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,6 +42,8 @@ import java.util.Map;
  * @since 2019/6/3
  */
 public class ExcleHelper {
+
+    private static Logger LOG = LoggerFactory.getLogger(ExcleHelper.class);
 
     public static final String YYYY_MM_DD = "yyyy-MM-dd";
 
@@ -77,7 +81,7 @@ public class ExcleHelper {
             }
 
         } catch (Exception e){
-            e.printStackTrace();
+            LOG.error("读取表格报错",e);
             throw new RuntimeException("读取表格报错");
         }
 
@@ -122,7 +126,7 @@ public class ExcleHelper {
         try {
             wookbook.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("关闭表格报错",e);
         }
         return sheetValues;
     }

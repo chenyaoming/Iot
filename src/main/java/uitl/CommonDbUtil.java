@@ -9,6 +9,8 @@ import org.apache.commons.dbutils.handlers.BeanListHandler;
 import org.apache.commons.dbutils.handlers.MapHandler;
 import org.apache.commons.dbutils.handlers.MapListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -17,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 public class CommonDbUtil {
+
+    private static Logger LOG = LoggerFactory.getLogger(CommonDbUtil.class);
 
     /**
      * ArrayHandler：将查询的结果的第一行放到一个数组中
@@ -32,7 +36,7 @@ public class CommonDbUtil {
             QueryRunner runner=new QueryRunner();
             return runner.query(connection,sql,new ArrayHandler(),params);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("执行sql错误："+sql,e);
             throw new RuntimeException("执行sql错误："+sql+"参数"+params);
         }finally {
             JDBCUtils.closeConnection(connection);
@@ -53,7 +57,7 @@ public class CommonDbUtil {
             List<Object[]> list=runner.query(connection,sql,new ArrayListHandler(),params);
             return list;
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("执行sql错误："+sql,e);
             throw new RuntimeException("执行sql错误："+sql+"参数"+params);
         }finally {
             JDBCUtils.closeConnection(connection);
@@ -73,7 +77,7 @@ public class CommonDbUtil {
             QueryRunner runner=new QueryRunner();
             return runner.query(connection,sql, new BeanHandler<>(beanClass),params);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("执行sql错误："+sql,e);
             throw new RuntimeException("执行sql错误："+sql+"参数"+params);
         }finally {
             JDBCUtils.closeConnection(connection);
@@ -93,7 +97,7 @@ public class CommonDbUtil {
             QueryRunner runner=new QueryRunner();
             return runner.query(connection,sql, new BeanListHandler<>(beanClass),params);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("执行sql错误："+sql,e);
             throw new RuntimeException("执行sql错误："+sql+"参数"+params);
         }finally {
             JDBCUtils.closeConnection(connection);
@@ -114,7 +118,7 @@ public class CommonDbUtil {
             QueryRunner runner=new QueryRunner();
             return runner.query(connection,sql,new MapHandler(),params);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("执行sql错误："+sql,e);
             throw new RuntimeException("执行sql错误："+sql+"参数"+params);
         }finally {
             JDBCUtils.closeConnection(connection);
@@ -134,7 +138,7 @@ public class CommonDbUtil {
             QueryRunner runner=new QueryRunner();
             return runner.query(connection,sql,new MapListHandler(),params);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("执行sql错误："+sql,e);
             throw new RuntimeException("执行sql错误："+sql+"参数"+params);
         }finally {
             JDBCUtils.closeConnection(connection);
@@ -156,7 +160,7 @@ public class CommonDbUtil {
             QueryRunner runner=new QueryRunner();
             return (T)runner.query(connection,sql,new ScalarHandler(col),params);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("执行sql错误："+sql,e);
             throw new RuntimeException("执行sql错误："+sql+"参数"+params);
         }finally {
             JDBCUtils.closeConnection(connection);
@@ -184,7 +188,7 @@ public class CommonDbUtil {
 
             return (T)runner.insert(connection,sql,new ScalarHandler(1),params);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("执行sql错误："+sql,e);
             throw new RuntimeException("执行sql错误："+sql+"参数"+params);
         }finally {
             JDBCUtils.closeConnection(connection);
@@ -198,7 +202,7 @@ public class CommonDbUtil {
             QueryRunner runner=new QueryRunner();
             runner.update(connection,sql,params);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("执行sql错误："+sql,e);
             throw new RuntimeException("执行sql错误："+sql+"参数"+params);
         }finally {
             JDBCUtils.closeConnection(connection);
@@ -214,11 +218,11 @@ public class CommonDbUtil {
             runner.batch(connection,sql,params);
             connection.commit();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("执行sql错误："+sql,e);
             try {
                 connection.rollback();
             } catch (SQLException e1) {
-                e1.printStackTrace();
+                LOG.error("回滚异常：",e1);
             }
             throw new RuntimeException("执行sql错误："+sql+"参数"+params);
         }finally {

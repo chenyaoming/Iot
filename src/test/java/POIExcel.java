@@ -4,6 +4,10 @@ import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTMarker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import uitl.CommonDbUtil;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -15,12 +19,15 @@ import java.util.Map;
  * Created by hgg on 2019/5/7.
  */
 public class POIExcel {
+    private static Logger LOG = LoggerFactory.getLogger(POIExcel.class);
+
+
     public static void getDataFromExcel(String filePath) throws IOException
     {
         //判断是否为excel类型文件
         if(!filePath.endsWith(".xls")&&!filePath.endsWith(".xlsx"))
         {
-            System.out.println("文件不是excel类型");
+            LOG.info("文件不是excel类型");
         }
         FileInputStream fis =null;
         Workbook wookbook = null;
@@ -90,7 +97,7 @@ public class POIExcel {
         String remark="";
         String pic="";
         //获得所有数据
-        System.out.println("产品名称\t\t空间\t\t规格/尺寸\t\t品牌\t\t单位\t\t数量\t\t单价\t\t金额\t\t材质\t\t备注");
+        //System.out.println("产品名称\t\t空间\t\t规格/尺寸\t\t品牌\t\t单位\t\t数量\t\t单价\t\t金额\t\t材质\t\t备注");
         for(int i = 1 ; i < totalRowNum ; i++)
         {
             //获得第i行对象
@@ -158,11 +165,11 @@ public class POIExcel {
                 cell.setCellType(CellType.STRING);
                 remark =cell.getStringCellValue()+"";
             }
-            System.out.println(proName+"\t\t"+space+"\t\t"+size+"\t\t"+brand+"\t\t"+unit+"\t\t"+num+"\t\t"
-                    +unitPrice+"\t\t"+total+"\t\t"+material+"\t\t"+remark);
+            /*System.out.println(proName+"\t\t"+space+"\t\t"+size+"\t\t"+brand+"\t\t"+unit+"\t\t"+num+"\t\t"
+                    +unitPrice+"\t\t"+total+"\t\t"+material+"\t\t"+remark);*/
         }
         for (Map.Entry<String, PictureData> entry : maplist.entrySet()) {
-            System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+            //System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
         }
         //使用完成关闭
         wookbook.close();
@@ -234,7 +241,7 @@ public class POIExcel {
 //            QiNiuUtils.uploadOneObject(data,"111_"+picName + "." + ext);
             //图片保存路径
             filePath = "D:\\img\\pic" + picName + "." + ext;
-            System.out.println(filePath);
+            //System.out.println(filePath);
             FileOutputStream out = new FileOutputStream(filePath);
             out.write(data);
             out.close();

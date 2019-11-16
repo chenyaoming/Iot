@@ -1,6 +1,9 @@
 package print;
 
 import bean.TbBorrowRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.*;
 import java.awt.print.Book;
 import java.awt.print.PageFormat;
@@ -12,6 +15,8 @@ import java.text.SimpleDateFormat;
 
 
 public class BorrowPrinter implements Printable {
+
+    private static Logger LOG = LoggerFactory.getLogger(BorrowPrinter.class);
 
     private TbBorrowRecord record;
 
@@ -48,7 +53,7 @@ public class BorrowPrinter implements Printable {
         try {
             job.print();
         } catch (PrinterException e) {
-            e.printStackTrace();
+            LOG.error("打印任务错误:",e);
         }
     }
 

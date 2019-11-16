@@ -21,6 +21,8 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import table.device.DeviceTable;
 
 import javax.imageio.ImageIO;
@@ -40,7 +42,7 @@ import java.util.List;
  * */
 public class ExcelUtil {
 
-
+    private static Logger LOG = LoggerFactory.getLogger(ExcelUtil.class);
 
     /**
      * 功能：创建HSSFSheet工作簿
@@ -275,7 +277,7 @@ public class ExcelUtil {
             try {
                 f.createNewFile();
             } catch (IOException e) {
-                e.printStackTrace();
+                LOG.error("创建文件错误：",e);
             }
         }
         try {
@@ -391,7 +393,7 @@ public class ExcelUtil {
                         drawingPatriarch.createPicture(anchor, workbook.addPicture(data, XSSFWorkbook.PICTURE_TYPE_JPEG));
 
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        LOG.error("导出表格时，图片处理报错：",e);
                     }
 
                 } else {

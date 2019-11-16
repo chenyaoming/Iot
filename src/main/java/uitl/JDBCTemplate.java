@@ -1,12 +1,15 @@
 package uitl;
 
 
-import org.apache.commons.dbutils.QueryRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
 public abstract class JDBCTemplate<T> {
+
+    private static Logger LOG = LoggerFactory.getLogger(JDBCTemplate.class);
 
     private Connection connection = null;
 
@@ -22,11 +25,11 @@ public abstract class JDBCTemplate<T> {
             return result;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("执行事务sql错误：",e);
             try {
                 connection.rollback();
             } catch (SQLException e1) {
-                e1.printStackTrace();
+                LOG.error("回滚事务出错："+e1);
             }
             throw new RuntimeException("执行sql错误");
         }finally {

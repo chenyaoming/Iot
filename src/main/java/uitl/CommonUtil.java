@@ -9,7 +9,7 @@ public class CommonUtil {
             BeautyEyeLNFHelper.frameBorderStyle = BeautyEyeLNFHelper.FrameBorderStyle.osLookAndFeelDecorated;
             org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper.launchBeautyEyeLNF();
         } catch (final Exception e) {
-            System.out.println("error");
+            //System.out.println("error");
 
         }
     }

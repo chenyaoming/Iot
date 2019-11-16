@@ -2,6 +2,8 @@ package uitl;
 
 import jodd.io.FileUtil;
 import org.apache.poi.ss.usermodel.PictureData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
@@ -16,6 +18,8 @@ import java.util.ResourceBundle;
 import java.util.UUID;
 
 public class JFileChooserUtil {
+
+    private static Logger LOG = LoggerFactory.getLogger(JFileChooserUtil.class);
 
     private static final String UPLOAD_PATH;
 
@@ -127,7 +131,7 @@ public class JFileChooserUtil {
 
             return lastPath+fileName;
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("拷贝图片时报错:",e);
         }
         return null;
     }
@@ -169,14 +173,14 @@ public class JFileChooserUtil {
 
             return UPLOAD_PATH+fileName;
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("保存图片时报错:",e);
         }finally {
             //关闭的时候只需要关闭最外层的流就行了
             if(null != bos){
                 try {
                     bos.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LOG.error("关闭输出流时报错:",e);
                 }
             }
 

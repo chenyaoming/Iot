@@ -55,7 +55,7 @@ public class DialogTest {
                 // 关闭对话框
                 dialog.dispose();
 
-                System.out.println("24324324");
+                //System.out.println("24324324");
             }
         });
 

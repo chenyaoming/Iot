@@ -103,8 +103,7 @@ public class MainFram extends JFrame implements FrameOperation, BorrowUserNameFi
         //必须设置
 
         //设置样式
-        /*CommonUtil.setlookandfeel();
-        IndexFrame indexFrame = new IndexFrame();*/
+        /*CommonUtil.setlookandfeel();*/
     }
 
     public JPanel createTreePanel(){
@@ -140,7 +139,7 @@ public class MainFram extends JFrame implements FrameOperation, BorrowUserNameFi
 
             FrameUtil.doClickSearchBtn();
 
-            //System.out.println("当前被选中的节点: " + e.getPath());
+            //"当前被选中的节点: " + e.getPath()
         });
 
         // 创建滚动面板，包裹树（因为树节点展开后可能需要很大的空间来显示，所以需要用一个滚动面板来包裹）

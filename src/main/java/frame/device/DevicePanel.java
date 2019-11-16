@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import progress.BaseProgress;
 import progress.MySwingWorker;
 import table.device.DeviceTable;
+import uitl.CommonDbUtil;
 import uitl.JFileChooserUtil;
 
 import java.awt.*;
