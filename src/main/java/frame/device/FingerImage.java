@@ -4,6 +4,7 @@ import constant.ImageConstant;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import uitl.ImageUtil;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -16,7 +17,7 @@ public class FingerImage extends JPanel{
     private Image image;
 
     public FingerImage() {
-        image = Toolkit.getDefaultToolkit().createImage(ImageConstant.FINGERING);
+        image = ImageUtil.getImage(ImageConstant.FINGERING);
     }
 
     @Override

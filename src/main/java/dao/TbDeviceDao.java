@@ -4,6 +4,8 @@ import bean.TbDevice;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uitl.CommonDbUtil;
 
 import java.sql.Connection;
@@ -12,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TbDeviceDao {
+
+    private static Logger LOG = LoggerFactory.getLogger(TbDeviceDao.class);
 
     public static final String COLUMS = "name,typeNum,code,count,savePosition,image,features";
 
@@ -66,6 +70,8 @@ public class TbDeviceDao {
 
         Object[] params = {device.getName(),device.getTypeNum(),device.getCode(),device.getCount(),
                 device.getSavePosition(),device.getImage(),device.getFeatures()};
+
+        LOG.info("执行sql：{}, 参数：{}",sql,device);
         return CommonDbUtil.insertOneRetureId(sql,params);
     }
 
@@ -119,6 +125,8 @@ public class TbDeviceDao {
 
         String sql = "update TB_DEVICE set name =?,typeNum =? ,code =?,count =? ,savePosition =? ,image =? ,features =? " +
                 " where id = ?";
+
+        LOG.info("执行sql：{}, 参数：{}",sql,device);
         CommonDbUtil.update(sql,params);
     }
 
@@ -126,6 +134,8 @@ public class TbDeviceDao {
 
         Object[] params = {value,id};
         String sql = "update TB_DEVICE set "+colum+" = ? where id = ?";
+
+        LOG.info("执行sql：{}, 参数：{}:{}",sql,colum,value);
         CommonDbUtil.update(sql,params);
     }
 
@@ -134,6 +144,8 @@ public class TbDeviceDao {
 
         Object[] params = {value,id};
         String sql = "update TB_DEVICE set "+colum+" = ? where id = ?";
+
+        LOG.info("执行sql：{}, 参数：{}:{}",sql,colum,value);
         runner.update(connection,sql,params);
     }
 

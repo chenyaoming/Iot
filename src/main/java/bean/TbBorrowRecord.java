@@ -2,6 +2,7 @@ package bean;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.Date;
 
@@ -9,6 +10,7 @@ import java.util.Date;
  * 借用记录表
  */
 
+@ToString
 @Data
 @NoArgsConstructor
 public class TbBorrowRecord {

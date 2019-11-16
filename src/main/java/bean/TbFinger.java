@@ -21,4 +21,11 @@ public class TbFinger {
      */
     private Integer userId;
 
+    @Override
+    public String toString() {
+        return "TbFinger{" +
+                "id=" + id +
+                ", userId=" + userId +
+                '}';
+    }
 }

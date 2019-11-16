@@ -9,6 +9,7 @@ import frame.FrameUtil;
 import jodd.util.StringUtil;
 import label.RequiredLabel;
 import org.apache.commons.lang3.StringUtils;
+import uitl.ImageUtil;
 import uitl.JFileChooserUtil;
 import uitl.ModalFrameUtil;
 import uitl.NumberUtil;
@@ -35,7 +36,7 @@ public class DeviceAddDialog extends JFrame{
         this.setTitle("设备信息");
         thisDialog = this;
 
-        this.setIconImage(new ImageIcon(ImageConstant.LOGO).getImage());
+        ImageUtil.setImage(this,ImageConstant.LOGO);
 
         // 创建一个模态对话框
        // final JFrame dialog = new JFrame("");

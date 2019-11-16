@@ -8,6 +8,7 @@ import interfaces.BorrowUserNameFieldFrameOperation;
 import interfaces.BorrowUserNameFieldOperation;
 import interfaces.FrameOperation;
 import interfaces.PanelOperation;
+import uitl.ImageUtil;
 import uitl.JDBCUtils;
 
 import javax.swing.*;
@@ -15,6 +16,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.URL;
 
 public class MainFram extends JFrame implements FrameOperation, BorrowUserNameFieldFrameOperation {
 
@@ -53,13 +55,10 @@ public class MainFram extends JFrame implements FrameOperation, BorrowUserNameFi
         JPanel treePanel = createTreePanel();
         this.add(treePanel, BorderLayout.WEST);
 
-
-
         // 主界面标题
         this.setTitle("出入库系统");
-        this.setIconImage(new ImageIcon(ImageConstant.LOGO).getImage());
 
-
+        ImageUtil.setImage(this,ImageConstant.LOGO);
 
         // 创建第 1 个选项卡（选项卡只包含 标题）
         tabbedPane.addTab("设备管理", new DevicePanel());

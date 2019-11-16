@@ -1,6 +1,8 @@
 package frame;
 
+import constant.ImageConstant;
 import frame.device.JScrollImagePanel;
+import uitl.ImageUtil;
 import uitl.ModalFrameUtil;
 
 import javax.swing.*;
@@ -12,6 +14,8 @@ public class BigImageDialog extends JFrame {
 
     public BigImageDialog(JFrame ownFrame,String imgUrl){
         this.ownFrame = ownFrame;
+
+        ImageUtil.setImage(this, ImageConstant.LOGO);
 
         // 设置对话框的宽高
         this.setSize(550, 450);

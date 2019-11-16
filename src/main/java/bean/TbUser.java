@@ -3,9 +3,11 @@ package bean;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.Date;
 
+@ToString
 @Data
 @NoArgsConstructor
 public class TbUser {

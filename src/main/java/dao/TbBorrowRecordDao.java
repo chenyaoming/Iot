@@ -4,6 +4,8 @@ import bean.TbBorrowRecord;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uitl.CommonDbUtil;
 
 import java.sql.Connection;
@@ -13,6 +15,8 @@ import java.util.List;
 
 
 public class TbBorrowRecordDao {
+
+    private static Logger LOG = LoggerFactory.getLogger(TbBorrowRecordDao.class);
 
     public static final String[] columArr = {"deviceId","deviceName","deviceType","deviceCode","devicePosition","deviceImage","features","borrowNum",
      "borrowUserId","borrowUserName","borrowDate", "borrowClerkUserId","borrowClerkUserName","status"};
@@ -33,6 +37,8 @@ public class TbBorrowRecordDao {
         Object[] params = {r.getDeviceName(),r.getDeviceType(),r.getDeviceCode(),r.getDevicePosition(),
                 r.getDeviceImage(),r.getFeatures(),r.getBorrowNum(),r.getRemark(),r.getId()};
 
+        LOG.info("执行sql：{}, 参数：{}",sql,r);
+
         CommonDbUtil.update(sql,params);
     }
 
@@ -43,6 +49,7 @@ public class TbBorrowRecordDao {
         Object[] params = {r.getReturnUserId(),r.getReturnUserName(),r.getReturnDate(),
                 r.getReturnClerkUserId(),r.getReturnClerkUserName(),r.getStatus(),r.getId()};
 
+        LOG.info("执行sql：{}, 参数：{}",sql,r);
         CommonDbUtil.update(sql,params);
     }
 
@@ -55,6 +62,7 @@ public class TbBorrowRecordDao {
         Object[] params = {r.getReturnUserId(),r.getReturnUserName(),r.getReturnDate(),
                 r.getReturnClerkUserId(),r.getReturnClerkUserName(),r.getStatus(),r.getId()};
 
+        LOG.info("执行sql：{}, 参数：{}",sql,r);
         runner.update(connection,sql,params);
     }
 
@@ -108,6 +116,7 @@ public class TbBorrowRecordDao {
         r.getDevicePosition(),r.getDeviceImage(),r.getFeatures(),r.getBorrowNum(),r.getBorrowUserId(),
         r.getBorrowUserName(),r.getBorrowDate(),r.getBorrowClerkUserId(),r.getBorrowClerkUserName(),r.getStatus()};
 
+        LOG.info("执行sql：{}, 参数：{}",sql,r);
         //CommonDbUtil.getBeanValues(record,columArr);
         return CommonDbUtil.insertOneRetureId(sql,params);
     }
@@ -124,6 +133,7 @@ public class TbBorrowRecordDao {
                 r.getDevicePosition(),r.getDeviceImage(),r.getFeatures(),r.getBorrowNum(),r.getBorrowUserId(),
                 r.getBorrowUserName(),r.getBorrowDate(),r.getBorrowClerkUserId(),r.getBorrowClerkUserName(),r.getStatus()};
 
+        LOG.info("执行sql：{}, 参数：{}",sql,r);
         return (Integer) runner.insert(connection,sql,new ScalarHandler(1),params);
     }
 

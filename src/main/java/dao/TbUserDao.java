@@ -4,6 +4,8 @@ import bean.TbUser;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uitl.CommonDbUtil;
 
 import java.sql.Connection;
@@ -12,6 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TbUserDao {
+
+    private static Logger LOG = LoggerFactory.getLogger(TbUserDao.class);
+
 
     public static final String[] COLUM_ARR = {"name","gender","age","phone","createDate"};
 
@@ -66,6 +71,8 @@ public class TbUserDao {
 
         Object[] params = {user.getName(),user.getGender(),user.getAge(),
                 user.getPhone(),user.getCreateDate()};
+
+        LOG.info("执行sql：{}, 参数：{}",sql,user);
         return CommonDbUtil.insertOneRetureId(sql,params);
     }
 
@@ -82,6 +89,8 @@ public class TbUserDao {
         Object[] params = {user.getName(),user.getGender(),user.getAge(),
                 user.getPhone(),user.getCreateDate()};
 
+        LOG.info("执行sql：{}, 参数：{}",sql,user);
+
         return (Integer) runner.insert(connection,sql,new ScalarHandler(1),params);
     }
 
@@ -91,6 +100,9 @@ public class TbUserDao {
         Object[] params = {user.getName(),user.getGender(),user.getAge(),user.getPhone(),user.getId()};
 
         String sql = "update TB_USER set name =?,gender =? ,age =?,phone =? where id = ?";
+
+        LOG.info("执行sql：{}, 参数：{}",sql,user);
+
         CommonDbUtil.update(sql,params);
     }
 

@@ -73,7 +73,7 @@
     <logger name="java.sql.ResultSet" level="info" />-->
 
     <root level="INFO">
-        <appender-ref ref="console" />
+        <!--<appender-ref ref="console" />-->
         <appender-ref ref="LogFile" />
     </root>
 
