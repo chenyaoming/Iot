@@ -7,8 +7,14 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Arrays;
+import java.util.List;
 
 public class ImageUtil {
+
+    public static final List<String> PIC_SUFIX_LIST = Arrays.asList(new String[]{"jpg","jpeg","png"});
+
+    public static final String[] PIC_DOT_SUFIX = new String[]{".jpg",".jpeg",".png"};
 
     private static Logger LOG = LoggerFactory.getLogger(ImageUtil.class);
 

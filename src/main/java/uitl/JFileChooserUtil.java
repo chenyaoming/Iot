@@ -1,5 +1,6 @@
 package uitl;
 
+import frame.FrameUtil;
 import jodd.io.FileUtil;
 import org.apache.poi.ss.usermodel.PictureData;
 import org.slf4j.Logger;
@@ -142,6 +143,13 @@ public class JFileChooserUtil {
      * @return
      */
     public static String writeImgToUpload(PictureData pictureData) {
+
+        if(!ImageUtil.PIC_SUFIX_LIST.contains(pictureData.suggestFileExtension())){
+            LOG.error("导入时不支持的图片格式："+pictureData.suggestFileExtension());
+            JOptionPane.showMessageDialog(FrameUtil.currentFrame,"不支持图片格式为"+pictureData.suggestFileExtension(),"错误",0);
+            throw new RuntimeException("导入时不支持的图片格式");
+        }
+
         // Tomcat 放在C盘中，可能无读写权限而写入失败
         // 写入目录文件
         // 获取文件格式

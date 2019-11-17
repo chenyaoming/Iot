@@ -152,9 +152,7 @@ public class DeviceAddDialog extends JFrame{
         // 选择图片
         imageBtn.addActionListener(e -> {
 
-            String[] picSufix = new String[]{".jpg",".jpeg",".png"};
-
-            File selectedFile = JFileChooserUtil.getSelectedOpenFile(picSufix,FrameUtil.currentFrame);
+            File selectedFile = JFileChooserUtil.getSelectedOpenFile(ImageUtil.PIC_DOT_SUFIX,FrameUtil.currentFrame);
             if(null != selectedFile){
                 iPanel.setImagePath(selectedFile.getPath());
                 iPanel.repaint();

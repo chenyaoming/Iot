@@ -83,13 +83,18 @@ public class MainFram extends JFrame implements FrameOperation, BorrowUserNameFi
 
         this.add(tabbedPane, BorderLayout.CENTER);
 
-
-        this.setPreferredSize(new Dimension(1200, 680));
+        //this.pack();
+        this.setSize(1200,680);
+       // this.setPreferredSize(new Dimension(1200, 680));
         // 设置主窗体显示在屏幕的位置
-        this.setLocation(100, 20);
+       // this.setLocation(100, 20);
+
+        //这个方法很好用，只需要注意该行代码应处于JFrame.setSize(x, y)或JFrame.pack()方法之后使用方有效果。
+        setLocationRelativeTo(null);
+
         // 设置是否显示
         this.setVisible(true);
-        this.pack();
+        //this.pack();
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 

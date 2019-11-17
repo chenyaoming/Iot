@@ -24,6 +24,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import table.device.DeviceTable;
+import uitl.ImageUtil;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -33,6 +34,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -376,13 +378,20 @@ public class ExcelUtil {
 
             //sheet.addMergedRegion(new CellRangeAddress(i + 1,i + 2,5,6)) ;
             if(StringUtils.isNotBlank(device.getImage())){
+                String suffix = device.getImage().trim().substring(device.getImage().trim().lastIndexOf(".")+1);
+
+                if(!ImageUtil.PIC_SUFIX_LIST.contains(suffix)){
+                    LOG.error("不支持的图片格式："+device.getImage());
+                    continue;
+                }
                 // 头像
                 File photoFile = new File(device.getImage().trim()) ;
                 if (photoFile.exists()){
                     try {
                         BufferedImage bufferedImage = ImageIO.read(photoFile) ;
                         ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
-                        ImageIO.write(bufferedImage, "jpg", byteArrayOut);
+
+                        ImageIO.write(bufferedImage, suffix, byteArrayOut);
                         byte[] data = byteArrayOut.toByteArray();
                         XSSFDrawing drawingPatriarch = sheet.createDrawingPatriarch();
                         //图片位置的调整可设置XSSFClientAnchor的前四个参数：分别是图片距离单元格left，top，right，bottom的像素距离

@@ -215,9 +215,7 @@ public class BorrowEditDialog extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                String[] picSufix = new String[]{".jpg",".jpeg",".png"};
-
-                File selectedFile = JFileChooserUtil.getSelectedOpenFile(picSufix,FrameUtil.currentFrame);
+                File selectedFile = JFileChooserUtil.getSelectedOpenFile(ImageUtil.PIC_DOT_SUFIX,FrameUtil.currentFrame);
                 if(null != selectedFile){
                     iPanel.setImagePath(selectedFile.getPath());
                     iPanel.repaint();

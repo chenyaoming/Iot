@@ -42,7 +42,7 @@ public class JScrollImagePanel extends JPanel{
     }
 
     @Override
-    public void paint(Graphics g) {
+    public void paintComponent(Graphics g) {
         try {
             if(StringUtils.isNotEmpty(imagePath)){
                 File file = new File(imagePath.trim());
