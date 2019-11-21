@@ -4,6 +4,7 @@ package frame.user;
 import bean.TbUser;
 import dao.DaoFactory;
 import frame.FrameUtil;
+import frame.MainFram;
 import jodd.util.StringUtil;
 import label.RequiredLabel;
 import org.apache.commons.lang3.StringUtils;
@@ -204,6 +205,14 @@ public class UserAddDialog extends JDialog {
                     FrameUtil.doClickSearchBtn();
                 }else{
                     //增加
+
+                    if(MainFram.getCurrentPanel() instanceof UserPanel) {
+                        Integer userType =((UserPanel) MainFram.getCurrentPanel()).getUserType();
+                        newUser.setType(userType);
+                    }else {
+                        JOptionPane.showMessageDialog(new JPanel(),"系统繁忙, 请联系管理员","错误",0);
+                        return;
+                    }
 
                     new MySwingWorker(thisDialog){
                         @Override

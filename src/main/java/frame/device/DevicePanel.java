@@ -9,6 +9,7 @@ import interfaces.PanelOperation;
 import helper.DeviceExportHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.xmlbeans.impl.jam.JField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import progress.BaseProgress;
@@ -20,6 +21,8 @@ import uitl.JFileChooserUtil;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -35,6 +38,10 @@ public class DevicePanel extends JPanel implements PanelOperation {
     private JScrollPane jsp;
 
     DeviceTable table = null;
+
+    public JTextField getDeviceCodeField(){
+        return this.deviceCodeField;
+    }
 
     public DevicePanel() {
         table = new DeviceTable();
@@ -107,7 +114,7 @@ public class DevicePanel extends JPanel implements PanelOperation {
         gridBagConstraints.gridy=0;
         gridBagConstraints.gridwidth=1;
         gridBagConstraints.gridheight=1;
-        gridBagLayout.setConstraints(devNameLabel, gridBagConstraints);
+        gridBagLayout.setConstraints(devCodeLabel, gridBagConstraints); //
         //组件2
         gridBagConstraints.gridx=1;
         gridBagConstraints.gridy=0;
@@ -115,7 +122,7 @@ public class DevicePanel extends JPanel implements PanelOperation {
         gridBagConstraints.gridheight=1;
         gridBagConstraints.insets = new Insets(0, 0, 0, 20);
 
-        gridBagLayout.setConstraints(deviceNameField, gridBagConstraints);
+        gridBagLayout.setConstraints(deviceCodeField, gridBagConstraints); //
 
         gridBagConstraints.insets = new Insets(0, 0, 0, 0);
 
@@ -123,14 +130,14 @@ public class DevicePanel extends JPanel implements PanelOperation {
         gridBagConstraints.gridy=0;
         gridBagConstraints.gridwidth=1;
         gridBagConstraints.gridheight=1;
-        gridBagLayout.setConstraints(devCodeLabel, gridBagConstraints);
+        gridBagLayout.setConstraints(devNameLabel, gridBagConstraints);
 
         gridBagConstraints.gridx=5;
         gridBagConstraints.gridy=0;
         gridBagConstraints.gridwidth=3;
         gridBagConstraints.gridheight=1;
         gridBagConstraints.insets = new Insets(0, 0, 0, 10);
-        gridBagLayout.setConstraints(deviceCodeField, gridBagConstraints);
+        gridBagLayout.setConstraints(deviceNameField, gridBagConstraints);
 
         gridBagConstraints.gridx=8;
         gridBagConstraints.gridy=0;
@@ -259,6 +266,17 @@ public class DevicePanel extends JPanel implements PanelOperation {
 
     private void initOperator() {
 
+       deviceCodeField.addKeyListener(new KeyAdapter(){
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                if(e.getKeyChar()==KeyEvent.VK_ENTER )   //按回车键执行相应操作;
+                {
+                    searchData();
+                }
+            }
+        });
+
         // 查询事件
         // 增加回车事件
         //this.getRootPane().setDefaultButton(searchBtn);// 获取焦点
@@ -273,6 +291,7 @@ public class DevicePanel extends JPanel implements PanelOperation {
             @Override
             public void actionPerformed(ActionEvent e) {
                 clear();
+                searchData();
             }
         });
         //新增
@@ -395,14 +414,19 @@ public class DevicePanel extends JPanel implements PanelOperation {
 
 
 
-    public static void main(String[] args){
+    /*public static void main(String[] args){
         //设置样式
         //CommonUtil.setlookandfeel();
        // DevicePanel devicePanel = new DevicePanel();
-    }
+    }*/
 
     @Override
     public JButton getSearchButton() {
         return this.searchBtn;
+    }
+
+    @Override
+    public JTextField getFirstSearchField() {
+        return this.deviceCodeField;
     }
 }

@@ -1,6 +1,8 @@
 package dao;
 
 import bean.TbUser;
+import frame.MainFram;
+import frame.user.UserPanel;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.commons.lang3.StringUtils;
@@ -18,28 +20,39 @@ public class TbUserDao {
     private static Logger LOG = LoggerFactory.getLogger(TbUserDao.class);
 
 
-    public static final String[] COLUM_ARR = {"name","gender","age","phone","createDate"};
+    public static final String[] COLUM_ARR = {"name","gender","age","phone","createDate","type"};
 
-    public long countAll(){
+    /*public long countAll(){
         String sql = "select count(*) FROM TB_USER";
         return CommonDbUtil.queryReturnSimpleVal(sql,1);
-    }
+    }*/
 
-    public List<TbUser> findByPage(int page, int size){
+    /*public List<TbUser> findByPage(int page, int size){
         Object[] params = {(page -1)*size ,size};
         String sql = "select * from TB_USER  limit ?,?";
 
         return CommonDbUtil.queryReturnBeanList(sql,TbUser.class,params);
-    }
+    }*/
 
     public long countAllByCondition(TbUser user){
         StringBuilder sql = new StringBuilder("select count(*) FROM TB_USER where 1=1 ");
 
         List<Object> params = new ArrayList<>();
+        //增加用户类型的条件
+        addTypeCondition(sql, params);
+
         getSearchCondition(user, sql, params);
         Object[] paramArr = new Object[params.size()];
         params.toArray(paramArr);
         return CommonDbUtil.queryReturnSimpleVal(sql.toString(),1,paramArr);
+    }
+
+    private void addTypeCondition(StringBuilder sql, List<Object> params) {
+        if(MainFram.getCurrentPanel() instanceof UserPanel) {
+            Integer userType =((UserPanel) MainFram.getCurrentPanel()).getUserType();
+            sql.append(" and type = ? ");
+            params.add(userType);
+        }
     }
 
     public List<TbUser> findByConditionPage(TbUser user,int page,int size){
@@ -47,6 +60,9 @@ public class TbUserDao {
         StringBuilder sql = new StringBuilder("select * from TB_USER where 1=1 ");
 
         List<Object> params = new ArrayList<>();
+        //增加用户类型的条件
+        addTypeCondition(sql, params);
+
         getSearchCondition(user, sql, params);
 
         sql.append(" limit ?,? ");
@@ -62,7 +78,7 @@ public class TbUserDao {
 
 
 
-    public Integer insert(TbUser user){
+    /*public Integer insert(TbUser user){
 
         String colums = StringUtils.join(COLUM_ARR, ",");
         String questionMarks = CommonDbUtil.spliceSqlQuestionMark(COLUM_ARR.length);
@@ -74,7 +90,7 @@ public class TbUserDao {
 
         LOG.info("执行sql：{}, 参数：{}",sql,user);
         return CommonDbUtil.insertOneRetureId(sql,params);
-    }
+    }*/
 
 
     public Integer insertUser(Connection connection,TbUser user) throws SQLException {
@@ -87,7 +103,7 @@ public class TbUserDao {
         String sql = "INSERT INTO TB_USER("+ colums +") VALUES("+questionMarks+")";
 
         Object[] params = {user.getName(),user.getGender(),user.getAge(),
-                user.getPhone(),user.getCreateDate()};
+                user.getPhone(),user.getCreateDate(),user.getType()};
 
         LOG.info("执行sql：{}, 参数：{}",sql,user);
 

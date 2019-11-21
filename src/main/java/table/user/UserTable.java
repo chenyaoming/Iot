@@ -42,8 +42,8 @@ public class UserTable extends JTable {
 
 	public void initTable() {
 
-        this.setTotalRowCount((int) DaoFactory.getUserDao().countAll());
-		List<TbUser> userList = DaoFactory.getUserDao().findByPage(this.getCurrentPage(),this.getPageCount());
+        this.setTotalRowCount((int) DaoFactory.getUserDao().countAllByCondition(null));
+		List<TbUser> userList = DaoFactory.getUserDao().findByConditionPage(null,this.getCurrentPage(),this.getPageCount());
 		//结果集的总页数
 		this.setTotalPage(totalRowCount % pageCount == 0 ? totalRowCount/ pageCount : totalRowCount / pageCount + 1);
         this.showTable(userList);

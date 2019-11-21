@@ -3,6 +3,8 @@ package frame;
 import constant.ImageConstant;
 import frame.borrow.BorrowPanel;
 import frame.device.DevicePanel;
+import frame.user.ClerkUserPanel;
+import frame.user.MemberUserPanel;
 import frame.user.UserPanel;
 import interfaces.BorrowUserNameFieldFrameOperation;
 import interfaces.BorrowUserNameFieldOperation;
@@ -26,7 +28,7 @@ public class MainFram extends JFrame implements FrameOperation, BorrowUserNameFi
     private JMenuItem exit;
 
     // 创建选项卡面板
-    final JTabbedPane tabbedPane = new JTabbedPane();
+    final static JTabbedPane tabbedPane = new JTabbedPane();
 
     public MainFram(){
 
@@ -63,10 +65,14 @@ public class MainFram extends JFrame implements FrameOperation, BorrowUserNameFi
         // 创建第 1 个选项卡（选项卡只包含 标题）
         tabbedPane.addTab("设备管理", new DevicePanel());
 
-        // 创建第 2 个选项卡（选项卡包含 标题 和 图标）
-        tabbedPane.addTab("人员管理", new UserPanel());
 
-        // 创建第 3 个选项卡（选项卡包含 标题、图标 和 tip提示）
+        // 创建第 2 个选项卡（选项卡包含 标题 和 图标）
+        tabbedPane.addTab("人员管理", new MemberUserPanel());
+
+        //创建第 3 个选项卡
+        tabbedPane.addTab("保管员管理", new ClerkUserPanel());
+
+        // 创建第 4 个选项卡（选项卡包含 标题、图标 和 tip提示）
         //tabbedPane.addTab("借出归还管理", new ImageIcon("bb.jpg"), createTextPanel("TAB 03"), "This is a tab.");
 
         tabbedPane.addTab("借出归还管理", new BorrowPanel());
@@ -94,6 +100,7 @@ public class MainFram extends JFrame implements FrameOperation, BorrowUserNameFi
 
         // 设置是否显示
         this.setVisible(true);
+        firstFieldRequestFocus();
         //this.pack();
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -118,11 +125,14 @@ public class MainFram extends JFrame implements FrameOperation, BorrowUserNameFi
 
         // 创建二级节点
         DefaultMutableTreeNode deviceNode = new DefaultMutableTreeNode("设备管理");
-        DefaultMutableTreeNode userNode = new DefaultMutableTreeNode("人员管理");
+        DefaultMutableTreeNode memberUserNode = new DefaultMutableTreeNode("人员管理");
+        DefaultMutableTreeNode clerkUserNode = new DefaultMutableTreeNode("保管员管理");
+
         DefaultMutableTreeNode borrowNode = new DefaultMutableTreeNode("借出归还管理");
 
         rootNode.add(deviceNode);
-        rootNode.add(userNode);
+        rootNode.add(memberUserNode);
+        rootNode.add(clerkUserNode);
         rootNode.add(borrowNode);
 
         // 使用根节点创建树组件
@@ -142,6 +152,7 @@ public class MainFram extends JFrame implements FrameOperation, BorrowUserNameFi
             tabbedPane.setSelectedIndex(jTree.getSelectionModel().getLeadSelectionRow() - 1);
 
             FrameUtil.doClickSearchBtn();
+            firstFieldRequestFocus();
 
             //"当前被选中的节点: " + e.getPath()
         });
@@ -157,12 +168,7 @@ public class MainFram extends JFrame implements FrameOperation, BorrowUserNameFi
     }
 
     private void initOperator() {
-        exit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                exitWindow();
-            }
-        });
+        exit.addActionListener(e -> exitWindow());
 
     }
 
@@ -194,7 +200,7 @@ public class MainFram extends JFrame implements FrameOperation, BorrowUserNameFi
     @Override
     public JButton getCurrentSearchButton() {
 
-        Component component = tabbedPane.getSelectedComponent();
+        Component component = getCurrentPanel();
         if (component instanceof PanelOperation){
            return  ((PanelOperation) component).getSearchButton();
         }
@@ -203,10 +209,21 @@ public class MainFram extends JFrame implements FrameOperation, BorrowUserNameFi
 
     @Override
     public JTextField getCurrentBorrowUserNameField() {
-        Component component = tabbedPane.getSelectedComponent();
+        Component component = getCurrentPanel();
         if (component instanceof BorrowUserNameFieldOperation){
             return  ((BorrowUserNameFieldOperation) component).getBorrowUserNameField();
         }
         return null;
+    }
+
+    public static void firstFieldRequestFocus(){
+        Component component = getCurrentPanel();
+        if (component instanceof PanelOperation){
+            ((PanelOperation) component).getFirstSearchField().requestFocus();
+        }
+    }
+
+    public static Component getCurrentPanel(){
+        return tabbedPane.getSelectedComponent();
     }
 }

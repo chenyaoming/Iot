@@ -17,6 +17,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.List;
 
 public class BorrowPanel extends JPanel implements PanelOperation, BorrowUserNameFieldOperation {
@@ -105,13 +107,13 @@ public class BorrowPanel extends JPanel implements PanelOperation, BorrowUserNam
         gridBagConstraints.gridy=0;
         gridBagConstraints.gridwidth=1;
         gridBagConstraints.gridheight=1;
-        gridBagLayout.setConstraints(borrowUserNameLabel, gridBagConstraints);
+        gridBagLayout.setConstraints(deviceCodeLabel, gridBagConstraints); //
         //组件2
         gridBagConstraints.gridx=1;
         gridBagConstraints.gridy=0;
         gridBagConstraints.gridwidth=3;
         gridBagConstraints.gridheight=1;
-        gridBagLayout.setConstraints(borrowUserNameField, gridBagConstraints);
+        gridBagLayout.setConstraints(deviceCodeField, gridBagConstraints); //
 
         gridBagConstraints.gridx=4;
         gridBagConstraints.gridy=0;
@@ -131,14 +133,14 @@ public class BorrowPanel extends JPanel implements PanelOperation, BorrowUserNam
         gridBagConstraints.gridy=0;
         gridBagConstraints.gridwidth=1;
         gridBagConstraints.gridheight=1;
-        gridBagLayout.setConstraints(deviceCodeLabel, gridBagConstraints);
+        gridBagLayout.setConstraints(borrowUserNameLabel, gridBagConstraints);
 
         gridBagConstraints.gridx=9;
         gridBagConstraints.gridy=0;
         gridBagConstraints.gridwidth=3;
         gridBagConstraints.gridheight=1;
         //gridBagConstraints.insets = new Insets(0, 0, 0, 10);
-        gridBagLayout.setConstraints(deviceCodeField, gridBagConstraints);
+        gridBagLayout.setConstraints(borrowUserNameField, gridBagConstraints);
 
 
 
@@ -278,6 +280,17 @@ public class BorrowPanel extends JPanel implements PanelOperation, BorrowUserNam
 
     private void initOperator() {
 
+        deviceCodeField.addKeyListener(new KeyAdapter(){
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                if(e.getKeyChar()==KeyEvent.VK_ENTER )   //按回车键执行相应操作;
+                {
+                    searchData();
+                }
+            }
+        });
+
         // 查询事件
         // 增加回车事件
         //this.getRootPane().setDefaultButton(searchBtn);// 获取焦点
@@ -292,6 +305,7 @@ public class BorrowPanel extends JPanel implements PanelOperation, BorrowUserNam
             @Override
             public void actionPerformed(ActionEvent e) {
                 clear();
+                searchData();
             }
         });
 
@@ -487,5 +501,10 @@ public class BorrowPanel extends JPanel implements PanelOperation, BorrowUserNam
     @Override
     public JTextField getBorrowUserNameField() {
         return borrowUserNameField;
+    }
+
+    @Override
+    public JTextField getFirstSearchField() {
+        return this.deviceCodeField;
     }
 }

@@ -15,6 +15,11 @@ public class TbUser {
     private Integer id;
 
     /**
+     *   1：借用人和归还人管理 ,2:保管员管理
+     */
+    private Integer type;
+
+    /**
      * 姓名
      */
     private String name;

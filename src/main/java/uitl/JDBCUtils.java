@@ -164,6 +164,7 @@ public final class JDBCUtils {
             statement.execute("create table IF not EXISTS TB_USER\n" +
                     "(\n" +
                     "   id                   int IDENTITY not null,\n" +
+                    "   type                 int not null,\n" +
                     "   name                 varchar(255),\n" +
                     "   gender               varchar(8),\n" +
                     "   age                  int,\n" +

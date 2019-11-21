@@ -1,6 +1,8 @@
 package interfaces;
 
 
+import org.apache.xmlbeans.impl.jam.JField;
+
 import javax.swing.*;
 
 public interface PanelOperation {
@@ -10,5 +12,7 @@ public interface PanelOperation {
      * @return
      */
     JButton getSearchButton();
+
+    JTextField getFirstSearchField();
 
 }

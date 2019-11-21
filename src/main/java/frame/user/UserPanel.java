@@ -15,7 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-public class UserPanel extends JPanel implements PanelOperation {
+public abstract class UserPanel extends JPanel implements PanelOperation {
     private JButton searchBtn, resetBtn, addBtn, btnEdit,prePage, nextPage, lastPage;
     private JPanel conditPanel, pagePanel;
     private JLabel userNameLabel, phoneLabel, pageInfo;
@@ -25,6 +25,11 @@ public class UserPanel extends JPanel implements PanelOperation {
 
     UserTable table = null;
 
+    /**
+     * 用户类型
+     * @return
+     */
+    public abstract Integer getUserType();
 
     public UserPanel() {
         table = new UserTable();
@@ -240,6 +245,7 @@ public class UserPanel extends JPanel implements PanelOperation {
             @Override
             public void actionPerformed(ActionEvent e) {
                 clear();
+                searchData();
             }
         });
         //新增
@@ -330,5 +336,10 @@ public class UserPanel extends JPanel implements PanelOperation {
     @Override
     public JButton getSearchButton() {
         return this.searchBtn;
+    }
+
+    @Override
+    public JTextField getFirstSearchField() {
+        return this.userNameField;
     }
 }

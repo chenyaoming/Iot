@@ -59,7 +59,7 @@ public class BorrowTable extends JTable {
 
 	public void initTable() {
 
-        this.setTotalRowCount((int) DaoFactory.getUserDao().countAll());
+        this.setTotalRowCount((int) DaoFactory.getUserDao().countAllByCondition(null));
 		List<TbBorrowRecord> borrowList = DaoFactory.getBorrowRecordDao().findByConditionPage(null,this.getCurrentPage(),this.getPageCount());
 		//结果集的总页数
 		this.setTotalPage(totalRowCount % pageCount == 0 ? totalRowCount/ pageCount : totalRowCount / pageCount + 1);
