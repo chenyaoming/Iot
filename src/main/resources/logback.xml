@@ -45,7 +45,7 @@
     <appender name="LogFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!--<file>${LOG_HOME}/iot.log</file>-->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_HOME}/%d{yyyy-MM}/iot_%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${LOG_HOME}/%d{yyyy-MM}/iot_%d{yyyy-MM}.log</fileNamePattern>
         </rollingPolicy>
         <!-- <encoder>：对记录事件进行格式化。负责两件事，一是把日志信息转换成字节数组，二是把字节数组写入到输出流。-->
         <!-- PatternLayoutEncoder 是唯一有用的且默认的encoder ，有一个<pattern>节点，用来设置日志的输入格式。使用“%”加“转换符”方式，如果要输出“%”，则必须用“\”对“\%”进行转义。-->
