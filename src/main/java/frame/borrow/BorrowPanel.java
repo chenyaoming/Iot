@@ -20,12 +20,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.List;
+import java.util.Vector;
 
 public class BorrowPanel extends JPanel implements PanelOperation, BorrowUserNameFieldOperation {
     private JButton searchBtn, resetBtn, borrowBtn, btnEdit,returnBtn,printBtn, fingerSearchBtn, prePage, nextPage, lastPage;
     private JPanel conditPanel, pagePanel;
-    private JLabel borrowUserNameLabel, deviceNameLabel,deviceCodeLabel,pageInfo;
-    private JTextField borrowUserNameField = null, deviceNameField = null,deviceCodeField = null;
+    private JLabel borrowUserNameLabel, deviceNameLabel,deviceCodeLabel,pageInfo,returnUserNameLabel,statusLabel;
+    private JTextField borrowUserNameField = null, deviceNameField = null,deviceCodeField = null, returnUserNameField = null;
+    private JComboBox<String> statusComboBox = null;
 
     private JScrollPane jsp;
 
@@ -65,7 +67,6 @@ public class BorrowPanel extends JPanel implements PanelOperation, BorrowUserNam
 
         fingerSearchBtn = new JButton("借用人指纹查询");
 
-
         prePage = new JButton("上一页");
         nextPage = new JButton("下一页");
         lastPage = new JButton("末  页");
@@ -76,6 +77,17 @@ public class BorrowPanel extends JPanel implements PanelOperation, BorrowUserNam
 
         deviceCodeLabel = new JLabel("设备编码");
         deviceCodeField = new JTextField(15);
+
+        returnUserNameLabel = new JLabel("归还人");
+        returnUserNameField = new JTextField(15);
+
+        statusLabel = new JLabel("出借状态");
+
+        String[] listData = new String[]{"全部", "待归还", "已归还"};
+        statusComboBox = new JComboBox<>(listData);
+
+        statusComboBox.setFont(new Font("alias", Font.PLAIN, 12));
+        statusComboBox.setPreferredSize(new Dimension(100, 20));
 
         jsp = new JScrollPane(table);
 
@@ -107,34 +119,39 @@ public class BorrowPanel extends JPanel implements PanelOperation, BorrowUserNam
         gridBagConstraints.gridy=0;
         gridBagConstraints.gridwidth=1;
         gridBagConstraints.gridheight=1;
-        gridBagLayout.setConstraints(deviceCodeLabel, gridBagConstraints); //
+        gridBagLayout.setConstraints(deviceCodeLabel, gridBagConstraints);
         //组件2
         gridBagConstraints.gridx=1;
         gridBagConstraints.gridy=0;
         gridBagConstraints.gridwidth=3;
         gridBagConstraints.gridheight=1;
-        gridBagLayout.setConstraints(deviceCodeField, gridBagConstraints); //
+        gridBagLayout.setConstraints(deviceCodeField, gridBagConstraints);
 
+
+        gridBagConstraints.insets = new Insets(0, 20, 0, 5);
         gridBagConstraints.gridx=4;
         gridBagConstraints.gridy=0;
         gridBagConstraints.gridwidth=1;
         gridBagConstraints.gridheight=1;
         gridBagLayout.setConstraints(deviceNameLabel, gridBagConstraints);
 
+        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         gridBagConstraints.gridx=5;
         gridBagConstraints.gridy=0;
         gridBagConstraints.gridwidth=3;
         gridBagConstraints.gridheight=1;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 10);
         gridBagLayout.setConstraints(deviceNameField, gridBagConstraints);
 
 
+        gridBagConstraints.insets = new Insets(0, 20, 0, 0);
         gridBagConstraints.gridx=8;
         gridBagConstraints.gridy=0;
         gridBagConstraints.gridwidth=1;
         gridBagConstraints.gridheight=1;
         gridBagLayout.setConstraints(borrowUserNameLabel, gridBagConstraints);
 
+
+        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         gridBagConstraints.gridx=9;
         gridBagConstraints.gridy=0;
         gridBagConstraints.gridwidth=3;
@@ -143,51 +160,84 @@ public class BorrowPanel extends JPanel implements PanelOperation, BorrowUserNam
         gridBagLayout.setConstraints(borrowUserNameField, gridBagConstraints);
 
 
-
-        gridBagConstraints.gridx=12;
-        gridBagConstraints.gridy=0;
-        gridBagConstraints.gridwidth=1;
-        gridBagConstraints.gridheight=1;
-        gridBagLayout.setConstraints(searchBtn, gridBagConstraints);
-
-        gridBagConstraints.gridx=13;
-        gridBagConstraints.gridy=0;
-        gridBagConstraints.gridwidth=1;
-        gridBagConstraints.gridheight=1;
-
-        gridBagLayout.setConstraints(resetBtn, gridBagConstraints);
-
-
+        gridBagConstraints.insets = new Insets(5, 0, 0, 0);
         gridBagConstraints.gridx=0;
         gridBagConstraints.gridy=1;
         gridBagConstraints.gridwidth=1;
         gridBagConstraints.gridheight=1;
-        gridBagLayout.setConstraints(printBtn, gridBagConstraints);
+        gridBagLayout.setConstraints(returnUserNameLabel, gridBagConstraints);
 
         gridBagConstraints.gridx=1;
         gridBagConstraints.gridy=1;
+        gridBagConstraints.gridwidth=3;
+        gridBagConstraints.gridheight=1;
+        gridBagLayout.setConstraints(returnUserNameField, gridBagConstraints);
+
+
+        gridBagConstraints.insets = new Insets(5, 20, 0, 5);
+        gridBagConstraints.gridx=4;
+        gridBagConstraints.gridy=1;
+        gridBagConstraints.gridwidth=1;
+        gridBagConstraints.gridheight=1;
+        gridBagLayout.setConstraints(statusLabel, gridBagConstraints);
+
+        gridBagConstraints.insets = new Insets(5, 0, 0, 0);
+        gridBagConstraints.gridx=5;
+        gridBagConstraints.gridy=1;
+        gridBagConstraints.gridwidth=2;
+        gridBagConstraints.gridheight=1;
+        gridBagLayout.setConstraints(statusComboBox, gridBagConstraints);
+
+
+        gridBagConstraints.gridx=8;
+        gridBagConstraints.gridy=1;
+        gridBagConstraints.gridwidth=1;
+        gridBagConstraints.gridheight=1;
+        gridBagLayout.setConstraints(searchBtn, gridBagConstraints);
+
+        gridBagConstraints.insets = new Insets(5, 10, 0, 0);
+        gridBagConstraints.gridx=9;
+        gridBagConstraints.gridy=1;
+        gridBagConstraints.gridwidth=1;
+        gridBagConstraints.gridheight=1;
+        gridBagLayout.setConstraints(resetBtn, gridBagConstraints);
+
+        gridBagConstraints.gridx=11;
+        gridBagConstraints.gridy=1;
+        gridBagConstraints.gridwidth=3;
+        gridBagConstraints.gridheight=1;
+        gridBagLayout.setConstraints(fingerSearchBtn, gridBagConstraints);
+
+
+
+        gridBagConstraints.insets = new Insets(5, 0, 0, 0);
+        gridBagConstraints.gridx=0;
+        gridBagConstraints.gridy=2;
+        gridBagConstraints.gridwidth=1;
+        gridBagConstraints.gridheight=1;
+        gridBagLayout.setConstraints(printBtn, gridBagConstraints);
+
+
+        gridBagConstraints.insets = new Insets(5, 10, 0, 0);
+        gridBagConstraints.gridx=1;
+        gridBagConstraints.gridy=2;
         gridBagConstraints.gridwidth=1;
         gridBagConstraints.gridheight=1;
         gridBagLayout.setConstraints(btnEdit, gridBagConstraints);
 
 
         gridBagConstraints.gridx=4;
-        gridBagConstraints.gridy=1;
+        gridBagConstraints.gridy=2;
         gridBagConstraints.gridwidth=1;
         gridBagConstraints.gridheight=1;
         gridBagLayout.setConstraints(borrowBtn, gridBagConstraints);
 
         gridBagConstraints.gridx=5;
-        gridBagConstraints.gridy=1;
+        gridBagConstraints.gridy=2;
         gridBagConstraints.gridwidth=1;
         gridBagConstraints.gridheight=1;
         gridBagLayout.setConstraints(returnBtn, gridBagConstraints);
 
-        gridBagConstraints.gridx=7;
-        gridBagConstraints.gridy=1;
-        gridBagConstraints.gridwidth=3;
-        gridBagConstraints.gridheight=1;
-        gridBagLayout.setConstraints(fingerSearchBtn, gridBagConstraints);
 
         conditPanel.add(borrowUserNameLabel);
         conditPanel.add(borrowUserNameField);
@@ -195,6 +245,13 @@ public class BorrowPanel extends JPanel implements PanelOperation, BorrowUserNam
         conditPanel.add(deviceNameField);
         conditPanel.add(deviceCodeLabel);
         conditPanel.add(deviceCodeField);
+
+        conditPanel.add(returnUserNameLabel);
+        conditPanel.add(returnUserNameField);
+
+        conditPanel.add(statusLabel);
+        conditPanel.add(statusComboBox);
+
 
         conditPanel.add(searchBtn);
         conditPanel.add(resetBtn);
@@ -239,6 +296,8 @@ public class BorrowPanel extends JPanel implements PanelOperation, BorrowUserNam
         borrowUserNameField.setText("");
         deviceNameField.setText("");
         deviceCodeField.setText("");
+        returnUserNameField.setText("");
+        statusComboBox.setSelectedIndex(0);
     }
 
 
@@ -262,6 +321,15 @@ public class BorrowPanel extends JPanel implements PanelOperation, BorrowUserNam
                 record.setBorrowUserName(borrowUserNameField.getText());
                 record.setDeviceName(deviceNameField.getText());
                 record.setDeviceCode(deviceCodeField.getText());
+                record.setReturnUserName(returnUserNameField.getText());
+                //String selectedItem = (String) statusComboBox.getSelectedItem();
+
+                if(statusComboBox.getSelectedIndex() == 1){
+                    record.setStatus(Status.BORROWING.name());
+                }else if(statusComboBox.getSelectedIndex() == 2){
+                    record.setStatus(Status.RETURNED.name());
+                }
+
 
                 //设置记录总数
                 table.setTotalRowCount((int) DaoFactory.getBorrowRecordDao().countAllByCondition(record));
@@ -286,6 +354,9 @@ public class BorrowPanel extends JPanel implements PanelOperation, BorrowUserNam
             {
                 if(e.getKeyChar()==KeyEvent.VK_ENTER )   //按回车键执行相应操作;
                 {
+                    String code = deviceCodeField.getText();
+                    clear();
+                    deviceCodeField.setText(code);
                     searchData();
                 }
             }
@@ -294,19 +365,13 @@ public class BorrowPanel extends JPanel implements PanelOperation, BorrowUserNam
         // 查询事件
         // 增加回车事件
         //this.getRootPane().setDefaultButton(searchBtn);// 获取焦点
-        searchBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                searchData();
-            }
+        searchBtn.addActionListener(e -> {
+            searchData();
         });
 
-        resetBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                clear();
-                searchData();
-            }
+        resetBtn.addActionListener(e -> {
+            clear();
+            searchData();
         });
 
 
@@ -375,16 +440,18 @@ public class BorrowPanel extends JPanel implements PanelOperation, BorrowUserNam
                 return;
             }
 
-            new MySwingWorker(FrameUtil.currentFrame){
+            new ReturnDetailDialog(record).showDialog();
+
+           /* new MySwingWorker(FrameUtil.currentFrame){
                 @Override
                 public void invokeBusiness() {
                     BorrowFingerDialog borrowFingerDialog = new BorrowFingerDialog(record);
                     FingerHelper fingerThread = new FingerHelper(borrowFingerDialog);
 
                     Thread dialogThread = new Thread(() -> {
-                        /**
+                        *//**
                          * 指纹弹窗
-                         */
+                         *//*
                         borrowFingerDialog.showDialog();
                         fingerThread.interrupt();
                     });
@@ -392,7 +459,7 @@ public class BorrowPanel extends JPanel implements PanelOperation, BorrowUserNam
                     fingerThread.start();
 
                 }
-            }.execute();
+            }.execute();*/
 
 
         });
@@ -495,7 +562,7 @@ public class BorrowPanel extends JPanel implements PanelOperation, BorrowUserNam
 
     @Override
     public JButton getSearchButton() {
-        return this.searchBtn;
+        return this.resetBtn;
     }
 
     @Override

@@ -99,6 +99,16 @@ public class TbBorrowRecord {
     private String returnClerkUserName;
 
     /**
+     * 已归还数量
+     */
+    private Integer returnNum;
+
+    /**
+     * 之前的归还数量
+     */
+    private Integer oldReturnNum;
+
+    /**
      * 备注
      */
     private String remark;

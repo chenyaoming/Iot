@@ -272,6 +272,9 @@ public class DevicePanel extends JPanel implements PanelOperation {
             {
                 if(e.getKeyChar()==KeyEvent.VK_ENTER )   //按回车键执行相应操作;
                 {
+                    String code = deviceCodeField.getText();
+                    clear();
+                    deviceCodeField.setText(code);
                     searchData();
                 }
             }
@@ -422,7 +425,7 @@ public class DevicePanel extends JPanel implements PanelOperation {
 
     @Override
     public JButton getSearchButton() {
-        return this.searchBtn;
+        return this.resetBtn;
     }
 
     @Override

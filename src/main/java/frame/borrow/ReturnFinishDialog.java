@@ -59,6 +59,9 @@ public class ReturnFinishDialog extends JDialog{
             public void actionPerformed(ActionEvent e) {
                 if(StringUtils.isNotBlank(remarkField.getText())){
                     DaoFactory.getBorrowRecordDao().updateRemark(remarkField.getText().trim(),record.getId());
+                }else {
+                    JOptionPane.showMessageDialog(new JPanel(),"请输入备注","提示",1);
+                    return;
                 }
                 FrameUtil.getCurrentSearchBtn().doClick();
                 thisDialog.dispose();
@@ -68,6 +71,7 @@ public class ReturnFinishDialog extends JDialog{
         this.addWindowListener(new WindowAdapter(){
             @Override
             public void windowClosing(WindowEvent e) {
+                thisDialog.dispose();
                 FrameUtil.getCurrentSearchBtn().doClick();
             }
         });

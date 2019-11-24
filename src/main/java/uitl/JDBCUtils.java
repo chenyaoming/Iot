@@ -149,6 +149,7 @@ public final class JDBCUtils {
                     "   returnDate           datetime,\n" +
                     "   returnClerkUserId    int,\n" +
                     "   returnClerkUserName  varchar(128),\n" +
+                    "   returnNum            int not null DEFAULT 0,\n" +
                     "   remark               varchar(512),\n" +
                     "   primary key (id)\n" +
                     ")");

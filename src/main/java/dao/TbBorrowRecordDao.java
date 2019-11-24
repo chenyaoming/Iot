@@ -42,7 +42,7 @@ public class TbBorrowRecordDao {
         CommonDbUtil.update(sql,params);
     }
 
-    public void updateReturnData(TbBorrowRecord r){
+    /*public void updateReturnData(TbBorrowRecord r){
 
         String sql = "UPDATE TB_BORROW_RECORD set returnUserId = ? ,returnUserName = ? " +
                 " ,returnDate = ? ,returnClerkUserId =?  ,returnClerkUserName = ? ,status = ? where id = ?";
@@ -51,16 +51,16 @@ public class TbBorrowRecordDao {
 
         LOG.info("执行sql：{}, 参数：{}",sql,r);
         CommonDbUtil.update(sql,params);
-    }
+    }*/
 
     public void updateReturnData(Connection connection,TbBorrowRecord r) throws SQLException {
 
         QueryRunner runner = new QueryRunner();
 
         String sql = "UPDATE TB_BORROW_RECORD set returnUserId = ? ,returnUserName = ? " +
-                " ,returnDate = ? ,returnClerkUserId =?  ,returnClerkUserName = ? ,status = ? where id = ?";
+                " ,returnDate = ? ,returnClerkUserId =?  ,returnClerkUserName = ? ,status = ? ,returnNum = ? where id = ?";
         Object[] params = {r.getReturnUserId(),r.getReturnUserName(),r.getReturnDate(),
-                r.getReturnClerkUserId(),r.getReturnClerkUserName(),r.getStatus(),r.getId()};
+                r.getReturnClerkUserId(),r.getReturnClerkUserName(),r.getStatus(),r.getReturnNum(),r.getId()};
 
         LOG.info("执行sql：{}, 参数：{}",sql,r);
         runner.update(connection,sql,params);
@@ -80,7 +80,7 @@ public class TbBorrowRecordDao {
         List<Object> params = new ArrayList<>();
         getSearchCondition(record, sql, params);
 
-        sql.append(" order by status asc, id desc ");
+        sql.append(" order by id desc ");
         sql.append(" limit ?,? ");
         params.add((page -1)*size);
         params.add(size);
@@ -92,10 +92,10 @@ public class TbBorrowRecordDao {
         return CommonDbUtil.queryReturnBeanList(sql.toString(), TbBorrowRecord.class,paramArr);
     }
 
-    public long countAll(){
+    /*public long countAll(){
         String sql = "select count(*) FROM TB_BORROW_RECORD";
         return CommonDbUtil.queryReturnSimpleVal(sql,1);
-    }
+    }*/
 
     public long countAllByCondition(TbBorrowRecord record){
         StringBuilder sql = new StringBuilder("select count(*) FROM TB_BORROW_RECORD where 1=1 ");
@@ -107,7 +107,7 @@ public class TbBorrowRecordDao {
         return CommonDbUtil.queryReturnSimpleVal(sql.toString(),1,paramArr);
     }
 
-    public Integer insert(TbBorrowRecord r){
+    /*public Integer insert(TbBorrowRecord r){
         String colums = StringUtils.join(columArr, ",");
         String questionMarks = CommonDbUtil.spliceSqlQuestionMark(columArr.length);
 
@@ -119,7 +119,7 @@ public class TbBorrowRecordDao {
         LOG.info("执行sql：{}, 参数：{}",sql,r);
         //CommonDbUtil.getBeanValues(record,columArr);
         return CommonDbUtil.insertOneRetureId(sql,params);
-    }
+    }*/
 
 
     public Integer insertBorrowRecord(Connection connection,TbBorrowRecord r) throws SQLException {
@@ -156,6 +156,14 @@ public class TbBorrowRecordDao {
             if (StringUtils.isNotBlank(record.getBorrowUserName())) {
                 sql.append(" and borrowUserName like ? ");
                 params.add("%" + record.getBorrowUserName().trim() + "%");
+            }
+            if(StringUtils.isNotBlank(record.getReturnUserName())){
+                sql.append(" and returnUserName like ? ");
+                params.add("%" + record.getReturnUserName().trim() + "%");
+            }
+            if(StringUtils.isNotBlank(record.getStatus())){
+                sql.append(" and status = ? ");
+                params.add(record.getStatus());
             }
         }
     }

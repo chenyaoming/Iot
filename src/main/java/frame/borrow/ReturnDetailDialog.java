@@ -7,12 +7,9 @@ import constant.ImageConstant;
 import dao.DaoFactory;
 import frame.BigImageDialog;
 import frame.FrameUtil;
-import frame.InfiniteProgressPanel;
 import frame.device.ImagePanel;
-import helper.DeviceExportHelper;
 import label.RequiredLabel;
 import org.apache.commons.lang3.StringUtils;
-import progress.BaseProgress;
 import progress.MySwingWorker;
 import uitl.FingerHelper;
 import uitl.ImageUtil;
@@ -24,16 +21,12 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.util.List;
-import java.util.regex.Pattern;
 
-import static java.util.regex.Pattern.compile;
-
-public class BorrowDetailDialog extends JFrame{
+public class ReturnDetailDialog extends JFrame{
 
     private JFrame thisDialog;
 
-    public BorrowDetailDialog( TbBorrowRecord record){
+    public ReturnDetailDialog(TbBorrowRecord record){
         this.setTitle("设备信息");
         thisDialog = this;
 
@@ -43,7 +36,7 @@ public class BorrowDetailDialog extends JFrame{
        // final JFrame dialog = new JFrame("");
         // 设置对话框的宽高
         //dialog.setSize(400, 400);
-        this.setSize(500, 500);
+        this.setSize(500, 550);
         // 设置对话框大小不可改变
         this.setResizable(false);
         // 设置对话框相对显示的位置
@@ -79,21 +72,32 @@ public class BorrowDetailDialog extends JFrame{
 
         JTextField borrowCountTextField=new JTextField(30);
         borrowCountTextField.setBounds(160, 160, 250, 30);
-        borrowCountTextField.setText("1"); //默认借出一个可以更改
+
         this.add(countLabel);
         this.add(borrowCountTextField);
 
+
+        RequiredLabel returnNumLabel = new RequiredLabel("已还数量");
+        returnNumLabel.setBounds(100, 200, 90, 50);
+
+        JTextField returnNumTextField=new JTextField(30);
+        returnNumTextField.setBounds(160, 210, 250, 30);
+
+        this.add(returnNumLabel);
+        this.add(returnNumTextField);
+
+
         JLabel jPositionLabel = new JLabel("存放位置");
-        jPositionLabel.setBounds(100, 200, 90, 50);
+        jPositionLabel.setBounds(100, 250, 90, 50);
         JTextField jPositionTextField=new JTextField(30);
-        jPositionTextField.setBounds(160, 210, 250, 30);
+        jPositionTextField.setBounds(160, 260, 250, 30);
         this.add(jPositionLabel);
         this.add(jPositionTextField);
 
         JLabel jFeaturesLabel = new JLabel("设备功能");
-        jFeaturesLabel.setBounds(100, 250, 90, 50);
+        jFeaturesLabel.setBounds(100, 300, 90, 50);
         JTextField jfeaturesTextField=new JTextField(30);
-        jfeaturesTextField.setBounds(160, 260, 250, 30);
+        jfeaturesTextField.setBounds(160, 310, 250, 30);
 
 
         jNameTextField.setBackground(Color.LIGHT_GRAY);
@@ -101,6 +105,9 @@ public class BorrowDetailDialog extends JFrame{
 
         jTypeNumTextField.setBackground(Color.LIGHT_GRAY);
         jTypeNumTextField.setEditable(false);
+
+        borrowCountTextField.setBackground(Color.LIGHT_GRAY);
+        borrowCountTextField.setEditable(false);
 
         jCodeTextField.setBackground(Color.LIGHT_GRAY);
         jCodeTextField.setEditable(false);
@@ -116,24 +123,27 @@ public class BorrowDetailDialog extends JFrame{
         this.add(jfeaturesTextField);
 
         JLabel imageLabel = new JLabel("设备图片");
-        imageLabel.setBounds(100, 300, 90, 50);
+        imageLabel.setBounds(100, 350, 90, 50);
         this.add(imageLabel);
 
         ImagePanel iPanel = new ImagePanel();
-        iPanel.setBounds(160, 310, 100, 90);
+        iPanel.setBounds(160, 360, 100, 90);
         //iPanel.setVisible(false);
         this.add(iPanel);
 
         JButton cancelBtn = new JButton("取消");
-        cancelBtn.setBounds(160, 420, 80, 30);
+        cancelBtn.setBounds(160, 470, 80, 30);
         JButton nextBtn = new JButton("下一步");
-        nextBtn.setBounds(280, 420,  80, 30);
+        nextBtn.setBounds(280, 470,  80, 30);
         this.add(cancelBtn);
         this.add(nextBtn);
 
         if(null != record){
             jNameTextField.setText(record.getDeviceName());
             jTypeNumTextField.setText(record.getDeviceType());
+
+            borrowCountTextField.setText(record.getBorrowNum()+"");
+            returnNumTextField.setText(null == record.getReturnNum() ? "0" : record.getReturnNum() +"");
 
             jCodeTextField.setText(record.getDeviceCode());
             jPositionTextField.setText(record.getDevicePosition());
@@ -143,6 +153,11 @@ public class BorrowDetailDialog extends JFrame{
                 //iPanel.setVisible(true);
             }
             jfeaturesTextField.setText(record.getFeatures());
+
+
+            //保存之前的归还数量
+            record.setOldReturnNum(record.getReturnNum());
+
         }
 
         iPanel.addMouseListener(new MouseAdapter(){
@@ -160,29 +175,34 @@ public class BorrowDetailDialog extends JFrame{
         // 下一步按钮
         nextBtn.addActionListener(e -> {
 
-            if(StringUtils.isBlank(borrowCountTextField.getText())){
-                JOptionPane.showMessageDialog(new JPanel(),"请输入借出数量","提示",1);
+            if(StringUtils.isBlank(returnNumTextField.getText())){
+                JOptionPane.showMessageDialog(thisDialog,"请输入归还数量","提示",1);
                 return;
             }else {
-                if(!NumberUtil.isNumeric(borrowCountTextField.getText())){
-                    JOptionPane.showMessageDialog(new JPanel(),"借出数量请输入正整数","提示",1);
+                if(!NumberUtil.isNumeric(returnNumTextField.getText())){
+                    JOptionPane.showMessageDialog(thisDialog,"归还数量请输入正整数","提示",1);
                     return;
                 }
             }
 
-            TbDevice device = DaoFactory.getDeviceDao().queryById(record.getDeviceId());
-
-            int borNum = Integer.parseInt(borrowCountTextField.getText().trim());
-            if(borNum == 0 ){
-                JOptionPane.showMessageDialog(new JPanel(),"借出数量请输入正整数","提示",1);
+            int returnNum = Integer.parseInt(returnNumTextField.getText().trim());
+            if(returnNum == 0 ){
+                JOptionPane.showMessageDialog(thisDialog,"归还数量请输入正整数","提示",1);
                 return;
             }
+            if(null == record.getReturnNum()){
+                record.setReturnNum(0);
+            }
 
-            if(borNum > device.getCount()){
-                JOptionPane.showMessageDialog(new JPanel(),"此设备库存数量不足, 只剩"+device.getCount(),"提示",1);
+            if(returnNum <= record.getReturnNum() ){
+                JOptionPane.showMessageDialog(thisDialog,"此次归还数量必须大于之前归还数量","提示",1);
                 return;
             }
-            record.setBorrowNum(borNum);
+            if(returnNum > record.getBorrowNum()){
+                JOptionPane.showMessageDialog(thisDialog,"归还数量必须小于借出数量","提示",1);
+                return;
+            }
+            record.setReturnNum(returnNum);
 
             new MySwingWorker(thisDialog){
                 @Override

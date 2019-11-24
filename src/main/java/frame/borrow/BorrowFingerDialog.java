@@ -68,10 +68,15 @@ public class BorrowFingerDialog extends JDialog  {
             @Override
             public void windowClosing(WindowEvent e) {
                thisDialog.dispose();
-               //借出时才弹出
+
                if(null == record.getId()){
+                   //借出时弹出
                    new BorrowDetailDialog(record).showDialog();
+               }else {
+                   //归还时弹出
+                   new ReturnDetailDialog(record).showDialog();
                }
+
             }
         });
 

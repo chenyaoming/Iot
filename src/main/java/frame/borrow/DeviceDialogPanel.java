@@ -5,6 +5,7 @@ import bean.TbBorrowRecord;
 import bean.TbDevice;
 import controller.ExcelUtil;
 import dao.DaoFactory;
+import enums.Status;
 import frame.FrameUtil;
 import frame.InfiniteProgressPanel;
 import helper.DeviceExportHelper;
@@ -19,6 +20,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -109,26 +112,26 @@ public class DeviceDialogPanel extends JPanel {
         gridBagConstraints.gridy=0;
         gridBagConstraints.gridwidth=1;
         gridBagConstraints.gridheight=1;
-        gridBagLayout.setConstraints(devNameLabel, gridBagConstraints);
+        gridBagLayout.setConstraints(devCodeLabel, gridBagConstraints);
         //组件2
         gridBagConstraints.gridx=1;
         gridBagConstraints.gridy=0;
         gridBagConstraints.gridwidth=3;
         gridBagConstraints.gridheight=1;
-        gridBagLayout.setConstraints(deviceNameField, gridBagConstraints);
+        gridBagLayout.setConstraints(deviceCodeField, gridBagConstraints);
 
         gridBagConstraints.gridx=4;
         gridBagConstraints.gridy=0;
         gridBagConstraints.gridwidth=1;
         gridBagConstraints.gridheight=1;
-        gridBagLayout.setConstraints(devCodeLabel, gridBagConstraints);
+        gridBagLayout.setConstraints(devNameLabel, gridBagConstraints);
 
         gridBagConstraints.gridx=5;
         gridBagConstraints.gridy=0;
         gridBagConstraints.gridwidth=3;
         gridBagConstraints.gridheight=1;
         gridBagConstraints.insets = new Insets(0, 0, 0, 10);
-        gridBagLayout.setConstraints(deviceCodeField, gridBagConstraints);
+        gridBagLayout.setConstraints(deviceNameField, gridBagConstraints);
 
         gridBagConstraints.gridx=8;
         gridBagConstraints.gridy=0;
@@ -239,6 +242,21 @@ public class DeviceDialogPanel extends JPanel {
 
 
     private void initOperator() {
+
+        deviceCodeField.addKeyListener(new KeyAdapter(){
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                if(e.getKeyChar()==KeyEvent.VK_ENTER )   //按回车键执行相应操作;
+                {
+                    String code = deviceCodeField.getText();
+                    clear();
+                    deviceCodeField.setText(code);
+                    searchData();
+                }
+            }
+        });
+
         // 查询事件
         // 增加回车事件
         //this.getRootPane().setDefaultButton(searchBtn);// 获取焦点
@@ -253,6 +271,7 @@ public class DeviceDialogPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 clear();
+                searchData();
             }
         });
 
@@ -305,6 +324,8 @@ public class DeviceDialogPanel extends JPanel {
                 record.setDevicePosition(device.getSavePosition());
                 record.setDeviceImage(device.getImage());
                 record.setFeatures(device.getFeatures());
+                record.setStatus(Status.BORROWING.name());
+                record.setReturnNum(0);
 
                 //借出的数量
                 //record.setBorrowNum(1);

@@ -4,6 +4,8 @@ import bean.TbDevice;
 import dao.DaoFactory;
 import frame.BigImageDialog;
 import frame.FrameUtil;
+import frame.MainFram;
+import frame.device.DevicePanel;
 import frame.device.JScrollImagePanel;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
@@ -229,7 +231,7 @@ public class DeviceTable extends JTable {
 
 				// 记录进入编辑状态前单元格得数据
 				try {
-					if(table.getSelectedColumn() == IMAGE_COLUM){
+					if(table.getSelectedColumn() == IMAGE_COLUM && MainFram.getCurrentPanel() instanceof DevicePanel){
 						//图片那一列
 						Object obj = table.getValueAt(table.getSelectedRow(),
 								table.getSelectedColumn());

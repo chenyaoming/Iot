@@ -335,7 +335,7 @@ public abstract class UserPanel extends JPanel implements PanelOperation {
 
     @Override
     public JButton getSearchButton() {
-        return this.searchBtn;
+        return this.resetBtn;
     }
 
     @Override

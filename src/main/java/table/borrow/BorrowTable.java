@@ -3,6 +3,7 @@ package table.borrow;
 import bean.TbBorrowRecord;
 import bean.TbUser;
 import dao.DaoFactory;
+import enums.Status;
 import frame.BigImageDialog;
 import frame.FrameUtil;
 import frame.device.JScrollImagePanel;
@@ -50,7 +51,7 @@ public class BorrowTable extends JTable {
 
 	//ID为隐藏列
 	public static String[] COLUMN_NAMES = { "ID","序号","名称","型号", "管理编码", "存放位置", "图片","功用",
-			"借用人","借用日期","借出保管员","归还人","归还日期","归还保管员","备注"};
+			"借用人","借用日期","借出保管员","归还人","归还日期","归还保管员","备注","状态"};
 
 	public BorrowTable() {
 		initTable();
@@ -120,6 +121,12 @@ public class BorrowTable extends JTable {
 				}
 				data[i][13] = record.getReturnClerkUserName();
 				data[i][14] = record.getRemark();
+				if(Status.RETURNED.name().equals(record.getStatus())){
+					data[i][15] = "已归还";
+				}else {
+					data[i][15] = "待归还";
+				}
+
 			}
 		}
 		DefaultTableModel model = new DefaultTableModel(data, COLUMN_NAMES);

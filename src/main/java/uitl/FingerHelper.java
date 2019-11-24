@@ -399,18 +399,28 @@ public class FingerHelper extends Thread {
     }
 
     private void returnDeviceAndUpdateRecord() {
-        TbDevice device = DaoFactory.getDeviceDao().queryById(borrowFingerDialog.getRecord().getDeviceId());
 
-        borrowFingerDialog.getRecord().setStatus(Status.RETURNED.name());
+        TbBorrowRecord record = borrowFingerDialog.getRecord();
+
+        TbDevice device = DaoFactory.getDeviceDao().queryById(record.getDeviceId());
+
+        //借出数量等于已归还数量时就设置已归还状态
+        if(record.getBorrowNum().compareTo(record.getReturnNum()) == 0){
+            record.setStatus(Status.RETURNED.name());
+        }
 
         new JDBCTemplate<Void>(){
 
             @Override
             public Void sqlTask(Connection connection) throws SQLException {
                 //保存借用记录
-                DaoFactory.getBorrowRecordDao().updateReturnData(connection,borrowFingerDialog.getRecord());
+                DaoFactory.getBorrowRecordDao().updateReturnData(connection,record);
+
+                //此次实际归还的数量
+                Integer nowReturnNum = record.getReturnNum() -  record.getOldReturnNum();
+
                 //加上设备的库存
-                DaoFactory.getDeviceDao().update(connection,device.getId(),"count",device.getCount() + borrowFingerDialog.getRecord().getBorrowNum());
+                DaoFactory.getDeviceDao().update(connection,device.getId(),"count",device.getCount() + nowReturnNum);
                 return null;
             }
         }.doTask();
