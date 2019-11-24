@@ -7,7 +7,7 @@
 <!-- debug 当此属性设置为true时，将打印出logback内部日志信息，实时查看logback运行状态。默认值为false。 -->
 <configuration scan="false" scanPeriod="60 seconds" debug="false">
     <!-- 子节点<property> ：用来定义变量值，它有两个属性name和value，通过<property>定义的值会被插入到logger上下文中，可以使“${}”来使用变量。-->
-    <property name="LOG_HOME" value="D:\\Java\\log\\" />
+    <property name="LOG_HOME" value="D:\\IotLibrary\\log\\" />
 
     <!--子节点<appender>：负责写日志的组件，它有两个必要属性name和class。name指定appender名称，class指定appender的全限定名-->
     <!-- ConsoleAppender 控制台输出日志 -->

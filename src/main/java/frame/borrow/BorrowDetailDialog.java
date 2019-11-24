@@ -161,11 +161,11 @@ public class BorrowDetailDialog extends JFrame{
         nextBtn.addActionListener(e -> {
 
             if(StringUtils.isBlank(borrowCountTextField.getText())){
-                JOptionPane.showMessageDialog(new JPanel(),"请输入借出数量","提示",1);
+                JOptionPane.showMessageDialog(thisDialog,"请输入借出数量","提示",1);
                 return;
             }else {
                 if(!NumberUtil.isNumeric(borrowCountTextField.getText())){
-                    JOptionPane.showMessageDialog(new JPanel(),"借出数量请输入正整数","提示",1);
+                    JOptionPane.showMessageDialog(thisDialog,"借出数量请输入正整数","提示",1);
                     return;
                 }
             }
@@ -174,12 +174,12 @@ public class BorrowDetailDialog extends JFrame{
 
             int borNum = Integer.parseInt(borrowCountTextField.getText().trim());
             if(borNum == 0 ){
-                JOptionPane.showMessageDialog(new JPanel(),"借出数量请输入正整数","提示",1);
+                JOptionPane.showMessageDialog(thisDialog,"借出数量请输入正整数","提示",1);
                 return;
             }
 
             if(borNum > device.getCount()){
-                JOptionPane.showMessageDialog(new JPanel(),"此设备库存数量不足, 只剩"+device.getCount(),"提示",1);
+                JOptionPane.showMessageDialog(thisDialog,"此设备库存数量不足, 只剩"+device.getCount(),"提示",1);
                 return;
             }
             record.setBorrowNum(borNum);

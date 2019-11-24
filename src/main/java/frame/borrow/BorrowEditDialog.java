@@ -11,6 +11,7 @@ import frame.device.ImagePanel;
 import frame.device.JScrollImagePanel;
 import jodd.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
+import progress.MySwingWorker;
 import uitl.ImageUtil;
 import uitl.JFileChooserUtil;
 import uitl.ModalFrameUtil;
@@ -81,6 +82,9 @@ public class BorrowEditDialog extends JFrame{
         this.add(countLabel);
         this.add(countTextField);
 
+        countTextField.setBackground(Color.LIGHT_GRAY);
+        countTextField.setEditable(false);
+
         JLabel jPositionLabel = new JLabel("存放位置");
         jPositionLabel.setBounds(100, 200, 90, 50);
         JTextField jPositionTextField=new JTextField(30);
@@ -142,14 +146,14 @@ public class BorrowEditDialog extends JFrame{
 
         JLabel statusLabel = new JLabel("状态：");
         statusLabel.setBounds(270, 460, 100, 50);
-        JLabel statusValueLabel = new JLabel(record.getStatus() == "RETURNED" ? "已归还":"已出借");
+        JLabel statusValueLabel = new JLabel(record.getStatus() == "RETURNED" ? "已归还":"待归还");
         statusValueLabel.setBounds(320, 460, 100, 50);
         this.add(statusLabel);
         this.add(statusValueLabel);
 
         JLabel returnUserNameLabel = new JLabel("归还人:");
         returnUserNameLabel.setBounds(100, 490, 100, 50);
-        JLabel returnUserNameValueLabel = new JLabel(record.getReturnClerkUserName());
+        JLabel returnUserNameValueLabel = new JLabel(record.getReturnUserName());
         returnUserNameValueLabel.setBounds(160, 490, 100, 50);
         this.add(returnUserNameLabel);
         this.add(returnUserNameValueLabel);
@@ -172,6 +176,13 @@ public class BorrowEditDialog extends JFrame{
         returnClickUserNameValueLabel.setBounds(180, 520, 100, 50);
         this.add(returnClickUserNameLabel);
         this.add(returnClickUserNameValueLabel);
+
+        JLabel returnNumLabel = new JLabel("已归还数量：");
+        returnNumLabel.setBounds(270, 520, 100, 50);
+        JLabel returnNumLabelValueLabel = new JLabel(record.getReturnNum()+"");
+        returnNumLabelValueLabel.setBounds(350, 520, 100, 50);
+        this.add(returnNumLabel);
+        this.add(returnNumLabelValueLabel);
 
 
         JButton cancelBtn = new JButton("取消");
@@ -243,11 +254,11 @@ public class BorrowEditDialog extends JFrame{
 
 
             if(StringUtils.isBlank(countTextField.getText())){
-                JOptionPane.showMessageDialog(new JPanel(),"请填写借出数量","提示",1);
+                JOptionPane.showMessageDialog(thisDialog,"请填写借出数量","提示",1);
                 return;
             }else {
                 if(!NumberUtil.isNumeric(countTextField.getText())){
-                    JOptionPane.showMessageDialog(new JPanel(),"借出数量请输入正整数","提示",1);
+                    JOptionPane.showMessageDialog(thisDialog,"借出数量请输入正整数","提示",1);
                     return;
                 }else {
                     newRecord.setBorrowNum(Integer.valueOf(countTextField.getText().trim()));
@@ -255,31 +266,42 @@ public class BorrowEditDialog extends JFrame{
             }
 
             if(StringUtils.isBlank(newRecord.getDeviceName())){
-                JOptionPane.showMessageDialog(new JPanel(),"请填写设备名称","提示",1);
+                JOptionPane.showMessageDialog(thisDialog,"请填写设备名称","提示",1);
                 return;
             }
             if(StringUtil.isBlank(newRecord.getDeviceType())){
-                JOptionPane.showMessageDialog(new JPanel(),"请填写设备型号","提示",1);
+                JOptionPane.showMessageDialog(thisDialog,"请填写设备型号","提示",1);
                 return;
             }
             if(StringUtils.isBlank(newRecord.getDeviceCode())){
-                JOptionPane.showMessageDialog(new JPanel(),"请填写设备编码","提示",1);
+                JOptionPane.showMessageDialog(thisDialog,"请填写设备编码","提示",1);
                 return;
             }
             if(null == newRecord.getBorrowNum()){
-                JOptionPane.showMessageDialog(new JPanel(),"请填写借出数量数量","提示",1);
+                JOptionPane.showMessageDialog(thisDialog,"请填写借出数量数量","提示",1);
                 return;
             }
 
-            if(StringUtils.isNotBlank(newRecord.getDeviceImage())){
-                newRecord.setDeviceImage(JFileChooserUtil.writeImgToUpload(new File(newRecord.getDeviceImage().trim())));
-            }
-            DaoFactory.getBorrowRecordDao().updateRecord(newRecord);
+            new MySwingWorker(thisDialog){
+                @Override
+                public void invokeBusiness() {
+                    if(StringUtils.isNotBlank(newRecord.getDeviceImage())){
 
-            thisDialog.dispose();
-            JOptionPane.showMessageDialog(FrameUtil.currentFrame,"操作成功","提示",1);
+                        if( !newRecord.getDeviceImage().equals(record.getDeviceImage())){
+                            newRecord.setDeviceImage(JFileChooserUtil.writeImgToUpload(new File(newRecord.getDeviceImage().trim())));
+                        }
+                    }
+                    DaoFactory.getBorrowRecordDao().updateRecord(newRecord);
+                }
 
-            FrameUtil.doClickSearchBtn();
+                @Override
+                public void afterDone(){
+                    thisDialog.dispose();
+                    JOptionPane.showMessageDialog(FrameUtil.currentFrame,"操作成功","提示",1);
+                    FrameUtil.doClickSearchBtn();
+                }
+
+            }.execute();
         });
 
         // 取消按钮

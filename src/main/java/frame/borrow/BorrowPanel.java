@@ -440,6 +440,7 @@ public class BorrowPanel extends JPanel implements PanelOperation, BorrowUserNam
                 return;
             }
 
+            record.setOldReturnNum(record.getReturnNum());
             new ReturnDetailDialog(record).showDialog();
 
            /* new MySwingWorker(FrameUtil.currentFrame){

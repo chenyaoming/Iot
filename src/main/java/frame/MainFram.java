@@ -174,7 +174,7 @@ public class MainFram extends JFrame implements FrameOperation, BorrowUserNameFi
 
     // 退出窗口
     private void exitWindow() {
-        //JOptionPane.showMessageDialog(null, "程序即将退出...");
+
         System.exit(0);
     }
 

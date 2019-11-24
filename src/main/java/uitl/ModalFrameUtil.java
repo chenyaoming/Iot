@@ -57,6 +57,7 @@ public class ModalFrameUtil {
                     owner.setEnabled(true);
                     owner.removeWindowListener(this);
                     owner.setState(JFrame.NORMAL);
+                    owner.toFront();
                 }
 
                 //当按关闭窗口按钮时调用

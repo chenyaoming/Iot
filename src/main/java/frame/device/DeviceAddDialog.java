@@ -9,6 +9,7 @@ import frame.FrameUtil;
 import jodd.util.StringUtil;
 import label.RequiredLabel;
 import org.apache.commons.lang3.StringUtils;
+import progress.MySwingWorker;
 import uitl.ImageUtil;
 import uitl.JFileChooserUtil;
 import uitl.ModalFrameUtil;
@@ -171,53 +172,58 @@ public class DeviceAddDialog extends JFrame{
             }
 
             if(StringUtils.isBlank(newDevice.getName())){
-                JOptionPane.showMessageDialog(new JPanel(),"请填写设备名称","提示",1);
+                JOptionPane.showMessageDialog(thisDialog,"请填写设备名称","提示",1);
                 return;
             }
             if(StringUtil.isBlank(newDevice.getTypeNum())){
-                JOptionPane.showMessageDialog(new JPanel(),"请填写设备型号","提示",1);
+                JOptionPane.showMessageDialog(thisDialog,"请填写设备型号","提示",1);
                 return;
             }
             if(StringUtils.isBlank(newDevice.getCode())){
-                JOptionPane.showMessageDialog(new JPanel(),"请填写设备编码","提示",1);
+                JOptionPane.showMessageDialog(thisDialog,"请填写设备编码","提示",1);
                 return;
             }
             if(StringUtils.isBlank(countTextField.getText())){
-                JOptionPane.showMessageDialog(new JPanel(),"请填写库存数量","提示",1);
+                JOptionPane.showMessageDialog(thisDialog,"请填写库存数量","提示",1);
                 return;
             }else {
                 if(!NumberUtil.isNumeric(countTextField.getText())){
-                    JOptionPane.showMessageDialog(new JPanel(),"库存数量请输入正整数","提示",1);
+                    JOptionPane.showMessageDialog(thisDialog,"库存数量请输入正整数","提示",1);
                     return;
                 }else {
                     newDevice.setCount(Integer.valueOf(countTextField.getText().trim()));
                 }
             }
 
-            if(StringUtils.isNotBlank(newDevice.getImage())){
-                newDevice.setImage(JFileChooserUtil.writeImgToUpload(new File(newDevice.getImage().trim())));
-            }
-            if(null != newDevice.getId()){
-                //编辑更新
-                DaoFactory.getDeviceDao().update(newDevice);
-            }else{
-                //增加
-                DaoFactory.getDeviceDao().insert(newDevice);
-            }
+            new MySwingWorker(thisDialog){
+                @Override
+                public void invokeBusiness() {
+                    if(StringUtils.isNotBlank(newDevice.getImage())){
+                        if(null == oldDevice || !newDevice.getImage().equals(oldDevice.getImage())){
+                            newDevice.setImage(JFileChooserUtil.writeImgToUpload(new File(newDevice.getImage().trim())));
+                        }
+                    }
+                    if(null != newDevice.getId()){
+                        //编辑更新
+                        DaoFactory.getDeviceDao().update(newDevice);
+                    }else{
+                        //增加
+                        DaoFactory.getDeviceDao().insert(newDevice);
+                    }
+                }
 
-            thisDialog.dispose();
-            JOptionPane.showMessageDialog(FrameUtil.currentFrame,"操作成功","提示",1);
+                @Override
+                public void afterDone(){
+                    thisDialog.dispose();
+                    JOptionPane.showMessageDialog(FrameUtil.currentFrame,"操作成功","提示",1);
 
-            FrameUtil.doClickSearchBtn();
+                    FrameUtil.doClickSearchBtn();
+                }
+            }.execute();
         });
 
         // 取消按钮
-        cancelBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                thisDialog.dispose();
-            }
-        });
+        cancelBtn.addActionListener(e -> thisDialog.dispose());
         // 显示对话框
         //这个只能调用一次，不然会删两次才能删掉
         //dialog.setVisible(true);

@@ -49,16 +49,29 @@ public abstract class MySwingWorker extends SwingWorker {
     protected void done() {
         //将耗时任务执行完得到的结果移至done来进行处理，处理完关闭旋转等待框
         try {
-            Object result = get();
+            //Object result = get();
+
         } catch (Exception e) {
             LOG.error("获取结果：",e);
+
         }finally {
             // 关闭旋转等待框
             if(glasspane != null) {
                 // 在合适的地方关闭动画效果
                 glasspane.stop();
             }
+            try {
+                afterDone();
+            }catch (Exception ex){
+
+            }
         }
 
     }
+
+    public void afterDone(){
+
+    }
+
+
 }

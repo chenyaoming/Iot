@@ -154,10 +154,6 @@ public class ReturnDetailDialog extends JFrame{
             }
             jfeaturesTextField.setText(record.getFeatures());
 
-
-            //保存之前的归还数量
-            record.setOldReturnNum(record.getReturnNum());
-
         }
 
         iPanel.addMouseListener(new MouseAdapter(){
@@ -194,7 +190,7 @@ public class ReturnDetailDialog extends JFrame{
                 record.setReturnNum(0);
             }
 
-            if(returnNum <= record.getReturnNum() ){
+            if(returnNum <= record.getOldReturnNum() ){
                 JOptionPane.showMessageDialog(thisDialog,"此次归还数量必须大于之前归还数量","提示",1);
                 return;
             }

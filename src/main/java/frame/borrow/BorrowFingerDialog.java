@@ -2,6 +2,7 @@ package frame.borrow;
 
 
 import bean.TbBorrowRecord;
+import dao.DaoFactory;
 import frame.FrameUtil;
 import frame.device.FingerImage;
 
@@ -74,7 +75,13 @@ public class BorrowFingerDialog extends JDialog  {
                    new BorrowDetailDialog(record).showDialog();
                }else {
                    //归还时弹出
-                   new ReturnDetailDialog(record).showDialog();
+
+                   TbBorrowRecord dbRecord = DaoFactory.getBorrowRecordDao().queryById(record.getId());
+                   //保存之前的归还数量,而归还数量保存最新编辑的数量
+                   dbRecord.setOldReturnNum(dbRecord.getReturnNum());
+                   dbRecord.setReturnNum(record.getReturnNum());
+
+                   new ReturnDetailDialog(dbRecord).showDialog();
                }
 
             }
